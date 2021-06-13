@@ -42,16 +42,17 @@ export const Login = ({navigation, route}) => {
     }
   }, []);
 
-  // useEffect(() => {
-  //   if (user !== '' && user !== undefined) {
-  //     //console.log(user);
-  //     //setPhone(user[0].phone);
-  //     //setPassWord(user[0].password);
-  //     setLoading(true);
-  //     navigation.navigate(AppRouter.TAB);
-  //     setLoading(false);
-  //   }
-  // }, [user]);
+  useEffect(() => {
+    console.log(user);
+    if (user !== '' && user !== null) {
+      console.log(user);
+      setPhone(user[0]?.phone);
+      setPassWord(user[0]?.password);
+      setLoading(true);
+      navigation.navigate(AppRouter.TAB);
+      setLoading(false);
+    }
+  }, [user]);
 
   useEffect(() => {
     if (response !== '') {
@@ -152,7 +153,7 @@ export const Login = ({navigation, route}) => {
             textAlign: 'left',
             marginBottom: -5,
           }}>
-          Super{' '}
+          Đồ án{' '}
         </Text>
         <Text
           style={{
@@ -162,7 +163,7 @@ export const Login = ({navigation, route}) => {
             textAlign: 'left',
             marginBottom: -5,
           }}>
-          Money
+          tốt nghiệp
         </Text>
       </View>
 

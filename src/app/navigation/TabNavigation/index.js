@@ -1,33 +1,64 @@
 import React from 'react';
+import {View, Text} from 'react-native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Entypo from 'react-native-vector-icons/Entypo';
-import Fontisto from 'react-native-vector-icons/Fontisto';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import {settings} from '../../config';
 
 import HomeNavigation from '../HomeNavigation';
-import HistoryNavigation from '../HistoryNavigation';
-import UserNavigation from '../UserNavigation';
+import CalendarNavigation from '../CalendarNavigation';
+import SettingNavigation from '../SettingNavigation';
 
 const Tab = createBottomTabNavigator();
 
-const TabNavigator = props => {
+const TabNavigator = () => {
   return (
     <Tab.Navigator
       screenOptions={({route}) => ({
-        tabBarIcon: ({focused, color, size}) => {
+        tabBarIcon: ({color}) => {
           let iconName;
           if (route.name === 'HOME') {
             iconName = 'home';
-            return <Entypo name={iconName} size={22} color={color} />;
+            return (
+              <View style={{alignItems: 'center', justifyContent: 'center'}}>
+                <Entypo
+                  name={iconName}
+                  size={22}
+                  color={color}
+                  style={{marginBottom: -2}}
+                />
+                <Text style={{color: color, fontSize: 12}}>Home</Text>
+              </View>
+            );
           }
-          if (route.name === 'HISTORY') {
-            iconName = 'history';
-            return <Fontisto name={iconName} size={18} color={color} />;
+          if (route.name === 'CALENDAR') {
+            iconName = 'calendar';
+            return (
+              <View style={{alignItems: 'center', justifyContent: 'center'}}>
+                <FontAwesome
+                  name={iconName}
+                  size={18}
+                  color={color}
+                  style={{marginBottom: 2}}
+                />
+                <Text style={{color: color, fontSize: 12}}>Lịch kiểm tra</Text>
+              </View>
+            );
           }
-          if (route.name === 'USER') {
+          if (route.name === 'SETTING') {
             iconName = 'settings-outline';
-            return <Ionicons name={iconName} size={22} color={color} />;
+            return (
+              <View style={{alignItems: 'center', justifyContent: 'center'}}>
+                <Ionicons
+                  name={iconName}
+                  size={22}
+                  color={color}
+                  style={{marginBottom: -2}}
+                />
+                <Text style={{color: color, fontSize: 12}}>Cài đặt</Text>
+              </View>
+            );
           }
         },
       })}
@@ -37,8 +68,8 @@ const TabNavigator = props => {
         showLabel: false,
       }}>
       <Tab.Screen name="HOME" component={HomeNavigation} />
-      <Tab.Screen name="HISTORY" component={HistoryNavigation} />
-      <Tab.Screen name="USER" component={UserNavigation} />
+      <Tab.Screen name="CALENDAR" component={CalendarNavigation} />
+      <Tab.Screen name="SETTING" component={SettingNavigation} />
     </Tab.Navigator>
   );
 };
