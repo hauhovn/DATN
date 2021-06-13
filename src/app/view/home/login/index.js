@@ -1,3 +1,6 @@
+// câccâccâc
+
+
 import React, {useEffect, useState} from 'react';
 import {
   View,
@@ -39,16 +42,16 @@ export const Login = ({navigation, route}) => {
     }
   }, []);
 
-  useEffect(() => {
-    if (user !== '' && user !== undefined) {
-      console.log(user);
-      setPhone(user[0].phone);
-      setPassWord(user[0].password);
-      setLoading(true);
-      navigation.navigate(AppRouter.TAB);
-      setLoading(false);
-    }
-  }, [user]);
+  // useEffect(() => {
+  //   if (user !== '' && user !== undefined) {
+  //     //console.log(user);
+  //     //setPhone(user[0].phone);
+  //     //setPassWord(user[0].password);
+  //     setLoading(true);
+  //     navigation.navigate(AppRouter.TAB);
+  //     setLoading(false);
+  //   }
+  // }, [user]);
 
   useEffect(() => {
     if (response !== '') {
