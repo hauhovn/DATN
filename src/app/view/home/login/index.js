@@ -26,7 +26,7 @@ const colors = settings.colors;
 export const Login = ({navigation, route}) => {
   const isFocus = useIsFocused();
   const [phone, setPhone] = useState('');
-  const [passWord, setPassWord] = useState('');
+  const [passWord, setPassWord] = React.useState('');
 
   const [response, setResponse] = useState('');
 
@@ -54,11 +54,13 @@ export const Login = ({navigation, route}) => {
     }
   }, [user]);
 
+
+
   useEffect(() => {
     if (response !== '') {
       setLoading(false);
       if (response.length === 0) {
-        setTextError('Sai mail hoặc mật khẩu');
+        setTextError('Sai mail hoặc mật khẩu'); // Hook
       } else {
         saveAccount(response);
         navigation.navigate(AppRouter.TAB);
@@ -75,6 +77,7 @@ export const Login = ({navigation, route}) => {
       console.log('Khong luu duoc');
     }
   };
+
 
   const getAccount = async () => {
     try {
@@ -106,6 +109,7 @@ export const Login = ({navigation, route}) => {
     }
   };
 
+  
   const postData = async () => {
     try {
       const data = await postLogin(phone, passWord);

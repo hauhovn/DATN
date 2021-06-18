@@ -365,6 +365,7 @@ export const HomeScreen = ({navigation}) => {
             </View>
           </View>
         </View>
+        <View style={{width: '100%', height: 500}}/>
       </Animated.ScrollView>
 
       {/* Kết thúc screen */}
