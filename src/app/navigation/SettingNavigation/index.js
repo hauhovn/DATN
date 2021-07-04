@@ -8,7 +8,7 @@ const Stack = createStackNavigator();
 
 const SettingNavigator = () => {
   return (
-    <Stack.Navigator>
+    <Stack.Navigator initialRouteName={AppRouter.USER}>
       <Stack.Screen
         name={AppRouter.USER}
         component={UserScreen}

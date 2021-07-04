@@ -1,6 +1,5 @@
 // câccâccâc
 
-
 import React, {useEffect, useState} from 'react';
 import {
   View,
@@ -25,8 +24,8 @@ const colors = settings.colors;
 
 export const Login = ({navigation, route}) => {
   const isFocus = useIsFocused();
-  const [phone, setPhone] = useState('');
-  const [passWord, setPassWord] = React.useState('');
+  const [phone, setPhone] = useState('0775712018');
+  const [passWord, setPassWord] = React.useState('baochau');
 
   const [response, setResponse] = useState('');
 
@@ -54,8 +53,6 @@ export const Login = ({navigation, route}) => {
     }
   }, [user]);
 
-
-
   useEffect(() => {
     if (response !== '') {
       setLoading(false);
@@ -77,7 +74,6 @@ export const Login = ({navigation, route}) => {
       console.log('Khong luu duoc');
     }
   };
-
 
   const getAccount = async () => {
     try {
@@ -109,7 +105,6 @@ export const Login = ({navigation, route}) => {
     }
   };
 
-  
   const postData = async () => {
     try {
       const data = await postLogin(phone, passWord);
