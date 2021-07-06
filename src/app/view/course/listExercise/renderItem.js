@@ -5,7 +5,7 @@ import {settings} from '../../../config';
 
 export const RenderItem = ({item, data, handle, handleDelete}) => {
   const getMarginTop = () => {
-    if (item.id === data[0].id) {
+    if (item?.id === data[0]?.id) {
       return 5;
     } else {
       return 0;
@@ -13,8 +13,8 @@ export const RenderItem = ({item, data, handle, handleDelete}) => {
   };
 
   const marginBottom = () => {
-    if (item.MaCauHoi === data[data.length - 1].MaCauHoi) {
-      return 100;
+    if (item?.MaCauHoi === data[data.length - 1]?.MaCauHoi) {
+      return 10;
     } else {
       return 5;
     }
@@ -67,10 +67,10 @@ export const RenderItem = ({item, data, handle, handleDelete}) => {
 
       <View style={{flex: 1}}>
         <Text numberOfLines={1} style={{width: '100%', fontWeight: 'bold'}}>
-          {item.TenCauHoi}
+          {item?.CauHoi}
         </Text>
         <Text numberOfLines={1} style={{width: '100%', fontSize: 12}}>
-          Đáp án đúng: {item.DapAn}
+          Đáp án đúng: {item?.DapAn}
         </Text>
       </View>
       <TouchableOpacity

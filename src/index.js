@@ -1,13 +1,14 @@
 import React, {useEffect, useState} from 'react';
-import {View, LogBox} from 'react-native';
+import {View, LogBox, SafeAreaView} from 'react-native';
 import AppNavigation from './app/navigation/AppNavigation';
 import TestingNavigation from './app/navigation/TestingNavigation';
 
 LogBox.ignoreAllLogs();
-export default function App() {
+
+export function App() {
   return (
-    <View style={{flex: 1}}>
-      <TestingNavigation />
-    </View>
+    <SafeAreaView style={{flex: 1}}>
+      <AppNavigation />
+    </SafeAreaView>
   );
 }

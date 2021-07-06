@@ -4,6 +4,9 @@ import {AppRouter} from '../AppRouter';
 import {HomeScreen} from '../../view/home/homeScreen';
 import {CourseNav} from '../../view/course';
 import {ListExercise} from '../../view/course/listExercise';
+import {TabHeader} from '../../view/course/Tab';
+import {ChuDeNav} from '../../view/chuDe';
+import {User} from '../../view/user';
 
 const Stack = createStackNavigator();
 
@@ -24,6 +27,21 @@ const HomeNavigator = () => {
         name={AppRouter.ALLEXERCISE}
         component={ListExercise}
         options={{title: AppRouter.ALLEXERCISE, headerShown: false}}
+      />
+      <Stack.Screen
+        name={AppRouter.TAB}
+        component={TabHeader}
+        options={{title: AppRouter.TAB, headerShown: false}}
+      />
+      <Stack.Screen
+        name={AppRouter.USER}
+        component={User}
+        options={{title: AppRouter.USER, headerShown: false}}
+      />
+      <Stack.Screen
+        name={AppRouter.LISTCD}
+        component={ChuDeNav}
+        options={{title: AppRouter.LISTCD, headerShown: false}}
       />
     </Stack.Navigator>
   );

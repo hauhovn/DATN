@@ -15,8 +15,9 @@ import {i18n} from '../../../i18n';
 import {useNavigation} from '@react-navigation/native';
 import {mainStyles, QLMH, styleTK} from '../../view/home/homeScreen/styles';
 
-export const Header = () => {
+export const Header = ({GOTO, user}) => {
   const nav = useNavigation();
+
   return (
     <View
       style={{
@@ -34,7 +35,11 @@ export const Header = () => {
       />
       <TouchableOpacity
         onPress={() => {
-          nav.goBack();
+          if (GOTO !== undefined && GOTO !== null) {
+            nav.naigate(GOTO);
+          } else {
+            nav.goBack();
+          }
         }}
         activeOpacity={0.5}
         style={{
@@ -56,10 +61,10 @@ export const Header = () => {
       </TouchableOpacity>
       <View style={{flex: 1, height: 60, justifyContent: 'center'}}>
         <Text style={[mainStyles.title, {fontWeight: 'bold', fontSize: 10}]}>
-          {i18n.t('App.Teacher')}
+          {user[0]?.TenGV !== undefined ? 'Giáo viên' : 'Sinh viên'}
         </Text>
         <Text style={[mainStyles.title, {marginTop: 2, fontSize: 14}]}>
-          Nguyễn Phúc Bảo Châu
+          {user[0]?.TenGV} {user[0]?.TenSV}
         </Text>
       </View>
       <TouchableOpacity

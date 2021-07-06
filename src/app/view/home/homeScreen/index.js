@@ -1,4 +1,4 @@
-import React, {useRef, useState} from 'react';
+import React, {useRef, useState, useEffect} from 'react';
 import {
   SafeAreaView,
   View,
@@ -8,6 +8,7 @@ import {
   RefreshControl,
   TouchableOpacity,
   Alert,
+  Platform,
 } from 'react-native';
 import {settings} from '../../../config';
 import {AppRouter} from '../../../navigation/AppRouter';
@@ -16,6 +17,7 @@ import {HeaderMenu} from './headerMenu';
 import {Icon, Picker} from 'native-base';
 import ModalSelector from 'react-native-modal-selector';
 import {mainStyles, QLMH, styleTK} from '../../home/homeScreen/styles';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import {i18n} from '../../../../i18n';
 
@@ -37,6 +39,7 @@ const data = [
 
 export const HomeScreen = ({navigation}) => {
   const nav = useNavigation();
+  const [user, setUser] = useState('');
   const [refreshing, setRefreshing] = useState(false);
   const scrollY = useRef(new Animated.Value(0)).current;
 
@@ -44,6 +47,16 @@ export const HomeScreen = ({navigation}) => {
   const [soHocSinhKha, setHocSinhKha] = useState(35);
   const [soHocSinhTrungBinh, setHocSinhTrungBinh] = useState(8);
   const [soHocSinhYeu, setHocSinhYeu] = useState(2);
+
+  useEffect(() => {
+    getAccount();
+  }, []);
+
+  useEffect(() => {
+    if (user !== '') {
+      console.log('user: ', user);
+    }
+  }, [user]);
 
   const headerY = scrollY.interpolate({
     inputRange: [0, SCROLL_DISTANCE],
@@ -68,10 +81,15 @@ export const HomeScreen = ({navigation}) => {
     if (value === 'Môn học') {
       nav.navigate(AppRouter.COURSE);
     }
+
     if (value === 'Câu hỏi') {
       nav.navigate(AppRouter.ALLEXERCISE, {
         item: 'all',
       });
+    }
+
+    if (value === 'Chủ đề') {
+      nav.navigate(AppRouter.LISTCD);
     }
   };
 
@@ -83,6 +101,15 @@ export const HomeScreen = ({navigation}) => {
     return new Promise(resolve => setTimeout(resolve, timeout));
   };
 
+  const getAccount = async () => {
+    try {
+      const res = await AsyncStorage.getItem('currentUser');
+      setUser(JSON.parse(res));
+    } catch (e) {
+      // error reading value
+    }
+  };
+
   const handleQLMonHoc = () => {
     console.log('quan ly mon hoc');
     nav.navigate(AppRouter.COURSE);
@@ -90,7 +117,10 @@ export const HomeScreen = ({navigation}) => {
 
   const handleQLBaiKT = () => {
     console.log('quan ly bai kiem tra');
-    Alert.alert('Qua màn hình', 'Quản lý bài kiểm tra');
+    // nav.navigate(AppRouter.TAB, {
+    //   tab: 1,
+    //   user: user,
+    // });
   };
 
   const handleHSG = () => {
@@ -192,7 +222,36 @@ export const HomeScreen = ({navigation}) => {
             style={QLMH.iconArrow}
           />
         </TouchableOpacity>
-
+        {user[0]?.isAdmin !== undefined && parseInt(user[0]?.isAdmin) === 1 && (
+          <TouchableOpacity
+            onPress={() => {
+              nav.navigate(AppRouter.USER, {
+                user: user,
+              });
+            }}
+            activeOpacity={0.5}
+            style={[QLMH.container, {backgroundColor: '#25a244'}]}>
+            <View style={QLMH.viewIcon}>
+              <Icon
+                type="FontAwesome"
+                name="address-book-o"
+                style={QLMH.iconBook}
+              />
+            </View>
+            <View>
+              <Text style={QLMH.textTitle}>Quản lý tài khoản</Text>
+              <Text style={QLMH.textSubTitle}>
+                Tài khoản giảng viên, sinh viên..
+              </Text>
+            </View>
+            <View style={{flex: 1}} />
+            <Icon
+              type="MaterialIcons"
+              name="keyboard-arrow-right"
+              style={QLMH.iconArrow}
+            />
+          </TouchableOpacity>
+        )}
         <View
           style={{
             height: 450,
@@ -388,6 +447,7 @@ export const HomeScreen = ({navigation}) => {
           mainStyles.topBar,
           {
             backgroundColor: mainColor,
+            marginTop: Platform.OS === 'ios' ? 35 : 0,
           },
         ]}>
         <View
@@ -413,14 +473,16 @@ export const HomeScreen = ({navigation}) => {
             paddingLeft: 15,
             flexDirection: 'row',
             alignItems: 'center',
+            marginTop: Platform.OS === 'ios' ? 35 : 0,
           },
         ]}>
+        <SafeAreaView />
         <View style={{flex: 1, height: 60, justifyContent: 'center'}}>
           <Text style={[mainStyles.title, {fontWeight: 'bold', fontSize: 10}]}>
-            Giáo viên
+            {user[0]?.TenGV !== undefined ? 'Giáo viên' : 'Sinh viên'}
           </Text>
           <Text style={[mainStyles.title, {marginTop: 2, fontSize: 14}]}>
-            Nguyễn Phúc Bảo Châu
+            {user[0]?.TenGV} {user[0]?.TenSV}
           </Text>
         </View>
         <TouchableOpacity

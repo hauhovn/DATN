@@ -17,4 +17,13 @@ export const AppRouter = {
   TESTING: 'TESTING',
   MENU_QUESTION: 'MENU_QUESTION',
   WAITING_SCREEN: 'WAITING_SCREEN',
+  AddExercise: 'AddExercise',
+  AddAnswer: 'AddAnswer',
+  AddTest: 'AddTest',
+  QuestToTest: 'QuestToTest',
+  LOADING: 'LOADING',
+  EditQuest: 'EditQuest',
+  EditAnswer: 'EditAnswer',
+  USER: 'USER',
+  LISTCD: 'LISTCHUDE',
 };

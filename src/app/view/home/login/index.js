@@ -7,7 +7,7 @@ import {
   StyleSheet,
   Image,
   TextInput,
-  Alert,
+  Appearance,
   ImageBackground,
   StatusBar,
 } from 'react-native';
@@ -17,54 +17,37 @@ import {TouchableOpacity} from 'react-native-gesture-handler';
 import {AppRouter} from '../../../navigation/AppRouter';
 import {postLogin} from '../../../../server/login';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
-import {useIsFocused} from '@react-navigation/native';
+import {useDispatch} from 'react-redux';
+import {activate} from '../../../../../store/reducers/userSlice';
 
 const colors = settings.colors;
 
 export const Login = ({navigation, route}) => {
-  const isFocus = useIsFocused();
-  const [phone, setPhone] = useState('0775712018');
-  const [passWord, setPassWord] = React.useState('baochau');
-
+  const dispatch = useDispatch();
+  const colorScheme = Appearance.getColorScheme();
+  const [phone, setPhone] = useState('0775712017');
+  const [passWord, setPassWord] = useState('111111');
   const [response, setResponse] = useState('');
-
   const [textError, setTextError] = useState('');
   const [isShowPassword, setShowPassword] = useState(false);
   const [isLoading, setLoading] = useState(false);
 
-  const [user, setUser] = useState('');
-
-  useEffect(() => {
-    if (isFocus) {
-      getAccount();
-    }
-  }, []);
-
-  useEffect(() => {
-    console.log(user);
-    if (user !== '' && user !== null) {
-      console.log(user);
-      setPhone(user[0]?.phone);
-      setPassWord(user[0]?.password);
-      setLoading(true);
-      navigation.navigate(AppRouter.TAB);
-      setLoading(false);
-    }
-  }, [user]);
-
   useEffect(() => {
     if (response !== '') {
       setLoading(false);
-      if (response.length === 0) {
-        setTextError('Sai mail hoặc mật khẩu'); // Hook
+      if (response?.data?.user === undefined || response?.data?.user === null) {
+        setTextError('Sai mail hoặc mật khẩu');
       } else {
-        saveAccount(response);
-        navigation.navigate(AppRouter.TAB);
+        saveAccount(response?.data?.user);
+        dispatch(activate(true));
         setLoading(false);
       }
     }
   }, [response]);
+
+  if (colorScheme === 'dark') {
+    console.log('dark');
+  }
 
   const saveAccount = async value => {
     try {
@@ -72,15 +55,6 @@ export const Login = ({navigation, route}) => {
       await AsyncStorage.setItem('currentUser', jsonValue);
     } catch (e) {
       console.log('Khong luu duoc');
-    }
-  };
-
-  const getAccount = async () => {
-    try {
-      const jsonValue = await AsyncStorage.getItem('currentUser');
-      setUser(JSON.parse(jsonValue));
-    } catch (e) {
-      // error reading value
     }
   };
 
@@ -108,14 +82,11 @@ export const Login = ({navigation, route}) => {
   const postData = async () => {
     try {
       const data = await postLogin(phone, passWord);
+      console.log('res: ', data);
       setResponse(data);
     } catch (error) {
       console.log(error);
     }
-  };
-
-  const missPassword = () => {
-    Alert.alert('Quên mật khẩu', 'Mail: ' + phone + '\nPassword: ' + passWord);
   };
 
   const handleRegister = () => {
@@ -189,6 +160,7 @@ export const Login = ({navigation, route}) => {
             editable={!isLoading}
             keyboardType="phone-pad"
             placeholder={'Số điện thoại'}
+            placeholderTextColor="#000"
             value={phone}
             onChangeText={text => {
               onChangePhone(text);
@@ -215,6 +187,7 @@ export const Login = ({navigation, route}) => {
             editable={!isLoading}
             secureTextEntry={!isShowPassword}
             placeholder={'Mật khẩu'}
+            placeholderTextColor="#000"
             value={passWord}
             onChangeText={text => {
               onChangePassWord(text);
@@ -271,30 +244,6 @@ export const Login = ({navigation, route}) => {
             <Text style={styles.textLogin}>LOGIN</Text>
           )}
         </TouchableOpacity>
-        <View
-          style={{flexDirection: 'row', width: '65%', alignItems: 'center'}}>
-          <View style={{flex: 1}} />
-          <View
-            style={{
-              flexDirection: 'row',
-              marginTop: 10,
-            }}>
-            <Text style={{color: '#fff'}}>Mày chưa có tài khoản?</Text>
-          </View>
-          <TouchableOpacity
-            onPress={() => {
-              handleRegister();
-            }}
-            style={{
-              flexDirection: 'row',
-              marginLeft: 10,
-              marginTop: 10,
-            }}>
-            <Text style={{color: isLoading ? '#81C784' : colors.colorMain}}>
-              Đăng ký
-            </Text>
-          </TouchableOpacity>
-        </View>
       </View>
     </ImageBackground>
   );
@@ -335,6 +284,7 @@ const styles = StyleSheet.create({
     marginLeft: 5,
     marginRight: 5,
     fontSize: 14,
+    color: '#000',
   },
   textLogin: {
     color: '#fff',
