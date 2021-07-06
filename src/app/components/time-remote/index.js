@@ -9,7 +9,7 @@ import {AppRouter} from '../../navigation/AppRouter';
 export default class RemoteTime extends Component {
   constructor(props) {
     super(props);
-    this.socket = io('http://169.254.120.94:3000', {jsonp: false});
+    this.socket = io('https://da-tot-nghiep.herokuapp.com', {jsonp: false});
     this.state = {
       stopTime: false,
       textTimeStatus: 'Stop',

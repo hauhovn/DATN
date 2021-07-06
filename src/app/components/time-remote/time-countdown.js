@@ -12,7 +12,7 @@ export default class TestingTimeCountDown extends Component {
   constructor(props) {
     super(props);
     rootView = this;
-    this.socket = io('http://169.254.120.94:3000', {jsonp: false});
+    this.socket = io('https://da-tot-nghiep.herokuapp.com', {jsonp: false});
     this.state = {
       isRunning: true,
       textTimeStatus: 'Start',
