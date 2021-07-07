@@ -31,7 +31,6 @@ export const userSlice = createSlice({
   },
   reducers: {
     activate: (state, action) => {
-      console.log('activate: ', action);
       state.isActivated = action.payload;
     },
   },

@@ -12,12 +12,15 @@ import {
 } from 'react-native';
 import {settings} from '../../../config';
 import {AppRouter} from '../../../navigation/AppRouter';
+import {ITEM_KEYS} from './item-keys';
 import {useNavigation} from '@react-navigation/native';
 import {HeaderMenu} from './headerMenu';
 import {Icon, Picker} from 'native-base';
 import ModalSelector from 'react-native-modal-selector';
 import {mainStyles, QLMH, styleTK} from '../../home/homeScreen/styles';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+//sub screen
+import TopTests from './top-tests';
 
 import {i18n} from '../../../../i18n';
 
@@ -78,18 +81,23 @@ export const HomeScreen = ({navigation}) => {
 
   const HeaderHandle = value => {
     console.log('HeaderHandle: ', value);
-    if (value === 'Môn học') {
+
+    if (value === ITEM_KEYS.MON_HOC) {
       nav.navigate(AppRouter.COURSE);
     }
 
-    if (value === 'Câu hỏi') {
+    if (value === ITEM_KEYS.CAU_HOI) {
       nav.navigate(AppRouter.ALLEXERCISE, {
         item: 'all',
       });
     }
 
-    if (value === 'Chủ đề') {
+    if (value === ITEM_KEYS.CHU_DE) {
       nav.navigate(AppRouter.LISTCD);
+    }
+
+    if (value === ITEM_KEYS.BAI_KIEM_TRA) {
+      nav.navigate(AppRouter.TESTING_NAVIGATION);
     }
   };
 
@@ -154,94 +162,42 @@ export const HomeScreen = ({navigation}) => {
       />
 
       {/* Bắt đầu screen */}
-      <Animated.ScrollView
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{
-          paddingTop: MAX_HEIGHT - 32,
-          backgroundColor: '#fff',
-        }}
-        scrollEventThrottle={16}
-        onScroll={Animated.event(
-          [{nativeEvent: {contentOffset: {y: scrollY}}}],
-          {useNativeDriver: true},
-        )}>
-        <View style={{width: '100%', height: 32}} />
-        <TouchableOpacity
-          onPress={() => {
-            handleQLMonHoc();
+      {user[0]?.MaSV == undefined ? (
+        <Animated.ScrollView
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{
+            paddingTop: MAX_HEIGHT - 32,
+            backgroundColor: '#fff',
           }}
-          activeOpacity={0.5}
-          style={[
-            QLMH.container,
-            {backgroundColor: settings.colors.colorPinteres},
-          ]}>
-          <View style={QLMH.viewIcon}>
-            <Icon
-              type="MaterialCommunityIcons"
-              name="book-open-page-variant"
-              style={QLMH.iconBook}
-            />
-          </View>
-          <View>
-            <Text style={QLMH.textTitle}>{i18n.t('Home.object-manage')}</Text>
-            <Text style={QLMH.textSubTitle}>
-              {i18n.t('Home.object-manage-sub')}
-            </Text>
-          </View>
-          <View style={{flex: 1}} />
-          <Icon
-            type="MaterialIcons"
-            name="keyboard-arrow-right"
-            style={QLMH.iconArrow}
-          />
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => {
-            handleQLBaiKT();
-          }}
-          activeOpacity={0.5}
-          style={QLMH.container}>
-          <View style={QLMH.viewIcon}>
-            <Icon
-              type="FontAwesome"
-              name="address-book-o"
-              style={QLMH.iconBook}
-            />
-          </View>
-          <View>
-            <Text style={QLMH.textTitle}>Quản lý bài kiểm tra</Text>
-            <Text style={QLMH.textSubTitle}>Câu hỏi, học sinh, điểm..</Text>
-          </View>
-          <View style={{flex: 1}} />
-          <Icon
-            type="MaterialIcons"
-            name="keyboard-arrow-right"
-            style={QLMH.iconArrow}
-          />
-        </TouchableOpacity>
-        {user[0]?.isAdmin !== undefined && parseInt(user[0]?.isAdmin) === 1 && (
+          scrollEventThrottle={16}
+          onScroll={Animated.event(
+            [{nativeEvent: {contentOffset: {y: scrollY}}}],
+            {useNativeDriver: true},
+          )}>
+          <View style={{width: '100%', height: 32}} />
           <TouchableOpacity
             onPress={() => {
-              nav.navigate(AppRouter.USER, {
-                user: user,
-              });
+              handleQLMonHoc();
             }}
             activeOpacity={0.5}
-            style={[QLMH.container, {backgroundColor: '#25a244'}]}>
+            style={[
+              QLMH.container,
+              {backgroundColor: settings.colors.colorPinteres},
+            ]}>
             <View style={QLMH.viewIcon}>
               <Icon
-                type="FontAwesome"
-                name="address-book-o"
+                type="MaterialCommunityIcons"
+                name="book-open-page-variant"
                 style={QLMH.iconBook}
               />
             </View>
             <View>
-              <Text style={QLMH.textTitle}>Quản lý tài khoản</Text>
+              <Text style={QLMH.textTitle}>{i18n.t('Home.object-manage')}</Text>
               <Text style={QLMH.textSubTitle}>
-                Tài khoản giảng viên, sinh viên..
+                {i18n.t('Home.object-manage-sub')}
               </Text>
             </View>
             <View style={{flex: 1}} />
@@ -251,195 +207,252 @@ export const HomeScreen = ({navigation}) => {
               style={QLMH.iconArrow}
             />
           </TouchableOpacity>
-        )}
-        <View
-          style={{
-            height: 450,
-            width: '100%',
-            marginTop: 20,
-            borderTopWidth: 1,
-            borderBottomWidth: 1,
-            borderColor: '#CFD8DC',
-            paddingBottom: 50,
-          }}>
-          <Text
-            style={{
-              fontSize: 14,
-              color: mainColor,
-              marginVertical: 5,
-              marginLeft: 10,
-            }}>
-            THỐNG KÊ
-          </Text>
-          <View style={styleTK.pickerContainer}>
-            <ModalSelector
-              data={data}
-              style={{flex: 1}}
-              cancelStyle={styleTK.pickerCancel}
-              selectStyle={styleTK.pickerSelect}
-              optionContainerStyle={styleTK.pickerOption}
-              cancelText="CANCLE"
-              initValue="Select object"
-              onChange={option => {
-                //
-              }}
-            />
+          <TouchableOpacity
+            onPress={() => {
+              handleQLBaiKT();
+            }}
+            activeOpacity={0.5}
+            style={QLMH.container}>
+            <View style={QLMH.viewIcon}>
+              <Icon
+                type="FontAwesome"
+                name="address-book-o"
+                style={QLMH.iconBook}
+              />
+            </View>
+            <View>
+              <Text style={QLMH.textTitle}>Quản lý bài kiểm tra</Text>
+              <Text style={QLMH.textSubTitle}>Câu hỏi, học sinh, điểm..</Text>
+            </View>
+            <View style={{flex: 1}} />
             <Icon
               type="MaterialIcons"
-              name="keyboard-arrow-down"
-              style={styleTK.iconPicker}
+              name="keyboard-arrow-right"
+              style={QLMH.iconArrow}
             />
-          </View>
-
-          <View style={{flex: 1, marginTop: 10, paddingHorizontal: 10}}>
-            <View style={{flex: 1, flexDirection: 'row', alignItems: 'center'}}>
-              <View
-                style={[
-                  styleTK.container,
-                  {
-                    backgroundColor: settings.colors.colorGreen,
-                  },
-                ]}>
-                <Text style={styleTK.textTitle}>HỌC SINH GIỎI</Text>
-                <View style={styleTK.fakeView} />
-                <Text style={styleTK.number}>{soHocSinhGioi}</Text>
-                <View
-                  style={{
-                    flex: 1,
-                  }}
+          </TouchableOpacity>
+          {user[0]?.isAdmin !== undefined && parseInt(user[0]?.isAdmin) === 1 && (
+            <TouchableOpacity
+              onPress={() => {
+                nav.navigate(AppRouter.USER, {
+                  user: user,
+                });
+              }}
+              activeOpacity={0.5}
+              style={[QLMH.container, {backgroundColor: '#25a244'}]}>
+              <View style={QLMH.viewIcon}>
+                <Icon
+                  type="FontAwesome"
+                  name="address-book-o"
+                  style={QLMH.iconBook}
                 />
-                <TouchableOpacity
-                  onPress={() => {
-                    handleHSG();
-                  }}
-                  activeOpacity={0.5}
-                  style={{flexDirection: 'row'}}>
-                  <View style={{flex: 1}}>
-                    <Text style={styleTK.textDetail}>Xem</Text>
-                    <Text style={styleTK.textTitle}>chi tiết</Text>
-                  </View>
-                  <View style={styleTK.button}>
-                    <Icon
-                      type="MaterialIcons"
-                      name="keyboard-arrow-right"
-                      style={styleTK.btnIcon}
-                    />
-                  </View>
-                </TouchableOpacity>
               </View>
-              <View style={{width: 10, height: '100%'}} />
-              <View
-                style={[
-                  styleTK.container,
-                  {
-                    backgroundColor: settings.colors.colorBlue,
-                  },
-                ]}>
-                <Text style={styleTK.textTitle}>HỌC SINH KHÁ</Text>
-                <View style={styleTK.fakeView} />
-                <Text style={styleTK.number}>{soHocSinhKha}</Text>
-                <View
-                  style={{
-                    flex: 1,
-                  }}
-                />
-                <TouchableOpacity
-                  onPress={() => {
-                    handleHSK();
-                  }}
-                  activeOpacity={0.5}
-                  style={{flexDirection: 'row'}}>
-                  <View style={{flex: 1}}>
-                    <Text style={styleTK.textDetail}>Xem</Text>
-                    <Text style={styleTK.textTitle}>chi tiết</Text>
-                  </View>
-                  <View style={styleTK.button}>
-                    <Icon
-                      type="MaterialIcons"
-                      name="keyboard-arrow-right"
-                      style={styleTK.btnIcon}
-                    />
-                  </View>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </View>
-
-          <View style={{flex: 1, marginTop: 10, paddingHorizontal: 10}}>
-            <View style={{flex: 1, flexDirection: 'row', alignItems: 'center'}}>
-              <View
-                style={[
-                  styleTK.container,
-                  {
-                    backgroundColor: settings.colors.colorRed,
-                  },
-                ]}>
-                <Text style={styleTK.textTitle}>HỌC SINH TRUNG BÌNH</Text>
-                <View style={styleTK.fakeView} />
-                <Text style={[styleTK.number, {marginVertical: -10}]}>
-                  {soHocSinhTrungBinh}
+              <View>
+                <Text style={QLMH.textTitle}>Quản lý tài khoản</Text>
+                <Text style={QLMH.textSubTitle}>
+                  Tài khoản giảng viên, sinh viên..
                 </Text>
-                <View style={styleTK.fakeView} />
-                <TouchableOpacity
-                  onPress={() => {
-                    handleHSTB();
-                  }}
-                  activeOpacity={0.5}
-                  style={{flexDirection: 'row'}}>
-                  <View style={{flex: 1}}>
-                    <Text style={styleTK.textDetail}>Xem</Text>
-                    <Text style={styleTK.textTitle}>chi tiết</Text>
-                  </View>
-                  <View style={styleTK.button}>
-                    <Icon
-                      type="MaterialIcons"
-                      name="keyboard-arrow-right"
-                      style={styleTK.btnIcon}
-                    />
-                  </View>
-                </TouchableOpacity>
               </View>
-              <View style={{width: 10, height: '100%'}} />
+              <View style={{flex: 1}} />
+              <Icon
+                type="MaterialIcons"
+                name="keyboard-arrow-right"
+                style={QLMH.iconArrow}
+              />
+            </TouchableOpacity>
+          )}
+          <View
+            style={{
+              height: 450,
+              width: '100%',
+              marginTop: 20,
+              borderTopWidth: 1,
+              borderBottomWidth: 1,
+              borderColor: '#CFD8DC',
+              paddingBottom: 50,
+            }}>
+            <Text
+              style={{
+                fontSize: 14,
+                color: mainColor,
+                marginVertical: 5,
+                marginLeft: 10,
+              }}>
+              THỐNG KÊ
+            </Text>
+            <View style={styleTK.pickerContainer}>
+              <ModalSelector
+                data={data}
+                style={{flex: 1}}
+                cancelStyle={styleTK.pickerCancel}
+                selectStyle={styleTK.pickerSelect}
+                optionContainerStyle={styleTK.pickerOption}
+                cancelText="CANCLE"
+                initValue="Select object"
+                onChange={option => {
+                  //
+                }}
+              />
+              <Icon
+                type="MaterialIcons"
+                name="keyboard-arrow-down"
+                style={styleTK.iconPicker}
+              />
+            </View>
+
+            <View style={{flex: 1, marginTop: 10, paddingHorizontal: 10}}>
               <View
-                style={[
-                  styleTK.container,
-                  {
-                    backgroundColor: settings.colors.colorThumblr,
-                  },
-                ]}>
-                <Text style={styleTK.textTitle}>HỌC SINH YẾU</Text>
-                <View style={styleTK.fakeView} />
-                <Text style={styleTK.number}>{soHocSinhYeu}</Text>
+                style={{flex: 1, flexDirection: 'row', alignItems: 'center'}}>
                 <View
-                  style={{
-                    flex: 1,
-                  }}
-                />
-                <TouchableOpacity
-                  onPress={() => {
-                    handleHSY();
-                  }}
-                  activeOpacity={0.5}
-                  style={{flexDirection: 'row'}}>
-                  <View style={{flex: 1}}>
-                    <Text style={styleTK.textDetail}>Xem</Text>
-                    <Text style={styleTK.textTitle}>chi tiết</Text>
-                  </View>
-                  <View style={styleTK.button}>
-                    <Icon
-                      type="MaterialIcons"
-                      name="keyboard-arrow-right"
-                      style={styleTK.btnIcon}
-                    />
-                  </View>
-                </TouchableOpacity>
+                  style={[
+                    styleTK.container,
+                    {
+                      backgroundColor: settings.colors.colorGreen,
+                    },
+                  ]}>
+                  <Text style={styleTK.textTitle}>HỌC SINH GIỎI</Text>
+                  <View style={styleTK.fakeView} />
+                  <Text style={styleTK.number}>{soHocSinhGioi}</Text>
+                  <View
+                    style={{
+                      flex: 1,
+                    }}
+                  />
+                  <TouchableOpacity
+                    onPress={() => {
+                      handleHSG();
+                    }}
+                    activeOpacity={0.5}
+                    style={{flexDirection: 'row'}}>
+                    <View style={{flex: 1}}>
+                      <Text style={styleTK.textDetail}>Xem</Text>
+                      <Text style={styleTK.textTitle}>chi tiết</Text>
+                    </View>
+                    <View style={styleTK.button}>
+                      <Icon
+                        type="MaterialIcons"
+                        name="keyboard-arrow-right"
+                        style={styleTK.btnIcon}
+                      />
+                    </View>
+                  </TouchableOpacity>
+                </View>
+                <View style={{width: 10, height: '100%'}} />
+                <View
+                  style={[
+                    styleTK.container,
+                    {
+                      backgroundColor: settings.colors.colorBlue,
+                    },
+                  ]}>
+                  <Text style={styleTK.textTitle}>HỌC SINH KHÁ</Text>
+                  <View style={styleTK.fakeView} />
+                  <Text style={styleTK.number}>{soHocSinhKha}</Text>
+                  <View
+                    style={{
+                      flex: 1,
+                    }}
+                  />
+                  <TouchableOpacity
+                    onPress={() => {
+                      handleHSK();
+                    }}
+                    activeOpacity={0.5}
+                    style={{flexDirection: 'row'}}>
+                    <View style={{flex: 1}}>
+                      <Text style={styleTK.textDetail}>Xem</Text>
+                      <Text style={styleTK.textTitle}>chi tiết</Text>
+                    </View>
+                    <View style={styleTK.button}>
+                      <Icon
+                        type="MaterialIcons"
+                        name="keyboard-arrow-right"
+                        style={styleTK.btnIcon}
+                      />
+                    </View>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+
+            <View style={{flex: 1, marginTop: 10, paddingHorizontal: 10}}>
+              <View
+                style={{flex: 1, flexDirection: 'row', alignItems: 'center'}}>
+                <View
+                  style={[
+                    styleTK.container,
+                    {
+                      backgroundColor: settings.colors.colorRed,
+                    },
+                  ]}>
+                  <Text style={styleTK.textTitle}>HỌC SINH TRUNG BÌNH</Text>
+                  <View style={styleTK.fakeView} />
+                  <Text style={[styleTK.number, {marginVertical: -10}]}>
+                    {soHocSinhTrungBinh}
+                  </Text>
+                  <View style={styleTK.fakeView} />
+                  <TouchableOpacity
+                    onPress={() => {
+                      handleHSTB();
+                    }}
+                    activeOpacity={0.5}
+                    style={{flexDirection: 'row'}}>
+                    <View style={{flex: 1}}>
+                      <Text style={styleTK.textDetail}>Xem</Text>
+                      <Text style={styleTK.textTitle}>chi tiết</Text>
+                    </View>
+                    <View style={styleTK.button}>
+                      <Icon
+                        type="MaterialIcons"
+                        name="keyboard-arrow-right"
+                        style={styleTK.btnIcon}
+                      />
+                    </View>
+                  </TouchableOpacity>
+                </View>
+                <View style={{width: 10, height: '100%'}} />
+                <View
+                  style={[
+                    styleTK.container,
+                    {
+                      backgroundColor: settings.colors.colorThumblr,
+                    },
+                  ]}>
+                  <Text style={styleTK.textTitle}>HỌC SINH YẾU</Text>
+                  <View style={styleTK.fakeView} />
+                  <Text style={styleTK.number}>{soHocSinhYeu}</Text>
+                  <View
+                    style={{
+                      flex: 1,
+                    }}
+                  />
+                  <TouchableOpacity
+                    onPress={() => {
+                      handleHSY();
+                    }}
+                    activeOpacity={0.5}
+                    style={{flexDirection: 'row'}}>
+                    <View style={{flex: 1}}>
+                      <Text style={styleTK.textDetail}>Xem</Text>
+                      <Text style={styleTK.textTitle}>chi tiết</Text>
+                    </View>
+                    <View style={styleTK.button}>
+                      <Icon
+                        type="MaterialIcons"
+                        name="keyboard-arrow-right"
+                        style={styleTK.btnIcon}
+                      />
+                    </View>
+                  </TouchableOpacity>
+                </View>
               </View>
             </View>
           </View>
-        </View>
-        <View style={{width: '100%', height: 500}}/>
-      </Animated.ScrollView>
-
+          <View style={{width: '100%', height: 500}} />
+        </Animated.ScrollView>
+      ) : (
+        <TopTests />
+      )}
       {/* Kết thúc screen */}
 
       <Animated.View
