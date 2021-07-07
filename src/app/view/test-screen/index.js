@@ -13,6 +13,8 @@ import {createStackNavigator} from '@react-navigation/stack';
 //Moduns
 import {useNavigation, useIsFocused} from '@react-navigation/native';
 import {Icon} from 'native-base';
+import CountDown from 'react-native-countdown-component';
+import io from 'socket.io-client/dist/socket.io.js';
 import TestingTimeCountDown from '../../components/time-remote/time-countdown';
 //others
 import {settings} from '../../config';
@@ -23,7 +25,7 @@ import {testData} from './test-data';
 export function TestScreen({navigation, route}) {
   const fo = useIsFocused();
   //Socket
-  let socket = ('https://da-tot-nghiep.herokuapp.com', {jsonp: false});
+  let socket = ('http://169.254.120.94:3000', {jsonp: false});
   //Consts
   const [currentQuestion, setCurrentQuestion] = useState(testData[0]);
   const QUESTION_ID = route.params;
@@ -39,8 +41,8 @@ export function TestScreen({navigation, route}) {
   useEffect(() => {
     if (fo) {
       try {
+        console.log('QUESTION_ID: ', QUESTION_ID);
         setCurrentQuestion(testData[QUESTION_ID.QUESTION_ID - 1]);
-        console.log(currentQuestion);
       } catch (error) {}
     }
   }, [fo]);
@@ -71,39 +73,21 @@ export function TestScreen({navigation, route}) {
   //func
   const updateQuestion = next => {
     try {
-      //
-      console.log('Old question: ', currentQuestion);
       if (isTesting()) {
-        //
-        console.log(' Is testing: ', isTesting());
         let num = parseInt(currentQuestion.stt);
-        let dataLenght = testData.length;
-        //
-        console.log('Old stt: ', num, '/', dataLenght);
         if (next) {
-          console.log('Is next');
-          if (num == dataLenght) {
-            console.log('num == dataLenght');
-            setCurrentQuestion(testData[0]);
-          } else {
-            console.log('num != dataLenght');
-            let newQuestion = testData[parseInt(currentQuestion.stt)];
-            console.log('New question: ', newQuestion);
-            setCurrentQuestion(newQuestion);
-          }
+          if (num == testData.length) setCurrentQuestion(testData[0]);
+          else setCurrentQuestion(testData[parseInt(currentQuestion.stt)]);
         } else {
-          console.log('Is back!');
           if (num == 1) {
-            setCurrentQuestion(testData[dataLenght - 1]);
-          } else {
-            setCurrentQuestion(testData[num - 2]);
-          }
+            setCurrentQuestion(testData[testData.length - 1]);
+          } else setCurrentQuestion(testData[num - 2]);
         }
+        setCurrentQuestion(testData[QUESTION_ID.QUESTION_ID - 1]);
       } else {
         console.log('Time stoped!');
         Alert.alert('Time stoped!');
       }
-      console.log('New question: ', currentQuestion);
     } catch (error) {}
   };
 
@@ -186,9 +170,9 @@ export function TestScreen({navigation, route}) {
               style={{paddingRight: 15}}
               onPress={() => openMenuQuestion()}>
               <Icon
-                type="AntDesign"
-                name={'select1'}
-                style={[appBar.buttonIcon, {color: settings.colors.colorGreen}]}
+                type="MaterialCommunityIcons"
+                name={'microsoft-xbox-controller-menu'}
+                style={appBar.buttonIcon}
               />
             </TouchableOpacity>
           </View>
