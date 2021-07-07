@@ -13,7 +13,7 @@ import {
 import {Icon} from 'native-base';
 import {useIsFocused} from '@react-navigation/native'; // Cái này trong Document của Navigation
 import {settings} from '../../config';
-import {Calendar, LocaleConfig} from 'react-native-calendars';
+import {Calendar, LocaleConfig} from 'react-native-calendars/src/calendar';
 import {RenderItem} from './renderItem';
 import {dataFake} from './data';
 import {CalendarTheme, HeaderStyles, MainStyles, LoadingStyles} from './styles';
