@@ -1,21 +1,65 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import {createStackNavigator} from '@react-navigation/stack';
 import {AppRouter} from '../AppRouter';
-import {HomeScreen} from '../../view/home/homeScreen';
+//moduns
+import AsyncStorage from '@react-native-async-storage/async-storage';
+//screens
 import {CourseNav} from '../../view/course';
 import {ListExercise} from '../../view/course/listExercise';
 import {TabHeader} from '../../view/course/Tab';
 import {ChuDeNav} from '../../view/chuDe';
 import {User} from '../../view/user';
+import {TeacherScreen} from '../../view/home/homeScreen/teacher-screen';
+import {StudentScreen} from '../../view/home/homeScreen/student-screen';
+import {Loading} from '../../view/loading';
 
 const Stack = createStackNavigator();
 
 const HomeNavigator = () => {
-  return (
+  const [isTeacher, setIsTeacher] = useState(true);
+  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState('');
+
+  useEffect(async () => {
+    setLoading(true);
+    await getAccount();
+    //loadOption;
+  }, []);
+  const loadOption = async () => {
+    setLoading(true);
+    getAccount();
+    await new Promise(a => setTimeout(a, 500));
+  };
+
+  useEffect(async () => {
+    if (user !== '') {
+      if (user[0]?.MaSV != undefined) setIsTeacher(false);
+    }
+    await new Promise(a => setTimeout(a, 1000));
+    setLoading(false);
+  }, [user]);
+
+  //funs
+  const getAccount = async () => {
+    try {
+      const res = await AsyncStorage.getItem('currentUser');
+      setUser(JSON.parse(res));
+    } catch (e) {
+      // error reading value
+    }
+  };
+
+  return loading ? (
+    <Stack.Screen
+      name={AppRouter.LOADING}
+      options={{title: AppRouter.LOADING, headerShown: false}}
+      component={Loading}
+    />
+  ) : isTeacher ? (
     <Stack.Navigator>
       <Stack.Screen
-        name={AppRouter.HOME}
-        component={HomeScreen}
+        name={AppRouter.TEACHER_SCREEN}
+        component={TeacherScreen}
         options={{title: AppRouter.HOME, headerShown: false}}
       />
       <Stack.Screen
@@ -42,6 +86,14 @@ const HomeNavigator = () => {
         name={AppRouter.LISTCD}
         component={ChuDeNav}
         options={{title: AppRouter.LISTCD, headerShown: false}}
+      />
+    </Stack.Navigator>
+  ) : (
+    <Stack.Navigator>
+      <Stack.Screen
+        name={AppRouter.STUDENT_SCREEN}
+        component={StudentScreen}
+        options={{title: AppRouter.HOME, headerShown: false}}
       />
     </Stack.Navigator>
   );
