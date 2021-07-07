@@ -25,7 +25,7 @@ import {testData} from './test-data';
 export function TestScreen({navigation, route}) {
   const fo = useIsFocused();
   //Socket
-  let socket = ('http://169.254.120.94:3000', {jsonp: false});
+  let socket = ('https://da-tot-nghiep.herokuapp.com/', {jsonp: false});
   //Consts
   const [currentQuestion, setCurrentQuestion] = useState(testData[0]);
   const QUESTION_ID = route.params;

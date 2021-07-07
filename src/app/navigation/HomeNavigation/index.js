@@ -11,7 +11,9 @@ import {ChuDeNav} from '../../view/chuDe';
 import {User} from '../../view/user';
 import {TeacherScreen} from '../../view/home/homeScreen/teacher-screen';
 import {StudentScreen} from '../../view/home/homeScreen/student-screen';
+import {StudentTestList} from '../../view/StudentSubView/studentListTest';
 import {Loading} from '../../view/loading';
+import {TestingNavigation} from '../../navigation/TestingNavigation';
 
 const Stack = createStackNavigator();
 
@@ -94,6 +96,16 @@ const HomeNavigator = () => {
         name={AppRouter.STUDENT_SCREEN}
         component={StudentScreen}
         options={{title: AppRouter.HOME, headerShown: false}}
+      />
+      <Stack.Screen
+        name={AppRouter.STUDENT_LIST_TEST}
+        component={StudentTestList}
+        options={{title: AppRouter.STUDENT_LIST_TEST, headerShown: false}}
+      />
+      <Stack.Screen
+        name={AppRouter.TESTING}
+        component={TestingNavigation}
+        options={{title: AppRouter.TESTING, headerShown: false}}
       />
     </Stack.Navigator>
   );
