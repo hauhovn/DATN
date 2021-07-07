@@ -7,7 +7,6 @@ import {ListExercise} from '../../view/course/listExercise';
 import {TabHeader} from '../../view/course/Tab';
 import {ChuDeNav} from '../../view/chuDe';
 import {User} from '../../view/user';
-import TestingNavigation from '../TestingNavigation';
 
 const Stack = createStackNavigator();
 
@@ -18,14 +17,6 @@ const HomeNavigator = () => {
         name={AppRouter.HOME}
         component={HomeScreen}
         options={{title: AppRouter.HOME, headerShown: false}}
-      />
-      <Stack.Screen
-        name={AppRouter.TESTING_NAVIGATION}
-        component={TestingNavigation}
-        options={{
-          title: AppRouter.TESTING_NAVIGATION,
-          headerShown: false,
-        }}
       />
       <Stack.Screen
         name={AppRouter.COURSE}

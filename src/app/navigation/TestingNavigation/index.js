@@ -13,28 +13,27 @@ import {CalendarScreen} from '../../view/calendar';
 
 const Stack = createStackNavigator();
 
-function TestingNavigation({navigation, route}) {
+function TestingNavigation() {
   return (
-    <Stack.Navigator>
-      <Stack.Screen
-        name={AppRouter.WAITING_SCREEN}
-        options={{
-          title: AppRouter.WAITING_SCREEN,
-          headerShown: false,
-        }}
-        component={WaitingScreen}
-      />
-      <Stack.Screen
-        name={AppRouter.TESTING}
-        options={{title: AppRouter.LOGIN, headerShown: false}}
-        component={TestScreen}
-      />
-      <Stack.Screen
-        name={AppRouter.MENU_QUESTION}
-        options={{title: AppRouter.MENU_QUESTION, headerShown: false}}
-        component={MenuQuestion}
-      />
-    </Stack.Navigator>
+    <NavigationContainer>
+      <Stack.Navigator>
+        <Stack.Screen
+          name={AppRouter.WAITING_SCREEN}
+          options={{title: AppRouter.WAITING_SCREEN, headerShown: false}}
+          component={WaitingScreen}
+        />
+        <Stack.Screen
+          name={AppRouter.TESTING}
+          options={{title: AppRouter.LOGIN, headerShown: false}}
+          component={TestScreen}
+        />
+        <Stack.Screen
+          name={AppRouter.MENU_QUESTION}
+          options={{title: AppRouter.MENU_QUESTION, headerShown: false}}
+          component={MenuQuestion}
+        />
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 }
 

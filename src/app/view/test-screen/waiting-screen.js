@@ -11,7 +11,6 @@ export default class WaitingScreen extends Component {
   constructor(props) {
     super(props);
   }
-
   render() {
     return (
       <View style={{flex: 1, flexDirection: 'column'}}>

@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React from 'react';
 import {
   StyleSheet,
   View,
@@ -9,37 +9,15 @@ import {
 } from 'react-native';
 import {Icon} from 'native-base';
 import {settings} from '../../../config';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import {ITEM_KEYS} from './item-keys';
+import {useNavigation} from '@react-navigation/native';
 
-var MAX_HEIGHT = Platform.OS === 'ios' ? 290 : 240;
+const MAX_HEIGHT = Platform.OS === 'ios' ? 290 : 240;
 
 const mainColor = settings.colors.colorMain;
 
 export const HeaderMenu = ({headerY, imageOpacity, imageY, Handle}) => {
   const HeaderHandle = value => {
     Handle(value);
-  };
-
-  const [user, setUser] = useState('');
-
-  useEffect(() => {
-    getAccount();
-  }, []);
-
-  useEffect(() => {
-    if (user !== '') {
-      console.log('user _: ', user);
-    }
-  }, [user]);
-
-  const getAccount = async () => {
-    try {
-      const res = await AsyncStorage.getItem('currentUser');
-      setUser(JSON.parse(res));
-    } catch (e) {
-      // error reading value
-    }
   };
 
   return (
@@ -74,26 +52,26 @@ export const HeaderMenu = ({headerY, imageOpacity, imageY, Handle}) => {
           }}>
           <TouchableOpacity
             onPress={() => {
-              HeaderHandle(ITEM_KEYS.LOP_HOC_PHAN);
+              HeaderHandle('Môn học');
             }}
             activeOpacity={0.5}
             style={items.container}>
             <View style={items.button}>
               <Icon
-                type="MaterialCommunityIcons"
-                name="google-classroom"
+                type="Ionicons"
+                name="book-outline"
                 style={{
                   fontSize: 20,
                   color: mainColor,
+                  marginRight: -1,
                 }}
               />
             </View>
-            <Text style={items.textTitle}>Lớp học phần</Text>
+            <Text style={items.textTitle}>Môn học</Text>
           </TouchableOpacity>
-
           <TouchableOpacity
             onPress={() => {
-              HeaderHandle(ITEM_KEYS.BAI_KIEM_TRA);
+              HeaderHandle('Bài kiểm tra');
             }}
             activeOpacity={0.5}
             style={items.container}>
@@ -111,7 +89,7 @@ export const HeaderMenu = ({headerY, imageOpacity, imageY, Handle}) => {
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => {
-              HeaderHandle(ITEM_KEYS.DA_KET_THUC);
+              HeaderHandle('Bài kết thúc');
             }}
             activeOpacity={0.5}
             style={items.container}>
@@ -129,7 +107,7 @@ export const HeaderMenu = ({headerY, imageOpacity, imageY, Handle}) => {
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => {
-              HeaderHandle(ITEM_KEYS.SAP_DIEN_RA);
+              HeaderHandle('Sắp diễn ra');
             }}
             activeOpacity={0.5}
             style={items.container}>
@@ -146,88 +124,80 @@ export const HeaderMenu = ({headerY, imageOpacity, imageY, Handle}) => {
             <Text style={items.textTitle}>Sắp diễn ra</Text>
           </TouchableOpacity>
         </SafeAreaView>
-        {user[0]?.MaSV == undefined ? (
-          <View style={{flex: 1, flexDirection: 'row', alignItems: 'center'}}>
-            <TouchableOpacity
-              onPress={() => {
-                HeaderHandle(ITEM_KEYS.CAU_HOI);
-              }}
-              activeOpacity={0.5}
-              style={items.container}>
-              <View style={items.button}>
-                <Icon
-                  type="Octicons"
-                  name="question"
-                  style={{
-                    fontSize: 24,
-                    color: mainColor,
-                  }}
-                />
-              </View>
-              <Text style={items.textTitle}>Câu hỏi</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              onPress={() => {
-                HeaderHandle(ITEM_KEYS.MON_HOC);
-              }}
-              activeOpacity={0.5}
-              style={items.container}>
-              <View style={items.button}>
-                <Icon
-                  type="Ionicons"
-                  name="book-outline"
-                  style={{
-                    fontSize: 20,
-                    color: mainColor,
-                    marginRight: -1,
-                  }}
-                />
-              </View>
-              <Text style={items.textTitle}>Môn học</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              onPress={() => {
-                HeaderHandle(ITEM_KEYS.CHU_DE);
-              }}
-              activeOpacity={0.5}
-              style={items.container}>
-              <View style={items.button}>
-                <Icon
-                  type="MaterialCommunityIcons"
-                  name="theme-light-dark"
-                  style={{
-                    fontSize: 24,
-                    color: mainColor,
-                  }}
-                />
-              </View>
-              <Text style={items.textTitle}>Chủ đề</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              onPress={() => {
-                HeaderHandle(ITEM_KEYS.ABOUT);
-              }}
-              activeOpacity={0.5}
-              style={items.container}>
-              <View style={items.button}>
-                <Icon
-                  type="FontAwesome5"
-                  name="info-circle"
-                  style={{
-                    fontSize: 22,
-                    color: mainColor,
-                  }}
-                />
-              </View>
-              <Text style={items.textTitle}>About</Text>
-            </TouchableOpacity>
-          </View>
-        ) : (
-          <View></View>
-        )}
+        <View style={{flex: 1, flexDirection: 'row', alignItems: 'center'}}>
+          <TouchableOpacity
+            onPress={() => {
+              HeaderHandle('Câu hỏi');
+            }}
+            activeOpacity={0.5}
+            style={items.container}>
+            <View style={items.button}>
+              <Icon
+                type="Octicons"
+                name="question"
+                style={{
+                  fontSize: 24,
+                  color: mainColor,
+                }}
+              />
+            </View>
+            <Text style={items.textTitle}>Câu hỏi</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              HeaderHandle('Chủ đề');
+            }}
+            activeOpacity={0.5}
+            style={items.container}>
+            <View style={items.button}>
+              <Icon
+                type="MaterialCommunityIcons"
+                name="theme-light-dark"
+                style={{
+                  fontSize: 24,
+                  color: mainColor,
+                }}
+              />
+            </View>
+            <Text style={items.textTitle}>Chủ đề</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              HeaderHandle('Lớp học phần');
+            }}
+            activeOpacity={0.5}
+            style={items.container}>
+            <View style={items.button}>
+              <Icon
+                type="MaterialCommunityIcons"
+                name="google-classroom"
+                style={{
+                  fontSize: 20,
+                  color: mainColor,
+                }}
+              />
+            </View>
+            <Text style={items.textTitle}>Lớp học phần</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              HeaderHandle('About');
+            }}
+            activeOpacity={0.5}
+            style={items.container}>
+            <View style={items.button}>
+              <Icon
+                type="FontAwesome5"
+                name="info-circle"
+                style={{
+                  fontSize: 22,
+                  color: mainColor,
+                }}
+              />
+            </View>
+            <Text style={items.textTitle}>About</Text>
+          </TouchableOpacity>
+        </View>
       </Animated.View>
     </Animated.View>
   );
