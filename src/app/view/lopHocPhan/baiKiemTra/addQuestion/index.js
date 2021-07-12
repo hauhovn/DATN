@@ -6,9 +6,12 @@ import {useNavigation, useRoute} from '@react-navigation/native';
 import {useIsFocused} from '@react-navigation/native';
 import {getCauHoiByMaMH} from '../../../../../server/BaiKiemTra/getCauHoiByMaMH';
 import {getCD} from '../../../../../server/ChuDe/getCD';
+import {addQuestionDetail} from '../../../../../server/CT_BaiKiemTra';
 import {Header} from '../../../../components/header';
 
 import SelectMultiple from 'react-native-select-multiple';
+
+// NO NE de lam gi v
 
 export const ThemCauHoi = () => {
   const nav = useNavigation();
@@ -71,14 +74,27 @@ export const ThemCauHoi = () => {
 
   // Xóa bài kiểm tra
   const subMit = async data => {
-    try {
-      // const res = await deleteBaiKT(data);
-      console.log('@!#!@#!$!#!@#');
-    } catch (error) {
-      console.log(error);
+    // const res = await deleteBaiKT(data);
+    console.log(
+      'selectedFruits[0].value: ',
+      selectedFruits[0].value,
+      'params: ',
+      params.BaiKiemTra.MaBaiKT,
+    );
+    for (let i = 0; i < selectedFruits.length; i++) {
+      try {
+        const res = await addQuestionDetail(
+          selectedFruits[i].value,
+          params.BaiKiemTra.MaBaiKT,
+        );
+        console.log('#res: ', res.data);
+      } catch (error) {
+        console.log('addQuestion ERROR: ', error);
+      }
     }
   };
 
+  const addQuestToTest = (MaCH, MaBaiKT) => {};
   //
   const getTen = str => {
     //

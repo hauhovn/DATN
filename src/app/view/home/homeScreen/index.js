@@ -5,6 +5,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {TeacherScreen} from './teacher-screen';
 import {StudentScreen} from './student-screen';
 
+import {AppRouter} from '../../../navigation/AppRouter';
+
 const HomeScreen = navigation => {
   const [user, setUser] = useState('');
 
@@ -54,6 +56,7 @@ const HomeScreen = navigation => {
     }
 
     if (value === 'Lớp học phần') {
+      console.log('acccccc');
       nav.navigate(AppRouter.LISTLHP);
     }
   };

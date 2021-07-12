@@ -91,6 +91,11 @@ export const TeacherScreen = ({navigation}) => {
     if (value === 'Chủ đề') {
       nav.navigate(AppRouter.LISTCD);
     }
+
+    if (value === 'Lớp học phần') {
+      console.log('acccccc');
+      nav.navigate(AppRouter.LISTLHP);
+    }
   };
 
   const onRefresh = React.useCallback(() => {
