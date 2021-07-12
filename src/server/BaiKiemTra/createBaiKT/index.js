@@ -2,14 +2,17 @@ import {settings} from '../../../app/config';
 
 let api = settings.hostURL;
 
-const getCD = async (MaGV, MaMH) => {
+const createBaiKT = async (TenBaiKT, Ngay, MaGV, MaLopHP, ThoiGianLam) => {
   let res = '';
 
   var data = new FormData();
+  data.append('TenBaiKT', TenBaiKT);
+  data.append('Ngay', Ngay);
   data.append('MaGV', MaGV);
-  data.append('MaMH', MaMH);
+  data.append('MaLopHP', MaLopHP);
+  data.append('ThoiGianLam', ThoiGianLam);
 
-  console.log(MaGV, ' - ', MaMH);
+  console.log(MaGV, ' - ', MaLopHP);
 
   var requestOptions = {
     method: 'POST',
@@ -17,7 +20,7 @@ const getCD = async (MaGV, MaMH) => {
     redirect: 'follow',
   };
 
-  await fetch(api + 'ChuDe/getCD.php', requestOptions)
+  await fetch(api + 'BaiKiemTra/createBaiKT.php', requestOptions)
     .then(response => response.json())
     .then(data => {
       res = data;
@@ -27,4 +30,4 @@ const getCD = async (MaGV, MaMH) => {
   return res;
 };
 
-export {getCD};
+export {createBaiKT};

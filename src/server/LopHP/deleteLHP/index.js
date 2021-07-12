@@ -2,9 +2,10 @@ import {settings} from '../../../app/config';
 
 let api = settings.hostURL;
 
-const getCH = async MaCD => {
-  console.log('MaCD: ', MaCD);
+const deleteCD = async MaCD => {
   let res = '';
+
+  console.log('MaCD: ', MaCD);
 
   var data = new FormData();
   data.append('MaCD', MaCD);
@@ -15,7 +16,7 @@ const getCH = async MaCD => {
     redirect: 'follow',
   };
 
-  await fetch(api + 'CauHoi/getCH.php', requestOptions)
+  await fetch(api + 'ChuDe/deleteCD.php', requestOptions)
     .then(response => response.json())
     .then(data => {
       res = data;
@@ -25,4 +26,4 @@ const getCH = async MaCD => {
   return res;
 };
 
-export {getCH};
+export {deleteCD};

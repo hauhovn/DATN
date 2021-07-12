@@ -14,6 +14,7 @@ import {StudentScreen} from '../../view/home/homeScreen/student-screen';
 import {StudentTestList} from '../../view/StudentSubView/studentListTest';
 import {Loading} from '../../view/loading';
 import {TestingNavigation} from '../../navigation/TestingNavigation';
+import {LopHocPhanNav} from '../../view/lopHocPhan';
 
 const Stack = createStackNavigator();
 
@@ -88,6 +89,11 @@ const HomeNavigator = () => {
         name={AppRouter.LISTCD}
         component={ChuDeNav}
         options={{title: AppRouter.LISTCD, headerShown: false}}
+      />
+      <Stack.Screen
+        name={AppRouter.LISTLHP}
+        component={LopHocPhanNav}
+        options={{title: AppRouter.LISTLHP, headerShown: false}}
       />
     </Stack.Navigator>
   ) : (

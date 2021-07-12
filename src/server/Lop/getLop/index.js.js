@@ -2,20 +2,20 @@ import {settings} from '../../../app/config';
 
 let api = settings.hostURL;
 
-const getCH = async MaCD => {
-  console.log('MaCD: ', MaCD);
+const getLop = async MaGV => {
   let res = '';
 
   var data = new FormData();
-  data.append('MaCD', MaCD);
+  data.append('MaGV', MaGV);
+
+  console.log('MaGV: ', MaGV);
 
   var requestOptions = {
-    method: 'POST',
-    body: data,
+    method: 'GET',
     redirect: 'follow',
   };
 
-  await fetch(api + 'CauHoi/getCH.php', requestOptions)
+  await fetch(api + 'Lop/getLop.php', requestOptions)
     .then(response => response.json())
     .then(data => {
       res = data;
@@ -25,4 +25,4 @@ const getCH = async MaCD => {
   return res;
 };
 
-export {getCH};
+export {getLop};

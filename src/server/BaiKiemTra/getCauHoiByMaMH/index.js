@@ -2,12 +2,15 @@ import {settings} from '../../../app/config';
 
 let api = settings.hostURL;
 
-const getCH = async MaCD => {
-  console.log('MaCD: ', MaCD);
+const getCauHoiByMaMH = async (MaMH, MaCD, MaGV) => {
   let res = '';
 
   var data = new FormData();
+  data.append('MaMH', MaMH);
   data.append('MaCD', MaCD);
+  data.append('MaGV', MaGV);
+
+  console.log('MaGV: ', MaGV);
 
   var requestOptions = {
     method: 'POST',
@@ -15,7 +18,7 @@ const getCH = async MaCD => {
     redirect: 'follow',
   };
 
-  await fetch(api + 'CauHoi/getCH.php', requestOptions)
+  await fetch(api + 'CauHoi/getCauHoiByBKT.php', requestOptions)
     .then(response => response.json())
     .then(data => {
       res = data;
@@ -25,4 +28,4 @@ const getCH = async MaCD => {
   return res;
 };
 
-export {getCH};
+export {getCauHoiByMaMH};
