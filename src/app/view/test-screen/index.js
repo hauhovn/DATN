@@ -15,7 +15,7 @@ import {useNavigation, useIsFocused} from '@react-navigation/native';
 import {Icon} from 'native-base';
 import CountDown from 'react-native-countdown-component';
 import io from 'socket.io-client/dist/socket.io.js';
-import TestingTimeCountDown from '../../components/time-remote/time-countdown';
+import {TestingTimeCountDown} from '../../components/time-remote/time-countdown';
 //others
 import {settings} from '../../config';
 import {appBar, body, navigator, styles} from './styles';
@@ -83,7 +83,6 @@ export function TestScreen({navigation, route}) {
             setCurrentQuestion(testData[testData.length - 1]);
           } else setCurrentQuestion(testData[num - 2]);
         }
-        setCurrentQuestion(testData[QUESTION_ID.QUESTION_ID - 1]);
       } else {
         console.log('Time stoped!');
         Alert.alert('Time stoped!');

@@ -5,7 +5,7 @@ import {View, Text, TouchableOpacity} from 'react-native';
 import io from 'socket.io-client/dist/socket.io.js';
 //
 import {AppRouter} from '../../navigation/AppRouter';
-import RemoteTime from '../../components/time-remote';
+import {RemoteTime} from '../../components/time-remote';
 
 export default class WaitingScreen extends Component {
   constructor(props) {

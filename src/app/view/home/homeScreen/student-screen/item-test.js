@@ -10,14 +10,14 @@ export const ItemTest = ({item, handle}) => {
   };
 
   return (
-    <TouchableOpacity style={styles.container} onPress={pressItem()}>
+    <TouchableOpacity style={styles.container} onPress={() => pressItem()}>
       <View style={styles.title}>
         <Text style={styles.titleText}>{item.TenLopHP}</Text>
         <Text>{item.Ngay}</Text>
       </View>
       <View style={styles.content}>
-        <Text>Nội dung: {item.TenBaiKT}</Text>
-        <Text>Thời gian: {item.ThoiGianLam}</Text>
+        <Text>Bài kiểm tra: {item.TenBaiKT}</Text>
+        <Text>Thời gian làm: {item.ThoiGianLam}</Text>
       </View>
     </TouchableOpacity>
   );
@@ -26,7 +26,7 @@ export const ItemTest = ({item, handle}) => {
 const styles = StyleSheet.create({
   container: {
     marginHorizontal: '5%',
-    marginTop: 8,
+    marginBottom: 8,
     height: 90,
     width: '90%',
     borderWidth: 1,

@@ -50,7 +50,7 @@ export const StudentScreen = () => {
   };
 
   const getTests = async () => {
-    let data = await getBaiKiemTra(user[0]?.MaSV, 5);
+    let data = await getBaiKiemTra(user[0]?.MaSV, 3);
     setListTest(data);
     console.log(listTest);
   };
