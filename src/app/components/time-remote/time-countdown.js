@@ -11,23 +11,15 @@ export const TestingTimeCountDown = () => {
   const socket = io('https://da-tot-nghiep.herokuapp.com', {jsonp: false});
   const [isRunning, setIsRunning] = useState(true);
 
-  let render = 0;
-
-  if (render === 0) {
-    console.log('CHAUHHHH');
-    socket.on('server-stop-time', function (data) {
+  socket.on('server-stop-time', function (data) {
+    if (isRunning != data) {
+      console.log('isRunning: ', isRunning, '& data: ', data);
       console.log('server-stop-time ', data);
-      data !== isRunning ? setIsRunning(data) : console.log('cac');
-    });
-    render = 0;
-  }
+      setIsRunning(data);
+      socket.off('server-stop-time');
+    }
+  });
 
-  render++;
-
-  // const getTimeStatus = () => {
-  //   console.log('Cai Gi Do :',isRunning);
-  //   return isRunning;
-  // }
   return (
     <View style={{flex: 1, alignItems: 'center'}}>
       <CountDown
@@ -52,7 +44,7 @@ export const TestingTimeCountDown = () => {
 };
 
 // var rootView;
-// export default class TestingTimeCountDown extends Component {
+// export class TestingTimeCountDown extends Component {
 //   constructor(props) {
 //     super(props);
 //     rootView = this;
