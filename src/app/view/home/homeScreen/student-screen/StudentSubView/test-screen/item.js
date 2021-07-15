@@ -42,7 +42,7 @@ export const ItemQuestion = ({item, data, handle}) => {
           fontWeight: 'bold',
           color: '#fff',
         }}>
-        {item?.stt}
+        {item?.STT}
       </Text>
     </TouchableOpacity>
   );

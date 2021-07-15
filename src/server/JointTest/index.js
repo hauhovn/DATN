@@ -2,11 +2,11 @@ import {settings} from '../../app/config';
 
 let api = settings.hostURL;
 
-const JontTest = async (MaCH, MaBaiKT) => {
+const JointTest = async (MaSV, MaBaiKT) => {
   let res = '';
 
   var data = new FormData();
-  data.append('MaCH', MaCH);
+  data.append('MaSV', MaSV);
   data.append('MaBaiKT', MaBaiKT);
 
   var requestOptions = {
@@ -19,10 +19,11 @@ const JontTest = async (MaCH, MaBaiKT) => {
     .then(response => response.json())
     .then(data => {
       res = data;
+      //console.log('API LOGs: jont-test: ', data);
     })
     .catch(error => console.log('error', error));
 
   return res;
 };
 
-export {JontTest};
+export {JointTest};

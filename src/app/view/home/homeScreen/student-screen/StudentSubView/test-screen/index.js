@@ -18,13 +18,15 @@ import io from 'socket.io-client/dist/socket.io.js';
 import {settings} from '../../../../../../config';
 import {appBar, body, navigator, styles, pauseModal} from './styles';
 import {AppRouter} from '../../../../../../navigation/AppRouter';
-import {testData} from './test-data';
+//import {testData} from './test-data';
+import {JointTest} from '../../../../../../../server/JointTest';
 
 export function TestScreen({navigation, route}) {
   const fo = useIsFocused();
   //Socket
   const socket = io('https://da-tot-nghiep.herokuapp.com', {jsonp: false});
   const [isRunning, setIsRunning] = useState(true);
+  const [testData, setTestData] = useState('');
 
   socket.on('server-stop-time', function (data) {
     if (isRunning != data) {
@@ -35,9 +37,10 @@ export function TestScreen({navigation, route}) {
     }
   });
   //Consts
-  const [currentQuestion, setCurrentQuestion] = useState(testData[0]);
+  const [listQuestion, setListQuestion] = useState('');
+  const [currentQuestion, setCurrentQuestion] = useState('');
   const QUESTION_ID = route.params;
-  var gifcat = require('../../../../../../asset/gif/loading-cat.gif');
+
   //color answers
   const [colorAnswerA, setColorAnswerA] = useState(settings.colors.colorGreen);
   const [colorAnswerB, setColorAnswerB] = useState(settings.colors.colorGreen);
@@ -48,12 +51,22 @@ export function TestScreen({navigation, route}) {
 
   useEffect(() => {
     if (fo) {
+      if (testData == '') {
+        getListQuestion(1, 16);
+      }
       try {
-        console.log('QUESTION_ID: ', QUESTION_ID);
+        console.log('QUESTION_ID: ', QUESTION_ID.QUESTION_ID);
         setCurrentQuestion(testData[QUESTION_ID.QUESTION_ID - 1]);
       } catch (error) {}
     }
   }, [fo]);
+
+  useEffect(() => {
+    if (testData !== '') {
+      setCurrentQuestion(testData[0]);
+      console.log('# List quests: ', testData);
+    }
+  }, [testData]);
 
   useEffect(() => {
     setColorAnswerA(settings.colors.colorGreen);
@@ -61,30 +74,29 @@ export function TestScreen({navigation, route}) {
     setColorAnswerC(settings.colors.colorGreen);
     setColorAnswerD(settings.colors.colorGreen);
     //set answers
-    if (currentQuestion.dachon == 'A') {
-      console.log('currentQuestion.dachon == A');
+    if (currentQuestion?.Dachon == 'A') {
+      console.log('currentQuestion?.Dachon == A');
       setColorAnswerA(settings.colors.colorMain);
-    } else if (currentQuestion.dachon == 'B') {
-      console.log('currentQuestion.dachon == B');
+    } else if (currentQuestion?.Dachon == 'B') {
+      console.log('currentQuestion?.Dachon == B');
       setColorAnswerA(settings.colors.colorGreen);
       setColorAnswerB(settings.colors.colorMain);
-    } else if (currentQuestion.dachon == 'C') {
-      console.log('currentQuestion.dachon == C');
+    } else if (currentQuestion?.Dachon == 'C') {
+      console.log('currentQuestion?.Dachon == C');
       setColorAnswerC(settings.colors.colorMain);
-    } else if (currentQuestion.dachon == 'D') {
-      console.log('currentQuestion.dachon == D');
+    } else if (currentQuestion?.Dachon == 'D') {
+      console.log('currentQuestion?.Dachon == D');
       setColorAnswerD(settings.colors.colorMain);
     }
-    //
   }, [currentQuestion]);
 
   //func
   const updateQuestion = next => {
     try {
-      let num = parseInt(currentQuestion.stt);
+      let num = parseInt(currentQuestion?.STT);
       if (next) {
         if (num == testData.length) setCurrentQuestion(testData[0]);
-        else setCurrentQuestion(testData[parseInt(currentQuestion.stt)]);
+        else setCurrentQuestion(testData[parseInt(currentQuestion?.STT)]);
       } else {
         if (num == 1) {
           setCurrentQuestion(testData[testData.length - 1]);
@@ -94,8 +106,13 @@ export function TestScreen({navigation, route}) {
   };
 
   function openMenuQuestion() {
-    navigation.navigate(AppRouter.MENU_QUESTION);
+    navigation.navigate(AppRouter.MENU_QUESTION, {data: testData});
   }
+  const getListQuestion = async (MaSV, MaBaiKT) => {
+    let rs = await JointTest(MaSV, MaBaiKT);
+    setTestData(rs.data);
+    console.log('#ahihi: ', testData);
+  };
   //
   const pressingAnswer = answer => {
     setColorAnswerA(settings.colors.colorGreen);
@@ -122,6 +139,7 @@ export function TestScreen({navigation, route}) {
       default:
     }
   };
+  //
   return (
     <SafeAreaView style={{flex: 1}}>
       <Modal animationType={'fade'} transparent={true} visible={!isRunning}>
@@ -191,7 +209,7 @@ export function TestScreen({navigation, route}) {
         </View>
         <View style={body.container}>
           <View style={body.title}>
-            <Text style={appBar.textTitle}>Câu: {currentQuestion.stt}</Text>
+            <Text style={appBar.textTitle}>Câu: {currentQuestion?.STT}</Text>
             <TouchableOpacity
               style={{paddingRight: 15}}
               onPress={() => openMenuQuestion()}>
@@ -206,7 +224,7 @@ export function TestScreen({navigation, route}) {
             <ScrollView>
               <Text style={body.questionText}>
                 {'\t\t'}
-                {currentQuestion.cauhoi}
+                {currentQuestion?.CauHoi}
               </Text>
             </ScrollView>
           </View>
@@ -217,7 +235,7 @@ export function TestScreen({navigation, route}) {
                   pressingAnswer('A');
               }}
               style={[body.answer, {backgroundColor: colorAnswerA}]}>
-              <Text styles={body.answerText}>{currentQuestion.a}</Text>
+              <Text style={body.answerText}>{currentQuestion?.A}</Text>
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => {
@@ -225,7 +243,7 @@ export function TestScreen({navigation, route}) {
                   pressingAnswer('B');
               }}
               style={[body.answer, {backgroundColor: colorAnswerB}]}>
-              <Text styles={body.answerText}>{currentQuestion.b}</Text>
+              <Text style={body.answerText}>{currentQuestion?.B}</Text>
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => {
@@ -233,7 +251,7 @@ export function TestScreen({navigation, route}) {
                   pressingAnswer('C');
               }}
               style={[body.answer, {backgroundColor: colorAnswerC}]}>
-              <Text styles={body.answerText}>{currentQuestion.c}</Text>
+              <Text style={body.answerText}>{currentQuestion?.C}</Text>
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => {
@@ -241,7 +259,7 @@ export function TestScreen({navigation, route}) {
                   pressingAnswer('D');
               }}
               style={[body.answer, {backgroundColor: colorAnswerD}]}>
-              <Text styles={body.answerText}>{currentQuestion.d}</Text>
+              <Text style={body.answerText}>{currentQuestion?.D}</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -257,7 +275,7 @@ export function TestScreen({navigation, route}) {
             />
           </TouchableOpacity>
           <Text style={navigator.text}>
-            {currentQuestion.stt}/{questionQuantity}
+            {currentQuestion?.STT}/{questionQuantity}
           </Text>
           <TouchableOpacity
             onPress={() => {

@@ -16,11 +16,11 @@ const Stack = createStackNavigator();
 export const TestingNavigation = () => {
   return (
     <Stack.Navigator>
-      <Stack.Screen
+      {/* <Stack.Screen
         name={AppRouter.WAITING_SCREEN}
         options={{title: AppRouter.WAITING_SCREEN, headerShown: false}}
         component={WaitingScreen}
-      />
+      /> */}
       <Stack.Screen
         name={AppRouter.TESTING}
         options={{title: AppRouter.LOGIN, headerShown: false}}

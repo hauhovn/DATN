@@ -85,7 +85,7 @@ export const StudentScreen = () => {
   };
 
   const pressHandleKey = () => {
-    nav.navigate(AppRouter.TESTING);
+    nav.navigate(AppRouter.TESTING, {data: sentData});
   };
 
   return (

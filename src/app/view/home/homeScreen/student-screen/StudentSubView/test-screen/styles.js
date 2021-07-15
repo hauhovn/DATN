@@ -71,10 +71,11 @@ const body = StyleSheet.create({
     borderRadius: 8,
     margin: 8,
     padding: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   answerText: {
-    flex: 1,
-    fontSize: 18,
+    fontSize: 15,
     color: '#fff',
   },
 });

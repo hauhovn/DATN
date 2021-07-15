@@ -18,8 +18,10 @@ import {settings} from '../../../../../../config';
 import {AppRouter} from '../../../../../../navigation/AppRouter';
 import {KEYS} from '../../../../../../asset/keys';
 
-export const MenuQuestion = ({navigation}) => {
-  const [data, setData] = useState(testData);
+export const MenuQuestion = ({navigation, route}) => {
+  const dataX = route.params.data;
+  const [data, setData] = useState(dataX);
+  console.log('datax; ', data);
   const {width, height} = Dimensions.get('window');
   const handlePressItem = item => {
     navigation.navigate(AppRouter.TESTING, {QUESTION_ID: item.stt});
