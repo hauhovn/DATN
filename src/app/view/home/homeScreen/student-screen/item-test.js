@@ -5,19 +5,20 @@ const mainColor = '#FF7043';
 
 export const ItemTest = ({item, handle}) => {
   const pressItem = () => {
-    console.log('my check: ', item);
     handle(item);
   };
 
   return (
-    <TouchableOpacity style={styles.container} onPress={() => pressItem()}>
+    <TouchableOpacity style={styles.container} onPress={() => handle(item)}>
       <View style={styles.title}>
         <Text style={styles.titleText}>{item.TenLopHP}</Text>
         <Text>{item.Ngay}</Text>
       </View>
       <View style={styles.content}>
-        <Text>Bài kiểm tra: {item.TenBaiKT}</Text>
-        <Text>Thời gian làm: {item.ThoiGianLam}</Text>
+        <View style={styles.content}>
+          <Text>Bài kiểm tra: {item.TenBaiKT}</Text>
+          <Text>Thời gian làm: {item.ThoiGianLam}</Text>
+        </View>
       </View>
     </TouchableOpacity>
   );
@@ -29,7 +30,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     height: 90,
     width: '90%',
-    borderWidth: 1,
+    borderWidth: 0.6,
     borderColor: mainColor,
     borderRadius: 8,
   },

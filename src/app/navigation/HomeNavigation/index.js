@@ -11,10 +11,11 @@ import {ChuDeNav} from '../../view/chuDe';
 import {User} from '../../view/user';
 import {TeacherScreen} from '../../view/home/homeScreen/teacher-screen';
 import {StudentScreen} from '../../view/home/homeScreen/student-screen';
-import {StudentTestList} from '../../view/StudentSubView/studentListTest';
+import {StudentTestList} from '../../view/home/homeScreen/student-screen/StudentSubView/studentListTest';
 import {Loading} from '../../view/loading';
 import {TestingNavigation} from '../../navigation/TestingNavigation';
 import {LopHocPhanNav} from '../../view/lopHocPhan';
+import {LopHocPhanSV} from '../../view/home/homeScreen/student-screen/StudentSubView/LopHocPhanSV';
 
 const Stack = createStackNavigator();
 
@@ -112,6 +113,11 @@ const HomeNavigator = () => {
         name={AppRouter.TESTING}
         component={TestingNavigation}
         options={{title: AppRouter.TESTING, headerShown: false}}
+      />
+      <Stack.Screen
+        name={AppRouter.LOP_HOC_PHAN}
+        component={LopHocPhanSV}
+        options={{title: AppRouter.LOP_HOC_PHAN, headerShown: false}}
       />
     </Stack.Navigator>
   );

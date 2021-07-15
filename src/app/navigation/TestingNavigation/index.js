@@ -2,9 +2,9 @@ import React from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 //compoments
-import {TestScreen} from '../../view/test-screen';
-import {MenuQuestion} from '../../view/test-screen/menu-question';
-import WaitingScreen from '../../view/test-screen/waiting-screen';
+import {TestScreen} from '../../view/home/homeScreen/student-screen/StudentSubView/test-screen';
+import {MenuQuestion} from '../../view/home/homeScreen/student-screen/StudentSubView/test-screen/menu-question';
+import WaitingScreen from '../../view/home/homeScreen/student-screen/StudentSubView/test-screen/waiting-screen';
 //
 import {AppRouter} from '../AppRouter';
 //test-start

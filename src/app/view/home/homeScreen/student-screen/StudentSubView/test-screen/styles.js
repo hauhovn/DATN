@@ -1,7 +1,7 @@
 import {StyleSheet, Dimensions} from 'react-native';
-import {settings} from '../../config';
+import {settings} from '../../../../../../config';
 
-export {styles, appBar, body, navigator, menuQuestion};
+export {styles, appBar, body, navigator, menuQuestion, pauseModal};
 
 const styles = StyleSheet.create({
   container: {
@@ -17,7 +17,7 @@ const appBar = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: 'rgba(76, 175, 80,0.08)',
     position: 'relative',
   },
   leftButton: {
@@ -106,5 +106,41 @@ const menuQuestion = StyleSheet.create({
     borderRadius: 10,
     borderWidth: 1,
     borderColor: '#CFD8DC',
+  },
+});
+
+const pauseModal = StyleSheet.create({
+  container: {
+    width: '100%',
+    height: '100%',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(151, 153, 156,0.45)',
+  },
+  box: {
+    width: 340,
+    height: 240,
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    flexDirection: 'column',
+    alignItems: 'center',
+  },
+
+  gif: {
+    resizeMode: 'cover',
+    width: 100,
+    height: 100,
+    margin: 40,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginTop: 20,
+    color: settings.colors.colorMain,
+  },
+  textContent: {
+    marginTop: 2,
+    fontSize: 12,
   },
 });

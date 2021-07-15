@@ -17,6 +17,7 @@ export const settings = {
     colorRed: '#e53935',
     colorBoderLight: '#ECEFF1',
     colorBoderDark: '#CFD8DC',
+    bg_fade: 'rgba(151, 153, 156,0.45)',
   },
   text: {
     AppName: 'Viet Social',
@@ -25,5 +26,3 @@ export const settings = {
     Friends: 'Bạn bè',
   },
 };
-
-

@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import {Text, StyleSheet, TouchableOpacity, Dimensions} from 'react-native';
 //
-import {settings} from '../../config';
+import {settings} from '../../../../../../config';
 
 export const ItemQuestion = ({item, data, handle}) => {
   const pressItem = () => {

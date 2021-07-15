@@ -11,19 +11,20 @@ import {
 import {useNavigation, useIsFocused} from '@react-navigation/native';
 import {Icon} from 'native-base';
 //item
-import {ItemTest} from '../../home/homeScreen/student-screen/item-test';
+import {ItemTest} from '../../item-test';
 //api
-import {getBaiKiemTra} from '../../../../server/BaiKiemTra';
+import {getBaiKiemTra} from '../../../../../../../server/BaiKiemTra';
 //settting
-import {settings} from '../../../config';
+import {settings} from '../../../../../../config';
 //screens
-import {TestDetail} from '../testDetail';
+import {TestDetailModal} from '../modals/TestDetailModal';
 
 export const StudentTestList = ({navigation, route}) => {
   const nav = useNavigation();
   const fo = useIsFocused();
   const [isShowDialog, setIsShowDialog] = useState(false);
   const [data, setData] = useState('');
+  const [clickedItem, setClickedItem] = useState('');
   const [clickedData, setClickedData] = useState({
     MaBaiKT: '',
     Ngay: '',
@@ -55,20 +56,18 @@ export const StudentTestList = ({navigation, route}) => {
   };
 
   // Nhấn vô item
-  const handlePressItem = async item => {
-    clickedData.MaBaiKT = item.MaBaiKT;
-    clickedData.Ngay = item.Ngay;
-    clickedData.TenBaiKT = item.TenBaiKT;
-    clickedData.TenLopHP = item.TenLopHP;
-    clickedData.ThoiGianLam = item.ThoiGianLam;
-    clickedData.MaSV = SinhVien.MaSV;
-
+  const handlePressItem = item => {
+    // console.log('xxxxaaaaaaaaaaaaaaaaaa ', item);
+    // clickedData.MaBaiKT = item.MaBaiKT;
+    // clickedData.Ngay = item.Ngay;
+    // clickedData.TenBaiKT = item.TenBaiKT;
+    // clickedData.TenLopHP = item.TenLopHP;
+    // clickedData.ThoiGianLam = item.ThoiGianLam;
+    // clickedData.MaSV = SinhVien.MaSV;
     //let res = await getCTBaiKiemTra(SinhVien.MaSV, item.MaBaiKT);
     //clickedData.TenGV = res.TenGV;
-
-    setClickedData({clickedData});
-    console.log('clicked: ', clickedData);
-
+    // setClickedData({clickedData});
+    // console.log('clicked: ', clickedData);
     setIsShowDialog(true);
   };
 
@@ -93,6 +92,7 @@ export const StudentTestList = ({navigation, route}) => {
       <View style={styles.filter}>
         <Text>filler</Text>
       </View>
+
       <FlatList
         data={data}
         showsVerticalScrollIndicator={false}
@@ -102,15 +102,13 @@ export const StudentTestList = ({navigation, route}) => {
         keyExtractor={item => item.MaBaiKT}
         style={{flex: 1, marginTop: 12, backgroundColor: '#fff'}}
       />
-      {isShowDialog ? (
-        <TestDetail
-          modalVisible={isShowDialog}
-          closeDialog={() => setIsShowDialog(false)}
-          data={clickedData}
-        />
-      ) : (
-        <View></View>
-      )}
+      <TestDetailModal
+        modalVisible={isShowDialog}
+        close={() => {
+          setIsShowDialog(false);
+        }}
+        data={clickedItem}
+      />
     </SafeAreaView>
   );
 };

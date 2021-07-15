@@ -18,6 +18,7 @@ export const AppRouter = {
   ALLEXERCISE: 'ALLEXERCISE',
   INFO: 'INFO',
   TESTING: 'TESTING',
+  LOP_HOC_PHAN: 'LOP_HOC_PHAN_K',
   MENU_QUESTION: 'MENU_QUESTION',
   WAITING_SCREEN: 'WAITING_SCREEN',
   AddExercise: 'AddExercise',

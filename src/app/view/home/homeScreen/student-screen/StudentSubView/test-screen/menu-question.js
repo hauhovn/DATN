@@ -14,9 +14,9 @@ import {appBar, styles} from './styles';
 import {ItemQuestion} from './item';
 //test
 import {testData} from './test-data';
-import {settings} from '../../config';
-import {AppRouter} from '../../navigation/AppRouter';
-import {KEYS} from '../../asset/keys';
+import {settings} from '../../../../../../config';
+import {AppRouter} from '../../../../../../navigation/AppRouter';
+import {KEYS} from '../../../../../../asset/keys';
 
 export const MenuQuestion = ({navigation}) => {
   const [data, setData] = useState(testData);
@@ -45,7 +45,6 @@ export const MenuQuestion = ({navigation}) => {
         style={{
           width: '100%',
           height: 46,
-          backgroundColor: '#fff',
           flexDirection: 'row',
           justifyContent: 'space-around',
           alignItems: 'center',

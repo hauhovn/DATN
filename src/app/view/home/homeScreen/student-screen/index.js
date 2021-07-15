@@ -19,13 +19,24 @@ import {KEYS_VALUE} from './key_value';
 //Item
 import {ItemTest} from './item-test';
 //APIs
+import {getCTBaiKiemTra} from '../../../../../server/BaiKiemTra/getTestDetail';
+//
 import {getBaiKiemTra} from '../../../../../server/BaiKiemTra';
 import {AppRouter} from '../../../../navigation/AppRouter';
+import {settings} from '../../../../config';
+
+import {TestDetailModal} from '../../homeScreen/student-screen/StudentSubView/modals/TestDetailModal';
 
 export const StudentScreen = () => {
   const nav = useNavigation();
   const [user, setUser] = useState('');
   const [listTest, setListTest] = useState('');
+  const [clickedItem, setClickedItem] = useState('');
+  const [sentData, setSentData] = useState({
+    MaSV: '',
+    MaBaiKT: '',
+  });
+  const [isShowDialog, setIsShowDialog] = useState(false);
 
   useEffect(() => {
     getAccount();
@@ -61,10 +72,20 @@ export const StudentScreen = () => {
       nav.navigate(AppRouter.STUDENT_LIST_TEST, {MaSV: user[0]?.MaSV});
     if (value === KEYS_VALUE.BAI_KIEM_TRA)
       nav.navigate(AppRouter.TESTING, {SinhVien: user[0]});
+    if (value === KEYS_VALUE.LOP_HOC_PHAN)
+      nav.navigate(AppRouter.LOP_HOC_PHAN, {SinhVien: user[0]});
   };
   // Nhấn vô item
   const handlePressItem = item => {
-    console.log(item);
+    sentData.MaBaiKT = item.MaBaiKT;
+    sentData.MaSV = user[0].MaSV;
+
+    setSentData(sentData);
+    setIsShowDialog(true);
+  };
+
+  const pressHandleKey = () => {
+    nav.navigate(AppRouter.TESTING);
   };
 
   return (
@@ -156,7 +177,7 @@ export const StudentScreen = () => {
         <Text
           style={{
             fontSize: 14,
-            color: mainColor,
+            color: settings.colors.colorGreen,
             marginVertical: 5,
             marginLeft: 10,
             paddingTop: 20,
@@ -165,15 +186,41 @@ export const StudentScreen = () => {
           BÀI KIỂM TRA SẮP TỚI
         </Text>
         <View style={styles.listTest}>
-          <FlatList
-            data={listTest}
-            showsVerticalScrollIndicator={false}
-            renderItem={({item}) => (
-              <ItemTest item={item} data={listTest} handle={handlePressItem} />
-            )}
-            keyExtractor={item => item.MaBaiKT}
-          />
+          {listTest != '' ? (
+            <FlatList
+              data={listTest}
+              showsVerticalScrollIndicator={false}
+              renderItem={({item}) => (
+                <ItemTest
+                  item={item}
+                  data={listTest}
+                  handle={handlePressItem}
+                />
+              )}
+              keyExtractor={item => item.MaBaiKT}
+            />
+          ) : (
+            <View style={{flex: 1, alignItems: 'center'}}>
+              <Text
+                style={{
+                  fontSize: 14,
+                  color: settings.colors.colorMain,
+                }}>
+                Chưa có bài kiểm tra
+              </Text>
+            </View>
+          )}
         </View>
+        <TestDetailModal
+          modalVisible={isShowDialog}
+          close={() => {
+            setIsShowDialog(false);
+          }}
+          data={sentData}
+          pressHandle={() => {
+            pressHandleKey();
+          }}
+        />
       </View>
     </SafeAreaView>
   );

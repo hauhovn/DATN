@@ -5,31 +5,39 @@ import {
   TouchableOpacity,
   SafeAreaView,
   ScrollView,
-  Alert,
+  Modal,
+  Image,
 } from 'react-native';
 //Screens
-import {NavigationContainer} from '@react-navigation/native';
-import {createStackNavigator} from '@react-navigation/stack';
 //Moduns
 import {useNavigation, useIsFocused} from '@react-navigation/native';
 import {Icon} from 'native-base';
 import CountDown from 'react-native-countdown-component';
 import io from 'socket.io-client/dist/socket.io.js';
-import {TestingTimeCountDown} from '../../components/time-remote/time-countdown';
 //others
-import {settings} from '../../config';
-import {appBar, body, navigator, styles} from './styles';
-import {AppRouter} from '../../navigation/AppRouter';
+import {settings} from '../../../../../../config';
+import {appBar, body, navigator, styles, pauseModal} from './styles';
+import {AppRouter} from '../../../../../../navigation/AppRouter';
 import {testData} from './test-data';
 
 export function TestScreen({navigation, route}) {
   const fo = useIsFocused();
   //Socket
-  let socket = ('https://da-tot-nghiep.herokuapp.com/', {jsonp: false});
+  const socket = io('https://da-tot-nghiep.herokuapp.com', {jsonp: false});
+  const [isRunning, setIsRunning] = useState(true);
+
+  socket.on('server-stop-time', function (data) {
+    if (isRunning != data) {
+      console.log('isRunning: ', isRunning, '& data: ', data);
+      console.log('server-stop-time ', data);
+      setIsRunning(data);
+      socket.off('server-stop-time');
+    }
+  });
   //Consts
   const [currentQuestion, setCurrentQuestion] = useState(testData[0]);
   const QUESTION_ID = route.params;
-  const timeTestRef = useRef(null);
+  var gifcat = require('../../../../../../asset/gif/loading-cat.gif');
   //color answers
   const [colorAnswerA, setColorAnswerA] = useState(settings.colors.colorGreen);
   const [colorAnswerB, setColorAnswerB] = useState(settings.colors.colorGreen);
@@ -73,72 +81,75 @@ export function TestScreen({navigation, route}) {
   //func
   const updateQuestion = next => {
     try {
-      if (isTesting()) {
-        let num = parseInt(currentQuestion.stt);
-        if (next) {
-          if (num == testData.length) setCurrentQuestion(testData[0]);
-          else setCurrentQuestion(testData[parseInt(currentQuestion.stt)]);
-        } else {
-          if (num == 1) {
-            setCurrentQuestion(testData[testData.length - 1]);
-          } else setCurrentQuestion(testData[num - 2]);
-        }
+      let num = parseInt(currentQuestion.stt);
+      if (next) {
+        if (num == testData.length) setCurrentQuestion(testData[0]);
+        else setCurrentQuestion(testData[parseInt(currentQuestion.stt)]);
       } else {
-        console.log('Time stoped!');
-        Alert.alert('Time stoped!');
+        if (num == 1) {
+          setCurrentQuestion(testData[testData.length - 1]);
+        } else setCurrentQuestion(testData[num - 2]);
       }
     } catch (error) {}
   };
 
-  const isTesting = () => {
-    try {
-      let status = true;
-      status = timeTestRef.current.getTimeStatus();
-      console.log('getTimeTestStatus @1: ', status);
-      return status;
-    } catch (error) {
-      console.log('TestScreen / getTimeTestStatus: ', error);
-    }
-  };
-  //
   function openMenuQuestion() {
-    if (isTesting()) navigation.navigate(AppRouter.MENU_QUESTION);
-    else {
-      Alert.alert('Time stoped! ok ok ');
-    }
+    navigation.navigate(AppRouter.MENU_QUESTION);
   }
   //
   const pressingAnswer = answer => {
-    if (isTesting()) {
-      setColorAnswerA(settings.colors.colorGreen);
-      setColorAnswerB(settings.colors.colorGreen);
-      setColorAnswerC(settings.colors.colorGreen);
-      setColorAnswerD(settings.colors.colorGreen);
-      switch (answer) {
-        case 'A': {
-          setColorAnswerA(settings.colors.colorMain);
-          break;
-        }
-        case 'B': {
-          setColorAnswerB(settings.colors.colorMain);
-          break;
-        }
-        case 'C': {
-          setColorAnswerC(settings.colors.colorMain);
-          break;
-        }
-        case 'D': {
-          setColorAnswerD(settings.colors.colorMain);
-          break;
-        }
-        default:
+    setColorAnswerA(settings.colors.colorGreen);
+    setColorAnswerB(settings.colors.colorGreen);
+    setColorAnswerC(settings.colors.colorGreen);
+    setColorAnswerD(settings.colors.colorGreen);
+    switch (answer) {
+      case 'A': {
+        setColorAnswerA(settings.colors.colorMain);
+        break;
       }
-    } else {
-      Alert.alert('Time stoped! OK');
+      case 'B': {
+        setColorAnswerB(settings.colors.colorMain);
+        break;
+      }
+      case 'C': {
+        setColorAnswerC(settings.colors.colorMain);
+        break;
+      }
+      case 'D': {
+        setColorAnswerD(settings.colors.colorMain);
+        break;
+      }
+      default:
     }
   };
   return (
     <SafeAreaView style={{flex: 1}}>
+      <Modal animationType={'fade'} transparent={true} visible={!isRunning}>
+        <View style={pauseModal.container}>
+          <View style={pauseModal.box}>
+            <Image
+              style={pauseModal.gif}
+              source={require('../../../../../../asset/gif/loading-cat.gif')}
+            />
+            <View
+              style={{
+                borderRadius: 60,
+                width: 106,
+                height: 106,
+                marginTop: -150,
+                marginRight: -0.8,
+                backgroundColor: 'rgba(0,0,0,0)',
+                borderWidth: 1,
+                borderColor: settings.colors.colorGreen,
+              }}
+            />
+            <Text style={pauseModal.title}>TẠM DỪNG</Text>
+            <Text style={pauseModal.textContent}>
+              Bài kiểm tra này đã được giám thị dừng lại!
+            </Text>
+          </View>
+        </View>
+      </Modal>
       <View style={styles.container}>
         <View style={appBar.container}>
           <TouchableOpacity
@@ -153,7 +164,23 @@ export function TestScreen({navigation, route}) {
             />
           </TouchableOpacity>
           <Text style={appBar.textTitle}>THỜI GIAN</Text>
-          <TestingTimeCountDown ref={timeTestRef} />
+          <CountDown
+            size={16}
+            until={3600}
+            running={isRunning}
+            onFinish={() => {}}
+            digitStyle={{
+              backgroundColor: 'rgba(76, 175, 80,0)',
+              borderWidth: 0,
+              borderColor: 'blue',
+            }}
+            digitTxtStyle={{color: settings.colors.colorMain}}
+            timeLabelStyle={{color: 'red', fontWeight: 'bold'}}
+            separatorStyle={{color: settings.colors.colorMain}} // mau` dau :
+            timeToShow={['H', 'M', 'S']}
+            timeLabels={{m: null, s: null}}
+            showSeparator
+          />
           <TouchableOpacity onPress={() => {}} style={appBar.rightButton}>
             <Icon
               type="Ionicons"
