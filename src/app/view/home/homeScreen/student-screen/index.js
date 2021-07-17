@@ -85,7 +85,11 @@ export const StudentScreen = () => {
   };
 
   const pressHandleKey = () => {
-    nav.navigate(AppRouter.TESTING, {data: sentData});
+    /* 1. Navigate to the Details route with params */
+    nav.navigate(AppRouter.TESTING, {
+      itemId: 86,
+      otherParam: 'anything you want here',
+    });
   };
 
   return (

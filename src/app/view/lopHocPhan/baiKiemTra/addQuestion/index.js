@@ -84,27 +84,27 @@ export const ThemCauHoi = () => {
     }
   };
 
-  // Xóa bài kiểm tra
-  const subMit = async data => {
-    // const res = await deleteBaiKT(data);
-    console.log(
-      'selectedFruits[0].value: ',
-      selectedFruits[0].value,
-      'params: ',
-      params.BaiKiemTra.MaBaiKT,
-    );
-    for (let i = 0; i < selectedFruits.length; i++) {
-      try {
-        const res = await addQuestionDetail(
-          selectedFruits[i].value,
-          params.BaiKiemTra.MaBaiKT,
-        );
-        console.log('#res: ', res.data);
-      } catch (error) {
-        console.log('addQuestion ERROR: ', error);
-      }
-    }
-  };
+  // // Xóa bài kiểm tra
+  // const subMit = async data => {
+  //   // const res = await deleteBaiKT(data);
+  //   console.log(
+  //     'selectedFruits[0].value: ',
+  //     selectedFruits[0].value,
+  //     'params: ',
+  //     params.BaiKiemTra.MaBaiKT,
+  //   );
+  //   for (let i = 0; i < selectedFruits.length; i++) {
+  //     try {
+  //       const res = await addQuestionDetail(
+  //         selectedFruits[i].value,
+  //         params.BaiKiemTra.MaBaiKT,
+  //       );
+  //       console.log('#res: ', res.data);
+  //     } catch (error) {
+  //       console.log('addQuestion ERROR: ', error);
+  //     }
+  //   }
+  // };
 
   const addQuestToTest = (MaCH, MaBaiKT) => {};
   //
