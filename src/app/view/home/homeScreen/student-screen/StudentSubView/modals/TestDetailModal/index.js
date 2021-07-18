@@ -80,19 +80,19 @@ export const TestDetailModal = ({modalVisible, close, data, pressHandle}) => {
                 justifyContent: 'flex-end',
               }}>
               <View style={styles.title}>
-                <Text style={textStyles.title}>{resData?.TenMonHoc}</Text>
-                <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                <Text style={textStyles.title}>{resData?.TenMonHoc} </Text>
+                <View style={{flexDirection: 'row', alignItems: 'flex-end'}}>
                   <Text
                     style={[
                       textStyles.title,
-                      {fontSize: 13, color: '#000', fontWeight: '200'},
+                      {fontSize: 13, color: mainColor, fontWeight: '200'},
                     ]}>
-                    Lớp học phần{' '}
+                    Lớp học phần:{' '}
                   </Text>
                   <Text
                     style={[
                       textStyles.title,
-                      {fontSize: 15, color: mainColor, fontWeight: '600'},
+                      {fontSize: 15, color: mainColor, fontWeight: 'bold'},
                     ]}>
                     {resData?.TenLopHP}
                   </Text>

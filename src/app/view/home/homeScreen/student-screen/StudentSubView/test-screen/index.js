@@ -18,8 +18,9 @@ import io from 'socket.io-client/dist/socket.io.js';
 import {settings} from '../../../../../../config';
 import {appBar, body, navigator, styles, pauseModal} from './styles';
 import {AppRouter} from '../../../../../../navigation/AppRouter';
-//import {testData} from './test-data';
+//APIs
 import {JointTest} from '../../../../../../../server/JointTest';
+import {UpdateQuestion} from '../../../../../../../server/JointTest/update-answer';
 
 export function TestScreen({navigation, route}) {
   const fo = useIsFocused();
@@ -74,17 +75,17 @@ export function TestScreen({navigation, route}) {
     setColorAnswerC(settings.colors.colorGreen);
     setColorAnswerD(settings.colors.colorGreen);
     //set answers
-    if (currentQuestion?.Dachon == 'A') {
+    if (currentQuestion?.DASV == 'A') {
       console.log('currentQuestion?.Dachon == A');
       setColorAnswerA(settings.colors.colorMain);
-    } else if (currentQuestion?.Dachon == 'B') {
+    } else if (currentQuestion?.DASV == 'B') {
       console.log('currentQuestion?.Dachon == B');
       setColorAnswerA(settings.colors.colorGreen);
       setColorAnswerB(settings.colors.colorMain);
-    } else if (currentQuestion?.Dachon == 'C') {
+    } else if (currentQuestion?.DASV == 'C') {
       console.log('currentQuestion?.Dachon == C');
       setColorAnswerC(settings.colors.colorMain);
-    } else if (currentQuestion?.Dachon == 'D') {
+    } else if (currentQuestion?.DASV == 'D') {
       console.log('currentQuestion?.Dachon == D');
       setColorAnswerD(settings.colors.colorMain);
     }
@@ -119,26 +120,79 @@ export function TestScreen({navigation, route}) {
     setColorAnswerB(settings.colors.colorGreen);
     setColorAnswerC(settings.colors.colorGreen);
     setColorAnswerD(settings.colors.colorGreen);
+    let A = 'A',
+      B = 'B',
+      C = 'C',
+      D = 'D',
+      X = 'X';
+    let newAnswer = currentQuestion;
     switch (answer) {
-      case 'A': {
-        setColorAnswerA(settings.colors.colorMain);
+      case A: {
+        if (currentQuestion.DASV === X || currentQuestion.DASV !== A) {
+          //Update
+          setColorAnswerA(settings.colors.colorMain); // Set ui
+          changeAnwer(A); // Set server
+          newAnswer.DASV = A; // Set local
+        } else {
+          //Cancel
+          setColorAnswerA(settings.colors.colorGreen);
+          changeAnwer(X);
+          newAnswer.DASV = X;
+        }
         break;
       }
-      case 'B': {
-        setColorAnswerB(settings.colors.colorMain);
+      case B: {
+        if (currentQuestion.DASV === X || currentQuestion.DASV !== B) {
+          //Update
+          setColorAnswerB(settings.colors.colorMain);
+          changeAnwer(B);
+          newAnswer.DASV = B;
+        } else {
+          //Cancel
+          setColorAnswerB(settings.colors.colorGreen);
+          changeAnwer(X);
+          newAnswer.DASV = X;
+        }
         break;
       }
-      case 'C': {
-        setColorAnswerC(settings.colors.colorMain);
+      case C: {
+        if (currentQuestion.DASV === X || currentQuestion.DASV !== C) {
+          //Update
+          setColorAnswerC(settings.colors.colorMain);
+          changeAnwer(C);
+          newAnswer.DASV = C;
+        } else {
+          //Cancel
+          setColorAnswerC(settings.colors.colorGreen);
+          changeAnwer(X);
+          newAnswer.DASV = X;
+        }
         break;
       }
-      case 'D': {
-        setColorAnswerD(settings.colors.colorMain);
+      case D: {
+        if (currentQuestion.DASV === X || currentQuestion.DASV !== D) {
+          //Update
+          setColorAnswerD(settings.colors.colorMain);
+          changeAnwer(D);
+          newAnswer.DASV = D;
+        } else {
+          //Cancel
+          setColorAnswerD(settings.colors.colorGreen);
+          changeAnwer(X);
+          newAnswer.DASV = X;
+        }
         break;
       }
       default:
     }
   };
+  //
+  async function changeAnwer(DapAn) {
+    let res = await UpdateQuestion(data.MaSV, currentQuestion.MaCH, DapAn);
+
+    console.log(res.status, res.content);
+  }
+
   //
   return (
     <SafeAreaView style={{flex: 1}}>
@@ -230,34 +284,22 @@ export function TestScreen({navigation, route}) {
           </View>
           <View style={body.answersContainer}>
             <TouchableOpacity
-              onPress={() => {
-                if (colorAnswerA != settings.colors.colorMain)
-                  pressingAnswer('A');
-              }}
+              onPress={() => pressingAnswer('A')}
               style={[body.answer, {backgroundColor: colorAnswerA}]}>
               <Text style={body.answerText}>{currentQuestion?.A}</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              onPress={() => {
-                if (colorAnswerB != settings.colors.colorMain)
-                  pressingAnswer('B');
-              }}
+              onPress={() => pressingAnswer('B')}
               style={[body.answer, {backgroundColor: colorAnswerB}]}>
               <Text style={body.answerText}>{currentQuestion?.B}</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              onPress={() => {
-                if (colorAnswerC != settings.colors.colorMain)
-                  pressingAnswer('C');
-              }}
+              onPress={() => pressingAnswer('C')}
               style={[body.answer, {backgroundColor: colorAnswerC}]}>
               <Text style={body.answerText}>{currentQuestion?.C}</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              onPress={() => {
-                if (colorAnswerD != settings.colors.colorMain)
-                  pressingAnswer('D');
-              }}
+              onPress={() => pressingAnswer('D')}
               style={[body.answer, {backgroundColor: colorAnswerD}]}>
               <Text style={body.answerText}>{currentQuestion?.D}</Text>
             </TouchableOpacity>

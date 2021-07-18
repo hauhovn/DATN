@@ -17,7 +17,7 @@ export const styles = StyleSheet.create({
     backgroundColor: settings.colors.bg_fade,
   },
   box: {
-    height: 350,
+    height: 380,
     width: '70%',
     backgroundColor: '#fff',
     borderRadius: 12,
