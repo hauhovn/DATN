@@ -9,6 +9,7 @@ import {
   Alert,
 } from 'react-native';
 import {Icon} from 'native-base';
+import Moment from 'moment';
 
 //api
 import {getCTBaiKiemTra} from '../../../../../../../../server/BaiKiemTra/getTestDetail';
@@ -25,16 +26,36 @@ export const TestDetailModal = ({modalVisible, close, data, pressHandle}) => {
   const [keyInput, setKeyInput] = useState('');
 
   useEffect(() => {
-    if (data != undefined && data != '') {
+    if (data != undefined && modalVisible) {
+      setIsDowload(true);
       getResponse();
+      setIsDowload(false);
     }
   }, [close]);
 
   async function getResponse() {
+    console.log(
+      'item.MaBaiKT: ',
+      data.MaBaiKT,
+      ' & SinhVien.MaSV: ',
+      data.MaSV,
+    );
     const res = await getCTBaiKiemTra(data.MaSV, data.MaBaiKT);
     setResData(res.data[0]);
-    console.log('This item detail: ', resData);
-    setIsDowload(false);
+    console.log('getResponse: ', resData);
+    await new Promise(a => setTimeout(a, 5000));
+  }
+
+  function resetView() {
+    resData.TenBaiKT = '';
+    resData.TenGV = '';
+    resData.TenLopHP = '';
+    resData.ThoiGianLam = '00:00:00';
+    resData.Mail = 'contact@me.com';
+    resData.Ngay = '';
+    resData.TenMonHoc = '';
+
+    setResData(resData);
   }
 
   return (
@@ -44,7 +65,10 @@ export const TestDetailModal = ({modalVisible, close, data, pressHandle}) => {
           <View style={styles.buttonBox}>
             <TouchableOpacity
               style={styles.button}
-              onPress={() => close(false)}>
+              onPress={() => {
+                resetView();
+                close(false);
+              }}>
               <Icon type="AntDesign" name="close" style={styles.icon} />
             </TouchableOpacity>
           </View>
@@ -55,29 +79,37 @@ export const TestDetailModal = ({modalVisible, close, data, pressHandle}) => {
                 flexDirection: 'column',
                 justifyContent: 'flex-end',
               }}>
-              <View
-                style={{
-                  marginTop: -15,
-                  padding: 8,
-                }}>
-                <Text style={textStyles.title}>
-                  {resData != undefined ? resData.TenLopHP : ''}
-                </Text>
-                <Text style={[textStyles.title, {fontSize: 13}]}>
-                  {resData != undefined ? resData.TenBaiKT : ''}
-                </Text>
+              <View style={styles.title}>
+                <Text style={textStyles.title}>{resData?.TenMonHoc}</Text>
+                <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                  <Text
+                    style={[
+                      textStyles.title,
+                      {fontSize: 13, color: '#000', fontWeight: '200'},
+                    ]}>
+                    Lớp học phần{' '}
+                  </Text>
+                  <Text
+                    style={[
+                      textStyles.title,
+                      {fontSize: 15, color: mainColor, fontWeight: '600'},
+                    ]}>
+                    {resData?.TenLopHP}
+                  </Text>
+                </View>
               </View>
-              <View
-                style={{
-                  alignItems: 'flex-end',
-                  borderColor: mainColor,
-                  marginHorizontal: '20%',
-                }}>
+              <View style={styles.time}>
+                <Text
+                  style={[textStyles.date, {color: settings.colors.colorMain}]}>
+                  {resData?.TenBaiKT}
+                </Text>
                 <Text style={textStyles.date}>
-                  {resData != undefined ? resData.Ngay : ''}
+                  Ngày: {Moment(resData?.Ngay)?.format('L')}
                 </Text>
 
-                <Text> {resData != undefined ? resData.ThoiGianLam : ''}</Text>
+                <Text style={textStyles.time}>
+                  Thời gian làm: {resData?.ThoiGianLam}
+                </Text>
               </View>
               <View style={inputKeyBox.container}>
                 <TouchableOpacity
@@ -101,9 +133,12 @@ export const TestDetailModal = ({modalVisible, close, data, pressHandle}) => {
                   </View>
                 </TouchableOpacity>
               </View>
-              <Text>
-                {'   '}Liên hệ: {resData != undefined ? resData.Mail : ''}
-              </Text>
+              <View style={styles.contact}>
+                <Text style={[textStyles.contact, {marginBottom: 1}]}>
+                  Giảng viên: {resData?.TenGV}
+                </Text>
+                <Text style={textStyles.contact}>Email: {resData?.Mail}</Text>
+              </View>
             </View>
           ) : (
             <View

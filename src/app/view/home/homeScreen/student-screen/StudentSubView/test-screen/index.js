@@ -37,9 +37,8 @@ export function TestScreen({navigation, route}) {
     }
   });
   //Consts
-  const [listQuestion, setListQuestion] = useState('');
+  const {data} = route.params;
   const [currentQuestion, setCurrentQuestion] = useState('');
-  const QUESTION_ID = route.params;
 
   //color answers
   const [colorAnswerA, setColorAnswerA] = useState(settings.colors.colorGreen);
@@ -52,11 +51,12 @@ export function TestScreen({navigation, route}) {
   useEffect(() => {
     if (fo) {
       if (testData == '') {
-        getListQuestion(1, 16);
+        getListQuestion(data.MaSV, data.MaBaiKT);
+        console.log(' tao buon lam roi: ', data);
       }
       try {
-        console.log('QUESTION_ID: ', QUESTION_ID.QUESTION_ID);
-        setCurrentQuestion(testData[QUESTION_ID.QUESTION_ID - 1]);
+        console.log('QUESTION_ID: ', QUESTION_ID);
+        setCurrentQuestion(testData[QUESTION_ID - 1]);
       } catch (error) {}
     }
   }, [fo]);

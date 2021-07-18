@@ -1,3 +1,4 @@
+import {Thumbnail} from 'native-base';
 import React from 'react';
 import {StyleSheet} from 'react-native';
 import {settings} from '../../../../../../../config';
@@ -16,7 +17,7 @@ export const styles = StyleSheet.create({
     backgroundColor: settings.colors.bg_fade,
   },
   box: {
-    height: 400,
+    height: 350,
     width: '70%',
     backgroundColor: '#fff',
     borderRadius: 12,
@@ -39,23 +40,36 @@ export const styles = StyleSheet.create({
     fontSize: 26,
     color: mainColor,
   },
+  title: {
+    margin: 20,
+  },
+  contact: {
+    margin: 20,
+  },
+  time: {
+    margin: 20,
+  },
 });
 
 export const textStyles = StyleSheet.create({
   title: {
-    color: colorThumblr,
+    color: settings.colors.colorGreen,
+    fontSize: 24,
     fontWeight: 'bold',
-    fontSize: 18,
-    padding: 8,
-  },
-  subTitle: {
-    color: colorThumblr,
-    marginTop: -15,
+    marginVertical: 2,
   },
   date: {
+    color: colorThumblr,
     fontSize: 14,
-    marginRight: '-25%',
-    paddingBottom: 12,
+    margin: 2,
+  },
+  time: {
+    color: colorThumblr,
+    fontSize: 14,
+  },
+  contact: {
+    color: colorThumblr,
+    fontSize: 12,
   },
 });
 

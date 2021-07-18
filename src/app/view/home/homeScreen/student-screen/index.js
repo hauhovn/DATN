@@ -31,7 +31,6 @@ export const StudentScreen = () => {
   const nav = useNavigation();
   const [user, setUser] = useState('');
   const [listTest, setListTest] = useState('');
-  const [clickedItem, setClickedItem] = useState('');
   const [sentData, setSentData] = useState({
     MaSV: '',
     MaBaiKT: '',
@@ -85,11 +84,8 @@ export const StudentScreen = () => {
   };
 
   const pressHandleKey = () => {
-    /* 1. Navigate to the Details route with params */
-    nav.navigate(AppRouter.TESTING, {
-      itemId: 86,
-      otherParam: 'anything you want here',
-    });
+    setIsShowDialog(false);
+    nav.navigate(AppRouter.TESTING, {data: sentData});
   };
 
   return (

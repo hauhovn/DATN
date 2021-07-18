@@ -1,5 +1,6 @@
 import React from 'react';
 import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
+import Moment from 'moment';
 //STYLEs
 const mainColor = '#FF7043';
 
@@ -12,7 +13,7 @@ export const ItemTest = ({item, handle}) => {
     <TouchableOpacity style={styles.container} onPress={() => handle(item)}>
       <View style={styles.title}>
         <Text style={styles.titleText}>{item.TenLopHP}</Text>
-        <Text>{item.Ngay}</Text>
+        <Text>{Moment(item?.Ngay)?.format('L')}</Text>
       </View>
       <View style={styles.content}>
         <View style={styles.content}>

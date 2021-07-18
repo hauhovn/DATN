@@ -20,6 +20,7 @@
     "@reduxjs/toolkit": "^1.6.0",
     "i18n-js": "^3.8.0",
     "install": "^0.13.0",
+    "moment": "^2.29.1",
     "native-base": "^2.15.2",
     "npm": "^7.19.0",
     "react": "17.0.1",

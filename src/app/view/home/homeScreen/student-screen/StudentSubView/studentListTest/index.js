@@ -9,13 +9,15 @@ import {
 } from 'react-native';
 //modun
 import {useNavigation, useIsFocused} from '@react-navigation/native';
-import {Icon} from 'native-base';
+import {Icon, Picker} from 'native-base';
 //item
 import {ItemTest} from '../../item-test';
 //api
 import {getBaiKiemTra} from '../../../../../../../server/BaiKiemTra';
+import {getMiniLopHocPhan} from '../../../../../../../server/LopHP/getListNameLHP';
 //settting
 import {settings} from '../../../../../../config';
+import {AppRouter} from '../../../../../../../app/navigation/AppRouter';
 //screens
 import {TestDetailModal} from '../modals/TestDetailModal';
 
@@ -23,52 +25,51 @@ export const StudentTestList = ({navigation, route}) => {
   const nav = useNavigation();
   const fo = useIsFocused();
   const [isShowDialog, setIsShowDialog] = useState(false);
+  const [pickedValue, setPickedValue] = useState({
+    label: '',
+    value: '',
+  });
   const [data, setData] = useState('');
-  const [clickedItem, setClickedItem] = useState('');
-  const [clickedData, setClickedData] = useState({
+  const [listTenLHP, setListTenLHP] = useState('');
+
+  const [sentData, setSentData] = useState({
     MaBaiKT: '',
-    Ngay: '',
-    TenBaiKT: '',
-    TenLopHP: '',
-    ThoiGianLam: '',
-    MaSV: '',
-    TenGV: '',
+    TenBaiKT: ' listTenLHP[0]?.TenBaiKT',
   });
   const SinhVien = route.params;
-
-  useEffect(() => {
-    //getAccount();
-  }, []);
 
   useEffect(() => {
     if (fo) {
       try {
         console.log('MaSV: ', SinhVien.MaSV);
+        getListLPH();
         getTests();
       } catch (error) {}
     }
   }, [fo]);
 
+  const getListLPH = async () => {
+    let res = await getMiniLopHocPhan(SinhVien.MaSV);
+    setListTenLHP(res.data);
+    console.log('LIST LHPs: ', res.data);
+  };
   const getTests = async () => {
     let res = await getBaiKiemTra(SinhVien.MaSV);
     setData(res);
-    console.log(data);
+    console.log('LIST TESTs: ', res);
   };
 
   // Nhấn vô item
   const handlePressItem = item => {
-    // console.log('xxxxaaaaaaaaaaaaaaaaaa ', item);
-    // clickedData.MaBaiKT = item.MaBaiKT;
-    // clickedData.Ngay = item.Ngay;
-    // clickedData.TenBaiKT = item.TenBaiKT;
-    // clickedData.TenLopHP = item.TenLopHP;
-    // clickedData.ThoiGianLam = item.ThoiGianLam;
-    // clickedData.MaSV = SinhVien.MaSV;
-    //let res = await getCTBaiKiemTra(SinhVien.MaSV, item.MaBaiKT);
-    //clickedData.TenGV = res.TenGV;
-    // setClickedData({clickedData});
-    // console.log('clicked: ', clickedData);
+    sentData.MaBaiKT = item.MaBaiKT;
+    sentData.MaSV = SinhVien.MaSV;
+
+    setSentData(sentData);
     setIsShowDialog(true);
+  };
+  const pressHandleKey = () => {
+    setIsShowDialog(false);
+    nav.navigate(AppRouter.TESTING, {data: sentData});
   };
 
   return (
@@ -89,8 +90,27 @@ export const StudentTestList = ({navigation, route}) => {
         </Text>
         <Text></Text>
       </View>
-      <View style={styles.filter}>
-        <Text>filler</Text>
+
+      <View style={styles.filerBox}>
+        <Picker selectedValue={1} mode="dialog" style={styles.picker}>
+          <Picker.Item label="Tất cả" value="0" />
+          {/* {listTenLHP?.forEach(item => {
+            return (
+              <Picker.Item
+                key={item.MaLopHP}
+                value={item.MaLopHP}
+                label={item.TenLopHP}
+              />
+            );
+          })} */}
+          {listTenLHP != '' ? (
+            listTenLHP?.map(i => (
+              <Picker.Item label={i.TenLopHP} value={i.MaLopHP} />
+            ))
+          ) : (
+            <Picker label=". . ." />
+          )}
+        </Picker>
       </View>
 
       <FlatList
@@ -107,7 +127,10 @@ export const StudentTestList = ({navigation, route}) => {
         close={() => {
           setIsShowDialog(false);
         }}
-        data={clickedItem}
+        data={sentData}
+        pressHandle={() => {
+          pressHandleKey();
+        }}
       />
     </SafeAreaView>
   );
@@ -121,5 +144,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  filter: {},
+  filerBox: {
+    height: 46,
+    width: '100%',
+    alignItems: 'flex-end',
+    padding: 8,
+    backgroundColor: '#b1b4b5',
+  },
+  picker: {
+    height: 42,
+    width: '100%',
+  },
+  textFiler: {},
 });

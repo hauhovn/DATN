@@ -13,9 +13,10 @@ import {TeacherScreen} from '../../view/home/homeScreen/teacher-screen';
 import {StudentScreen} from '../../view/home/homeScreen/student-screen';
 import {StudentTestList} from '../../view/home/homeScreen/student-screen/StudentSubView/studentListTest';
 import {Loading} from '../../view/loading';
-import {TestingNavigation} from '../../navigation/TestingNavigation';
 import {LopHocPhanNav} from '../../view/lopHocPhan';
 import {LopHocPhanSV} from '../../view/home/homeScreen/student-screen/StudentSubView/LopHocPhanSV';
+import {TestScreen} from '../../view/home/homeScreen/student-screen/StudentSubView/test-screen';
+import {MenuQuestion} from '../../view/home/homeScreen/student-screen/StudentSubView/test-screen/menu-question';
 
 const Stack = createStackNavigator();
 
@@ -110,14 +111,19 @@ const HomeNavigator = () => {
         options={{title: AppRouter.STUDENT_LIST_TEST, headerShown: false}}
       />
       <Stack.Screen
-        name={AppRouter.TESTING}
-        component={TestingNavigation}
-        options={{title: AppRouter.TESTING, headerShown: false}}
-      />
-      <Stack.Screen
         name={AppRouter.LOP_HOC_PHAN}
         component={LopHocPhanSV}
         options={{title: AppRouter.LOP_HOC_PHAN, headerShown: false}}
+      />
+      <Stack.Screen
+        name={AppRouter.TESTING}
+        component={TestScreen}
+        options={{title: AppRouter.TESTING, headerShown: false}}
+      />
+      <Stack.Screen
+        name={AppRouter.MENU_QUESTION}
+        options={{title: AppRouter.MENU_QUESTION, headerShown: false}}
+        component={MenuQuestion}
       />
     </Stack.Navigator>
   );
