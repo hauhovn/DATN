@@ -1,16 +1,3 @@
-<<<<<<< HEAD
-import React, {useState, useEffect} from 'react';
-import {SafeAreaView} from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-//screens
-import {TeacherScreen} from './teacher-screen';
-import {StudentScreen} from './student-screen';
-
-import {AppRouter} from '../../../navigation/AppRouter';
-
-const HomeScreen = navigation => {
-  const [user, setUser] = useState('');
-=======
 import React, {useRef, useState, useEffect} from 'react';
 import {
   SafeAreaView,
@@ -44,7 +31,6 @@ export const HomeScreen = () => {
   const [dataThongKe, setDataThongKe] = useState('');
   const [refreshing, setRefreshing] = useState(false);
   const scrollY = useRef(new Animated.Value(0)).current;
->>>>>>> upstream/baochau
 
   useEffect(() => {
     getAccount();
@@ -119,11 +105,6 @@ export const HomeScreen = () => {
     }
   };
 
-<<<<<<< HEAD
-  return (
-    <SafeAreaView>
-      {user[0]?.MaSV == undefined ? <TeacherScreen /> : <StudentScreen />}
-=======
   // Get thong ke
   const getThongKe = async () => {
     try {
@@ -539,7 +520,6 @@ export const HomeScreen = () => {
           />
         </TouchableOpacity>
       </Animated.View>
->>>>>>> upstream/baochau
     </SafeAreaView>
   );
 };

@@ -14,13 +14,10 @@ import {StudentScreen} from '../../view/home/homeScreen/student-screen';
 import {StudentTestList} from '../../view/home/homeScreen/student-screen/StudentSubView/studentListTest';
 import {Loading} from '../../view/loading';
 import {LopHocPhanNav} from '../../view/lopHocPhan';
-<<<<<<< HEAD
 import {LopHocPhanSV} from '../../view/home/homeScreen/student-screen/StudentSubView/LopHocPhanSV';
 import {TestScreen} from '../../view/home/homeScreen/student-screen/StudentSubView/test-screen';
 import {MenuQuestion} from '../../view/home/homeScreen/student-screen/StudentSubView/test-screen/menu-question';
-=======
 import {KiemTraNav} from '../../view/kiemTra';
->>>>>>> upstream/baochau
 
 const Stack = createStackNavigator();
 

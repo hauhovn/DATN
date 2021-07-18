@@ -94,15 +94,6 @@ export const StudentTestList = ({navigation, route}) => {
       <View style={styles.filerBox}>
         <Picker selectedValue={1} mode="dialog" style={styles.picker}>
           <Picker.Item label="Tất cả" value="0" />
-          {/* {listTenLHP?.forEach(item => {
-            return (
-              <Picker.Item
-                key={item.MaLopHP}
-                value={item.MaLopHP}
-                label={item.TenLopHP}
-              />
-            );
-          })} */}
           {listTenLHP != '' ? (
             listTenLHP?.map(i => (
               <Picker.Item label={i.TenLopHP} value={i.MaLopHP} />
