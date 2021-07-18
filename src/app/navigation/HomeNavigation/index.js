@@ -16,7 +16,6 @@ import {Loading} from '../../view/loading';
 import {LopHocPhanNav} from '../../view/lopHocPhan';
 import {LopHocPhanSV} from '../../view/home/homeScreen/student-screen/StudentSubView/LopHocPhanSV';
 import {TestScreen} from '../../view/home/homeScreen/student-screen/StudentSubView/test-screen';
-import {MenuQuestion} from '../../view/home/homeScreen/student-screen/StudentSubView/test-screen/menu-question';
 import {KiemTraNav} from '../../view/kiemTra';
 
 const Stack = createStackNavigator();
@@ -125,11 +124,6 @@ const HomeNavigator = () => {
         name={AppRouter.TESTING}
         component={TestScreen}
         options={{title: AppRouter.TESTING, headerShown: false}}
-      />
-      <Stack.Screen
-        name={AppRouter.MENU_QUESTION}
-        options={{title: AppRouter.MENU_QUESTION, headerShown: false}}
-        component={MenuQuestion}
       />
     </Stack.Navigator>
   );

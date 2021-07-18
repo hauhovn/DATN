@@ -11,13 +11,14 @@ import {
 //Screens
 //Moduns
 import {useNavigation, useIsFocused} from '@react-navigation/native';
-import {Icon} from 'native-base';
+import {Icon, Item} from 'native-base';
 import CountDown from 'react-native-countdown-component';
 import io from 'socket.io-client/dist/socket.io.js';
 //others
 import {settings} from '../../../../../../config';
 import {appBar, body, navigator, styles, pauseModal} from './styles';
 import {AppRouter} from '../../../../../../navigation/AppRouter';
+import {MenuQuestionModal} from '../modals/MenuQuestionModal';
 //APIs
 import {JointTest} from '../../../../../../../server/JointTest';
 import {UpdateQuestion} from '../../../../../../../server/JointTest/update-answer';
@@ -27,6 +28,7 @@ export function TestScreen({navigation, route}) {
   //Socket
   const socket = io('https://da-tot-nghiep.herokuapp.com', {jsonp: false});
   const [isRunning, setIsRunning] = useState(true);
+  const [isShowMenuQuest, setIsShowMenuQuest] = useState(false);
   const [testData, setTestData] = useState('');
 
   socket.on('server-stop-time', function (data) {
@@ -48,6 +50,28 @@ export function TestScreen({navigation, route}) {
   const [colorAnswerD, setColorAnswerD] = useState(settings.colors.colorGreen);
 
   let questionQuantity = testData.length;
+  let demoData = [
+    {
+      STT: 123,
+      DapAn: 'A',
+      DASV: 'C',
+    },
+    {
+      STT: 3,
+      DapAn: 'A',
+      DASV: 'A',
+    },
+    {
+      STT: 13,
+      DapAn: 'A',
+      DASV: 'A',
+    },
+    {
+      STT: 93,
+      DapAn: 'A',
+      DASV: 'C',
+    },
+  ];
 
   useEffect(() => {
     if (fo) {
@@ -89,8 +113,16 @@ export function TestScreen({navigation, route}) {
       console.log('currentQuestion?.Dachon == D');
       setColorAnswerD(settings.colors.colorMain);
     }
-  }, [currentQuestion]);
 
+    //updateListData(currentQuestion, currentQuestion.STT - 1);
+  }, [currentQuestion]);
+  //
+  function updateListData(item, index) {
+    let newArr = testData;
+    newArr[index] = item;
+    setTestData(newArr);
+    console.log(testData);
+  }
   //func
   const updateQuestion = next => {
     try {
@@ -107,7 +139,7 @@ export function TestScreen({navigation, route}) {
   };
 
   function openMenuQuestion() {
-    navigation.navigate(AppRouter.MENU_QUESTION, {data: testData});
+    setIsShowMenuQuest(true);
   }
   const getListQuestion = async (MaSV, MaBaiKT) => {
     let rs = await JointTest(MaSV, MaBaiKT);
@@ -133,6 +165,7 @@ export function TestScreen({navigation, route}) {
           setColorAnswerA(settings.colors.colorMain); // Set ui
           changeAnwer(A); // Set server
           newAnswer.DASV = A; // Set local
+          updateQuestion(true); // Next question
         } else {
           //Cancel
           setColorAnswerA(settings.colors.colorGreen);
@@ -147,6 +180,7 @@ export function TestScreen({navigation, route}) {
           setColorAnswerB(settings.colors.colorMain);
           changeAnwer(B);
           newAnswer.DASV = B;
+          updateQuestion(true); // Next question
         } else {
           //Cancel
           setColorAnswerB(settings.colors.colorGreen);
@@ -161,6 +195,7 @@ export function TestScreen({navigation, route}) {
           setColorAnswerC(settings.colors.colorMain);
           changeAnwer(C);
           newAnswer.DASV = C;
+          updateQuestion(true); // Next question
         } else {
           //Cancel
           setColorAnswerC(settings.colors.colorGreen);
@@ -175,6 +210,7 @@ export function TestScreen({navigation, route}) {
           setColorAnswerD(settings.colors.colorMain);
           changeAnwer(D);
           newAnswer.DASV = D;
+          updateQuestion(true); // Next question
         } else {
           //Cancel
           setColorAnswerD(settings.colors.colorGreen);
@@ -189,10 +225,13 @@ export function TestScreen({navigation, route}) {
   //
   async function changeAnwer(DapAn) {
     let res = await UpdateQuestion(data.MaSV, currentQuestion.MaCH, DapAn);
-
     console.log(res.status, res.content);
   }
-
+  //
+  pressHandleQuestItem = item => {
+    // Nhan gia tri tu menu
+    setCurrentQuestion(testData[item - 1]);
+  };
   //
   return (
     <SafeAreaView style={{flex: 1}}>
@@ -222,6 +261,12 @@ export function TestScreen({navigation, route}) {
           </View>
         </View>
       </Modal>
+      <MenuQuestionModal
+        isVisible={isShowMenuQuest}
+        close={() => setIsShowMenuQuest(false)}
+        data={testData}
+        menuHandle={pressHandleQuestItem}
+      />
       <View style={styles.container}>
         <View style={appBar.container}>
           <TouchableOpacity
@@ -253,7 +298,11 @@ export function TestScreen({navigation, route}) {
             timeLabels={{m: null, s: null}}
             showSeparator
           />
-          <TouchableOpacity onPress={() => {}} style={appBar.rightButton}>
+          <TouchableOpacity
+            onPress={() => {
+              console.log('alo: ', testData);
+            }}
+            style={appBar.rightButton}>
             <Icon
               type="Ionicons"
               name={'ios-checkmark-done'}
