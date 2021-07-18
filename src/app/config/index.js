@@ -17,7 +17,11 @@ export const settings = {
     colorRed: '#e53935',
     colorBoderLight: '#ECEFF1',
     colorBoderDark: '#CFD8DC',
+<<<<<<< HEAD
     bg_fade: 'rgba(151, 153, 156,0.45)',
+=======
+    colorOrange: '#FF3D00',
+>>>>>>> upstream/baochau
   },
   text: {
     AppName: 'Viet Social',

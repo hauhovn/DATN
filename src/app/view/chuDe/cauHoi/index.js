@@ -28,7 +28,6 @@ export const CauHoi = ({params}) => {
 
   const [data, setData] = useState('');
   const [refreshing, setRefreshing] = React.useState(false);
-  const [loading, setLoading] = useState(true);
 
   // Kéo xuống để reload
   const onRefresh = React.useCallback(() => {
@@ -43,17 +42,9 @@ export const CauHoi = ({params}) => {
   // Vừa focus vào là gọi refesh để lấy data
   useEffect(() => {
     if (focus) {
-      console.log('route.params: ', route.params);
       onRefresh(MaCD);
     }
   }, [focus]);
-
-  // Khi lấy data xong khi không load nữa
-  useEffect(() => {
-    if (data !== '') {
-      setLoading(false);
-    }
-  }, [data]);
 
   // Gọi api lấy danh sách câu hỏi theo mã môn học
   const getData = async data => {
@@ -80,6 +71,8 @@ export const CauHoi = ({params}) => {
     nav.navigate(AppRouter.INFO, {
       item: item,
       user: route.params.user,
+      MonHoc: MonHoc,
+      ChuDe: route.params.item,
     });
   };
 
@@ -88,38 +81,44 @@ export const CauHoi = ({params}) => {
     del(item.MaCH);
   };
 
+  // Render screen
   return (
     <View style={{flex: 1, backgroundColor: '#fff'}}>
       <StatusBar barStyle="dark-content" hidden={true} />
       <Header user={user} />
+      <View
+        style={{
+          borderBottomWidth: 0.5,
+          borderColor: '#CFD8DC',
+          backgroundColor: '#fff',
+        }}>
+        <Text
+          style={{
+            marginLeft: '3%',
+            color: settings.colors.colorThumblr,
+            fontWeight: 'bold',
+            marginBottom: 5,
+            fontSize: 16,
+            marginTop: 10,
+          }}>
+          CHỦ ĐỀ: {route.params.item.TenCD}
+        </Text>
+        <Text
+          style={{
+            marginLeft: '3%',
+            color: settings.colors.colorThumblr,
+            fontWeight: 'bold',
+            marginBottom: 10,
+            fontSize: 14,
+          }}>
+          MÔN HỌC: {MonHoc.TenMonHoc}
+        </Text>
+      </View>
 
-      {!loading ? (
+      {data !== '' ? (
         <>
-          {data !== '' && data !== undefined && data.length !== 0 ? (
+          {data !== undefined && data.length !== 0 ? (
             <View style={{backgroundColor: '#fff', flex: 1}}>
-              <View style={{borderBottomWidth: 0.5, borderColor: '#CFD8DC'}}>
-                <Text
-                  style={{
-                    marginLeft: '3%',
-                    color: settings.colors.colorThumblr,
-                    fontWeight: 'bold',
-                    marginBottom: 5,
-                    fontSize: 16,
-                    marginTop: 10,
-                  }}>
-                  CHỦ ĐỀ: {route.params.item.TenCD}
-                </Text>
-                <Text
-                  style={{
-                    marginLeft: '3%',
-                    color: settings.colors.colorThumblr,
-                    fontWeight: 'bold',
-                    marginBottom: 10,
-                    fontSize: 14,
-                  }}>
-                  MÔN HỌC: {MonHoc.TenMonHoc}
-                </Text>
-              </View>
               <FlatList
                 data={data}
                 refreshControl={
@@ -166,6 +165,7 @@ export const CauHoi = ({params}) => {
                 nav.navigate(AppRouter.AddExercise, {
                   item: route.params,
                   user: route.params.user,
+                  MonHoc: MonHoc,
                 });
               }}
               activeOpacity={0.5}

@@ -72,6 +72,7 @@ export const BaiKiemTra = ({params}) => {
   const getData = async data => {
     try {
       const res = await getBaiKiemTraGV(user[0].MaGV, data);
+      console.log('getData: ', res);
       setData(res.data);
     } catch (error) {
       //
@@ -106,7 +107,7 @@ export const BaiKiemTra = ({params}) => {
   // Gọi api tạo mới
   const postData = async () => {
     try {
-      const res = await createBaiKT(
+      await createBaiKT(
         tenBaiKT,
         getDate(ngay),
         user[0]?.MaGV,
