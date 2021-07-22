@@ -20,8 +20,8 @@ import {KEYS_VALUE} from './key_value';
 import {ItemTest} from './item-test';
 //APIs
 import {getCTBaiKiemTra} from '../../../../../server/BaiKiemTra/getTestDetail';
-//
 import {getBaiKiemTra} from '../../../../../server/BaiKiemTra';
+
 import {AppRouter} from '../../../../navigation/AppRouter';
 import {settings} from '../../../../config';
 
@@ -33,6 +33,7 @@ export const StudentScreen = () => {
   const [listTest, setListTest] = useState('');
   const [sentData, setSentData] = useState({
     MaSV: '',
+    TenSV: '',
     MaBaiKT: '',
   });
   const [isShowDialog, setIsShowDialog] = useState(false);
@@ -69,8 +70,7 @@ export const StudentScreen = () => {
     console.log(value);
     if (value === KEYS_VALUE.SAP_DIEN_RA)
       nav.navigate(AppRouter.STUDENT_LIST_TEST, {MaSV: user[0]?.MaSV});
-    if (value === KEYS_VALUE.BAI_KIEM_TRA)
-      nav.navigate(AppRouter.TESTING, {SinhVien: user[0]});
+    if (value === KEYS_VALUE.BAI_KIEM_TRA) nav.navigate(AppRouter.DEMO_VIEW);
     if (value === KEYS_VALUE.LOP_HOC_PHAN)
       nav.navigate(AppRouter.LOP_HOC_PHAN, {SinhVien: user[0]});
   };
@@ -78,6 +78,7 @@ export const StudentScreen = () => {
   const handlePressItem = item => {
     sentData.MaBaiKT = item.MaBaiKT;
     sentData.MaSV = user[0].MaSV;
+    sentData.TenSV = user[0].TenSV;
 
     setSentData(sentData);
     setIsShowDialog(true);

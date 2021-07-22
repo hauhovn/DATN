@@ -41,4 +41,5 @@ export const AppRouter = {
   KIEMTRA: 'KIEMTRA',
   CHANGEPASS: 'CHANGEPASS',
   PROFILE: 'PROFILE',
+  DEMO_VIEW: 'DEMO_VIEW_V',
 };

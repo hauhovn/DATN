@@ -7,6 +7,7 @@ import {
   ScrollView,
   Modal,
   Image,
+  AppState,
 } from 'react-native';
 //Screens
 //Moduns
@@ -26,18 +27,61 @@ import {UpdateQuestion} from '../../../../../../../server/JointTest/update-answe
 export function TestScreen({navigation, route}) {
   const fo = useIsFocused();
   //Socket
-  const socket = io('https://da-tot-nghiep.herokuapp.com', {jsonp: false});
+  // const socket = io('https://da-tot-nghiep.herokuapp.com', {
+  //   autoConnect: false,
+  // });
+  // Localhost
+  const socket = io('http://10.0.2.2:3000', {autoConnect: false});
   const [isRunning, setIsRunning] = useState(true);
   const [isShowMenuQuest, setIsShowMenuQuest] = useState(false);
   const [testData, setTestData] = useState('');
 
-  socket.on('server-stop-time', function (data) {
-    if (isRunning != data) {
-      console.log('isRunning: ', isRunning, '& data: ', data);
-      console.log('server-stop-time ', data);
-      setIsRunning(data);
-      socket.off('server-stop-time');
+  const appState = useRef(AppState.currentState);
+  const [appStateVisible, setAppStateVisible] = useState(appState.current);
+
+  useEffect(() => {
+    AppState.addEventListener('change', _handleAppStateChange);
+
+    return () => {
+      AppState.removeEventListener('change', _handleAppStateChange);
+    };
+  }, []);
+
+  const _handleAppStateChange = nextAppState => {
+    if (
+      appState.current.match(/inactive|background/) &&
+      nextAppState === 'active'
+    ) {
+      console.log('App has come to the foreground!');
+      socket.connect();
+      requestJoinTest(data.MaSV, data.MaBaiKT, data.TenSV);
     }
+
+    appState.current = nextAppState;
+    setAppStateVisible(appState.current);
+    console.log('AppState', appState.current);
+    if (appState.current === 'background') {
+      // Connect to server
+      socket.emit('client-get-userquanlity', 'ouut');
+      socket.disconnect();
+    }
+  };
+
+  socket.on('server-set-time', function (isStart) {
+    console.log('server-set-time ', isStart);
+    setIsRunning(isStart);
+    //socket.off('server-set-time');
+  });
+
+  socket.on('server-report-failed', function (data) {
+    console.log(data);
+    //socket.off();
+  });
+
+  socket.on('server-report-joined', function (data) {
+    console.log(data);
+
+    //socket.off();
   });
   //Consts
   const {data} = route.params;
@@ -75,9 +119,12 @@ export function TestScreen({navigation, route}) {
 
   useEffect(() => {
     if (fo) {
-      if (testData == '') {
+      if (testData == '' || testData == undefined) {
+        // Connect to server
+        socket.connect();
         getListQuestion(data.MaSV, data.MaBaiKT);
-        console.log(' tao buon lam roi: ', data);
+        requestJoinTest(data.MaSV, data.MaBaiKT, data.TenSV);
+        console.log('Nav route data: ', data);
       }
       try {
         console.log('QUESTION_ID: ', QUESTION_ID);
@@ -117,6 +164,14 @@ export function TestScreen({navigation, route}) {
     //updateListData(currentQuestion, currentQuestion.STT - 1);
   }, [currentQuestion]);
   //
+  function requestJoinTest(MaSV, MaBaiKT, TenSV) {
+    socket.emit('client-join-test', {
+      MaSV: MaSV,
+      MaBaiKT: MaBaiKT,
+      TenSV: TenSV,
+    });
+  }
+  //
   function updateListData(item, index) {
     let newArr = testData;
     newArr[index] = item;
@@ -124,6 +179,25 @@ export function TestScreen({navigation, route}) {
     console.log(testData);
   }
   //func
+  function initSocket(__bool) {
+    if (__bool) {
+      if (!socket) {
+        socket = io.connect('http://xxx.xxx.xxx.xxx:8081', {secure: false});
+        socket.on('connect', function () {
+          console.log('connected');
+        });
+        socket.on('disconnect', function () {
+          console.log('disconnected');
+        });
+      } else {
+        socket.socket.connect(); // Yep, socket.socket ( 2 times )
+      }
+    } else {
+      socket.disconnect();
+      // socket = null; <<< We don't need this anymore
+    }
+  }
+  //
   const updateQuestion = next => {
     try {
       let num = parseInt(currentQuestion?.STT);
@@ -271,7 +345,10 @@ export function TestScreen({navigation, route}) {
         <View style={appBar.container}>
           <TouchableOpacity
             onPress={() => {
-              navigation.goBack(); // Quay về màn hình trước
+              {
+                navigation.goBack();
+                socket.off();
+              } // Quay về màn hình trước
             }}
             style={appBar.leftButton}>
             <Icon
@@ -298,11 +375,7 @@ export function TestScreen({navigation, route}) {
             timeLabels={{m: null, s: null}}
             showSeparator
           />
-          <TouchableOpacity
-            onPress={() => {
-              console.log('alo: ', testData);
-            }}
-            style={appBar.rightButton}>
+          <TouchableOpacity onPress={() => {}} style={appBar.rightButton}>
             <Icon
               type="Ionicons"
               name={'ios-checkmark-done'}

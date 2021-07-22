@@ -47,15 +47,19 @@ export const TestDetailModal = ({modalVisible, close, data, pressHandle}) => {
   }
 
   function resetView() {
-    resData.TenBaiKT = '';
-    resData.TenGV = '';
-    resData.TenLopHP = '';
-    resData.ThoiGianLam = '00:00:00';
-    resData.Mail = 'contact@me.com';
-    resData.Ngay = '';
-    resData.TenMonHoc = '';
+    try {
+      resData.TenBaiKT = '';
+      resData.TenGV = '';
+      resData.TenLopHP = '';
+      resData.ThoiGianLam = '00:00:00';
+      resData.Mail = 'contact@me.com';
+      resData.Ngay = '';
+      resData.TenMonHoc = '';
 
-    setResData(resData);
+      setResData(resData);
+    } catch (error) {
+      console.log('@Close no go test');
+    }
   }
 
   return (
@@ -114,7 +118,7 @@ export const TestDetailModal = ({modalVisible, close, data, pressHandle}) => {
               <View style={inputKeyBox.container}>
                 <TouchableOpacity
                   onPress={() => {
-                    if (resData.KeyBaiKT == keyInput) {
+                    if (resData?.KeyBaiKT == keyInput) {
                       console.log('Nhap dung key');
                       pressHandle(true);
                     } else {
