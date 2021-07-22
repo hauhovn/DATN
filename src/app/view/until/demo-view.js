@@ -12,16 +12,46 @@ import io from 'socket.io-client/dist/socket.io.js';
 export const DemoView = () => {
   const socket = io('http://10.0.2.2:3000', {autoConnect: false});
   const [room, setRoom] = useState('');
+  const [data, setData] = useState(undefined);
+
+  let temp = [
+    {name: 'Trao Trao', status: 'Disconnect'},
+    {name: 'Meo Meo', status: 'Disconnect'},
+    {name: 'Gau Gau', status: 'Connect'},
+  ];
+  //sockets on
+
+  //get new status
+  socket.on('server-send-newstatus', function (res) {
+    console.log('# server-send-newstatus');
+    if (res.isConnect) {
+      // User connect
+      setData(data.push({name: res.name, status: res.status}));
+      console.log('# Has new connect');
+    } else {
+      // User disconnect
+      let diser = data.find(name => name == res.name);
+      setData(data.splice(data.indexOf(diser), 1));
+      console.log('# Has new disconnect');
+    }
+  });
+
+  //funcs
 
   function pressStart(isStart) {
-    socket.connect();
-
     socket.emit('client-set-time', {room: room, isStart: isStart});
     console.log('client-set-time: ', isStart, '  input: ', room);
   }
-  React.useEffect(() => {
-    joinRoom(room);
-  }, []);
+
+  function connectAndJoinRoom(isConnect) {
+    if (isConnect) {
+      socket.connect();
+      joinRoom(room);
+    } else {
+      socket.disconnect();
+    }
+  }
+
   function joinRoom(room) {
     socket.emit('client-join-test', {
       MaSV: 6969,
@@ -40,27 +70,48 @@ export const DemoView = () => {
         />
         <View style={styles.buttonBox}>
           <TouchableOpacity
-            onPress={() => pressStart(true)}
-            style={([styles.button], {backgroundColor: '#127'})}>
-            <Text style={styles.texts}>Start</Text>
+            onPress={() => connectAndJoinRoom(true)}
+            style={([styles.button], {backgroundColor: 'blue'})}>
+            <Text style={styles.texts}>Connect</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => connectAndJoinRoom(false)}
+            style={([styles.button], {backgroundColor: 'orange'})}>
+            <Text style={styles.texts}>Disconnect</Text>
           </TouchableOpacity>
         </View>
         <View style={styles.buttonBox}>
           <TouchableOpacity
+            onPress={() => pressStart(true)}
+            style={([styles.button], {backgroundColor: 'green'})}>
+            <Text style={styles.texts}>Start</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
             onPress={() => pressStart(false)}
-            style={([styles.button], {backgroundColor: '#F24'})}>
+            style={([styles.button], {backgroundColor: 'red'})}>
             <Text style={styles.texts}>Stop</Text>
           </TouchableOpacity>
         </View>
       </View>
-      <FlatList style={styles.flatList} />
+      <FlatList
+        style={styles.flatList}
+        data={data}
+        renderItem={({item}) => (
+          <View>
+            <Text>
+              {item?.name} {item?.status}
+            </Text>
+          </View>
+        )}
+      />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 10,
+    flex: 1,
+    flexDirection: 'column',
   },
   buttons: {
     flexDirection: 'column',
@@ -71,19 +122,17 @@ const styles = StyleSheet.create({
     backgroundColor: '#987',
   },
   buttonBox: {
-    height: '25%',
     width: '100%',
     alignItems: 'center',
     justifyContent: 'center',
+    flexDirection: 'row',
   },
   button: {
-    height: 150,
-    width: 264,
     padding: 15,
     borderRadius: 5,
   },
   texts: {
-    padding: 20,
+    padding: 10,
     fontSize: 24,
     color: '#fff',
   },
