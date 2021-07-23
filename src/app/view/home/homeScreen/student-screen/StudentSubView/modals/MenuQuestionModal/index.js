@@ -16,7 +16,6 @@ import {ItemQuestion} from './item';
 import {appBar} from '../../test-screen/styles';
 
 export const MenuQuestionModal = ({isVisible, close, data, menuHandle}) => {
-  console.log('datax; ', data);
   const {width, height} = Dimensions.get('window');
 
   let isCheck = {

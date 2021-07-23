@@ -6,49 +6,70 @@ import {
   FlatList,
   TextInput,
   StyleSheet,
+  Alert,
+  SectionList,
 } from 'react-native';
 import io from 'socket.io-client/dist/socket.io.js';
 
 export const DemoView = () => {
   const socket = io('http://10.0.2.2:3000', {autoConnect: false});
-  const [room, setRoom] = useState('');
-  const [data, setData] = useState(undefined);
+  const [room, setRoom] = useState('22');
+  const [reRender, setReRender] = useState(false);
+  var render2 = 0;
+  const [oldRoom, setOldRoom] = useState(undefined);
+  var temp = [
+    {name: 'Meo Meo', status: 'Disconnect', socketid: 'x0'},
+    {name: 'Gau Gau', status: 'Connect', socketid: 'x01'},
+  ];
 
-  let temp = [
-    {name: 'Trao Trao', status: 'Disconnect'},
-    {name: 'Meo Meo', status: 'Disconnect'},
-    {name: 'Gau Gau', status: 'Connect'},
+  const [data, setData] = useState(temp);
+  const section = [
+    {
+      id: 0,
+      data: data,
+    },
   ];
   //sockets on
 
   //get new status
   socket.on('server-send-newstatus', function (res) {
-    console.log('# server-send-newstatus');
-    if (res.isConnect) {
-      // User connect
-      setData(data.push({name: res.name, status: res.status}));
-      console.log('# Has new connect');
-    } else {
-      // User disconnect
-      let diser = data.find(name => name == res.name);
-      setData(data.splice(data.indexOf(diser), 1));
-      console.log('# Has new disconnect');
-    }
+    console.log('# server-send-newstatus: ', res);
+
+    //  if (res.isConnect) {
+    // User connect
+    let userA = data;
+    console.log(`CONER: `, res);
+    userA.push(res);
+    setData(userA);
+    setReRender(render2++);
+
+    //socket.off();
+
+    // } else {
+    //   // User disconnect
+    //   let userA = data;
+    //   let diser = userA.find(name => name == res.name);
+    //   userA.splice(userA.indexOf(diser), 1);
+    //   console.log(`DISER: `, res);
+    //   setData(userA);
+    // }
   });
+
+  //Effect
 
   //funcs
 
   function pressStart(isStart) {
+    socket.connect();
     socket.emit('client-set-time', {room: room, isStart: isStart});
     console.log('client-set-time: ', isStart, '  input: ', room);
   }
 
   function connectAndJoinRoom(isConnect) {
+    socket.disconnect();
     if (isConnect) {
       socket.connect();
       joinRoom(room);
-    } else {
-      socket.disconnect();
     }
   }
 
@@ -57,17 +78,25 @@ export const DemoView = () => {
       MaSV: 6969,
       MaBaiKT: room,
       TenSV: 'TenSV_DM',
+      MaGV: 'GiangVien lllllllllllllllllllllllll',
     });
+  }
+  function leaveRoom(room) {
+    socket.emit('client-leave-room', room);
+  }
+
+  function logRoom() {
+    socket.emit('client-request-logroom');
   }
   return (
     <View style={styles.container}>
       <View style={styles.buttons}>
-        <TextInput
+        {/* <TextInput
           style={styles.input}
           onChangeText={setRoom}
           value={room}
           placeholder="useless placeholder"
-        />
+        /> */}
         <View style={styles.buttonBox}>
           <TouchableOpacity
             onPress={() => connectAndJoinRoom(true)}
@@ -91,19 +120,37 @@ export const DemoView = () => {
             style={([styles.button], {backgroundColor: 'red'})}>
             <Text style={styles.texts}>Stop</Text>
           </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => logRoom()}
+            style={([styles.button], {backgroundColor: 'purple'})}>
+            <Text style={styles.texts}>Log Rooms</Text>
+          </TouchableOpacity>
         </View>
       </View>
       <FlatList
         style={styles.flatList}
         data={data}
+        extraData={reRender}
+        keyExtractor={item => item.socketid + item.status}
         renderItem={({item}) => (
-          <View>
-            <Text>
-              {item?.name} {item?.status}
-            </Text>
+          <View style={styles.item}>
+            <Text>{item?.name}</Text>
+            <Text>. . . {item?.status}</Text>
           </View>
         )}
       />
+      {/* <SectionList
+        style={styles.flatList}
+        keyExtractor={item => item.socketid}
+        sections={section}
+        renderSectionHeader={() => null}
+        renderItem={({item}) => (
+          <View style={styles.item}>
+            <Text>{item?.name}</Text>
+            <Text>. . . {item?.status}</Text>
+          </View>
+        )}
+      /> */}
     </View>
   );
 };
@@ -141,5 +188,14 @@ const styles = StyleSheet.create({
     width: '50%',
     color: '#fff',
     backgroundColor: '#537067',
+  },
+  item: {
+    width: '100%',
+    height: 24,
+    backgroundColor: '#6a97de',
+    margin: 5,
+    padding: 3,
+    justifyContent: 'space-between',
+    flexDirection: 'row',
   },
 });

@@ -121,6 +121,7 @@ export function TestScreen({navigation, route}) {
     if (fo) {
       if (testData == '' || testData == undefined) {
         // Connect to server
+        socket.disconnect();
         socket.connect();
         getListQuestion(data.MaSV, data.MaBaiKT);
         requestJoinTest(data.MaSV, data.MaBaiKT, data.TenSV);
@@ -218,7 +219,6 @@ export function TestScreen({navigation, route}) {
   const getListQuestion = async (MaSV, MaBaiKT) => {
     let rs = await JointTest(MaSV, MaBaiKT);
     setTestData(rs.data);
-    console.log('#ahihi: ', testData);
   };
   //
   const pressingAnswer = answer => {
@@ -346,8 +346,8 @@ export function TestScreen({navigation, route}) {
           <TouchableOpacity
             onPress={() => {
               {
+                socket.disconnect();
                 navigation.goBack();
-                socket.off();
               } // Quay về màn hình trước
             }}
             style={appBar.leftButton}>
