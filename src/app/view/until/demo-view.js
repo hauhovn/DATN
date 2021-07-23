@@ -16,6 +16,7 @@ export const DemoView = () => {
   const [room, setRoom] = useState('22');
   const [reRender, setReRender] = useState(false);
   var render2 = 0;
+  let flatList = React.useRef();
   const [oldRoom, setOldRoom] = useState(undefined);
   var temp = [
     {name: 'Meo Meo', status: 'Disconnect', socketid: 'x0'},
@@ -42,6 +43,7 @@ export const DemoView = () => {
     userA.push(res);
     setData(userA);
     setReRender(render2++);
+    flatList.current.scrollToEnd();
 
     //socket.off();
 
@@ -128,6 +130,7 @@ export const DemoView = () => {
         </View>
       </View>
       <FlatList
+        ref={flatList}
         style={styles.flatList}
         data={data}
         extraData={reRender}
