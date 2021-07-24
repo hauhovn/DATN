@@ -7,6 +7,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   FlatList,
+  Image,
 } from 'react-native';
 //MODUNs
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -30,13 +31,15 @@ import {TestDetailModal} from '../../homeScreen/student-screen/StudentSubView/mo
 export const StudentScreen = () => {
   const nav = useNavigation();
   const [user, setUser] = useState('');
-  const [listTest, setListTest] = useState('');
+  const [listTest, setListTest] = useState(undefined);
   const [sentData, setSentData] = useState({
     MaSV: '',
     TenSV: '',
     MaBaiKT: '',
   });
   const [isShowDialog, setIsShowDialog] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isNullTest, setIsNullTest] = useState(false);
 
   useEffect(() => {
     getAccount();
@@ -46,6 +49,8 @@ export const StudentScreen = () => {
     if (user !== '') {
       console.log('Sinh Vien: ', user);
       getTests();
+      if (listTest?.lenght < 1) setIsNullTest(true);
+      setIsLoading(false);
     }
   }, [user]);
 
@@ -187,28 +192,43 @@ export const StudentScreen = () => {
           BÀI KIỂM TRA SẮP TỚI
         </Text>
         <View style={styles.listTest}>
-          {listTest != '' ? (
-            <FlatList
-              data={listTest}
-              showsVerticalScrollIndicator={false}
-              renderItem={({item}) => (
-                <ItemTest
-                  item={item}
-                  data={listTest}
-                  handle={handlePressItem}
-                />
-              )}
-              keyExtractor={item => item.MaBaiKT}
-            />
+          {!isLoading ? (
+            !isNullTest ? (
+              <FlatList
+                data={listTest}
+                showsVerticalScrollIndicator={false}
+                renderItem={({item}) => (
+                  <ItemTest
+                    item={item}
+                    data={listTest}
+                    handle={handlePressItem}
+                  />
+                )}
+                keyExtractor={item => item.MaBaiKT}
+              />
+            ) : (
+              <View style={{flex: 1, alignItems: 'center'}}>
+                <Text
+                  style={{
+                    fontSize: 14,
+                    color: settings.colors.colorMain,
+                  }}>
+                  Chưa có bài kiểm tra
+                </Text>
+              </View>
+            )
           ) : (
-            <View style={{flex: 1, alignItems: 'center'}}>
-              <Text
-                style={{
-                  fontSize: 14,
-                  color: settings.colors.colorMain,
-                }}>
-                Chưa có bài kiểm tra
-              </Text>
+            <View
+              style={{
+                width: '100%',
+                height: '80%',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}>
+              <Image
+                source={require('../../../../asset/gif/loading-3dot.gif')}
+                style={{height: 80, width: 80}}
+              />
             </View>
           )}
         </View>
@@ -231,6 +251,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     flexDirection: 'column',
+    backgroundColor: '#fff',
   },
   imageBackground: {
     flex: 2.5,

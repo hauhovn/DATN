@@ -22,14 +22,13 @@ var mainColor = settings.colors.colorMain;
 
 export const TestDetailModal = ({modalVisible, close, data, pressHandle}) => {
   const [resData, setResData] = useState(undefined);
-  const [isDowload, setIsDowload] = useState(true);
   const [keyInput, setKeyInput] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     if (data != undefined && modalVisible) {
-      setIsDowload(true);
       getResponse();
-      setIsDowload(false);
+      setIsLoading(false);
     }
   }, [close]);
 
@@ -60,6 +59,7 @@ export const TestDetailModal = ({modalVisible, close, data, pressHandle}) => {
     } catch (error) {
       console.log('@Close no go test');
     }
+    setIsLoading(true);
   }
 
   return (
@@ -76,7 +76,7 @@ export const TestDetailModal = ({modalVisible, close, data, pressHandle}) => {
               <Icon type="AntDesign" name="close" style={styles.icon} />
             </TouchableOpacity>
           </View>
-          {!isDowload ? (
+          {!isLoading ? (
             <View
               style={{
                 flex: 1,
