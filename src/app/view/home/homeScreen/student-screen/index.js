@@ -91,7 +91,14 @@ export const StudentScreen = () => {
 
   const pressHandleKey = () => {
     setIsShowDialog(false);
-    nav.navigate(AppRouter.TESTING, {data: sentData});
+    //nav.navigate(AppRouter.TESTING_NAV, { data: sentData });
+    nav.navigate(AppRouter.MAIN, {
+      screen: AppRouter.TESTING_NAV,
+      params: {
+        screen: AppRouter.WAITING_SCREEN,
+        params: {data: sentData},
+      },
+    });
   };
 
   return (

@@ -84,7 +84,7 @@ export function TestScreen({navigation, route}) {
     //socket.off();
   });
   //Consts
-  const {data} = route.params;
+  const data = route.params?.data;
   const [currentQuestion, setCurrentQuestion] = useState('');
 
   //color answers
