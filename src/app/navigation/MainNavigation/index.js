@@ -4,6 +4,8 @@ import {AppRouter} from '../AppRouter';
 import TabNavigator from '../TabNavigation/index';
 import {ChangePassword} from '../../view/profile/changePassword';
 import {UpdateProfile} from '../../view/profile/updateProfile';
+import {DemoView} from '../../view/until/demo-view';
+import {TestScreen} from '../../view/home/homeScreen/student-screen/StudentSubView/test-screen';
 
 const Stack = createStackNavigator();
 
@@ -29,6 +31,16 @@ function MainNavigation() {
         name={AppRouter.PROFILE}
         options={{title: AppRouter.PROFILE, headerShown: false}}
         component={UpdateProfile}
+      />
+      <Stack.Screen
+        name={AppRouter.DEMO_VIEW}
+        component={DemoView}
+        options={{title: AppRouter.DEMO_VIEW, headerShown: false}}
+      />
+      <Stack.Screen
+        name={AppRouter.TESTING}
+        component={TestScreen}
+        options={{title: AppRouter.TESTING, headerShown: false}}
       />
     </Stack.Navigator>
   );

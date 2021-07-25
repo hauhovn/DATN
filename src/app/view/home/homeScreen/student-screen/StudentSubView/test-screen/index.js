@@ -302,10 +302,10 @@ export function TestScreen({navigation, route}) {
     console.log(res.status, res.content);
   }
   //
-  pressHandleQuestItem = item => {
+  function pressHandleQuestItem(item) {
     // Nhan gia tri tu menu
     setCurrentQuestion(testData[item - 1]);
-  };
+  }
   //
   return (
     <SafeAreaView style={{flex: 1}}>

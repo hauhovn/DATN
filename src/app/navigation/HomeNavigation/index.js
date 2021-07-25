@@ -120,16 +120,16 @@ const HomeNavigator = () => {
         component={LopHocPhanSV}
         options={{title: AppRouter.LOP_HOC_PHAN, headerShown: false}}
       />
-      <Stack.Screen
+      {/* <Stack.Screen
         name={AppRouter.TESTING}
         component={TestScreen}
         options={{title: AppRouter.TESTING, headerShown: false}}
-      />
-      <Stack.Screen
+      /> */}
+      {/* <Stack.Screen
         name={AppRouter.DEMO_VIEW}
         component={DemoView}
         options={{title: AppRouter.DEMO_VIEW, headerShown: false}}
-      />
+      /> */}
     </Stack.Navigator>
   );
 };
