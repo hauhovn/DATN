@@ -18,12 +18,9 @@ export const DemoView = () => {
   const [reRender, setReRender] = useState(false);
   var render2 = 0;
   let flatList = React.useRef();
-  var temp = [
-    {isConnect: true, name: 'Meo Meo', status: 'Disconnect_St', socketid: 'x0'},
-    {isConnect: false, name: 'Gau Gau', status: 'Connect_st', socketid: 'x01'},
-  ];
+  var temp = [];
 
-  const [data, setData] = useState(temp);
+  const [data, setData] = useState([]);
   const section = [
     {
       id: 0,
@@ -35,10 +32,8 @@ export const DemoView = () => {
   //get new status
   socket.on('server-send-newstatus', function (res) {
     console.log('# server-send-newstatus: ', res);
-
     // User connect
     let userA = data;
-    console.log(`CONER: `, res);
     userA.push(res);
     setData(userA);
     setReRender(render2++);
@@ -67,12 +62,19 @@ export const DemoView = () => {
   }
 
   function joinRoom(room) {
+    let data = {
+      id: 6969,
+      room: room,
+      name: 'Giảng cnb viên',
+      is_teacher: true,
+      socket_id: null,
+    };
     socket.emit('client-join-test', {
-      MaSV: 6969,
-      MaBaiKT: room,
-      TenSV: 'TenSV_DM',
-      MaGV: 'GiangVien lllllllllllllllllllllllll',
+      data: data,
+      info: 'Day la giang vien',
+      status: 1,
     });
+    socket.connect();
   }
   function leaveRoom(room) {
     socket.emit('client-leave-room', room);
@@ -149,7 +151,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   flatList: {
-    backgroundColor: '#e9e9e9',
+    backgroundColor: '#d9d9d9',
   },
   buttonBox: {
     width: '100%',

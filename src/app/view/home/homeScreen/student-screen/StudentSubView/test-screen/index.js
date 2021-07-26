@@ -50,7 +50,7 @@ export function TestScreen({navigation, route}) {
     ) {
       console.log('App has come to the foreground!');
       socket.connect();
-      requestJoinTest(data.MaSV, data.MaBaiKT, data.TenSV);
+      requestJoinTest(data.MaSV, data.MaBaiKT, data.TenSV, 'Đã kết nối lại', 3);
     }
 
     appState.current = nextAppState;
@@ -58,7 +58,7 @@ export function TestScreen({navigation, route}) {
     console.log('AppState', appState.current);
     if (appState.current === 'background') {
       // Connect to server
-      socket.emit('client-get-userquanlity', 'ouut');
+      // socket.emit('client-get-userquanlity', 'ouut');
       socket.disconnect();
     }
   };
@@ -116,9 +116,6 @@ export function TestScreen({navigation, route}) {
   useEffect(() => {
     if (fo) {
       if (testData == '' || testData == undefined) {
-        // Connect to server
-        socket.disconnect();
-        socket.connect();
         getListQuestion(data.MaSV, data.MaBaiKT);
         //requestJoinTest(data.MaSV, data.MaBaiKT, data.TenSV);
         console.log('Nav route data: ', data);
@@ -131,7 +128,7 @@ export function TestScreen({navigation, route}) {
   }, [fo]);
 
   useEffect(() => {
-    if (testData !== '') {
+    if (testData !== '' && testData.length > 0) {
       setCurrentQuestion(testData[0]);
       console.log('# List quests: ', testData);
     }
@@ -161,11 +158,19 @@ export function TestScreen({navigation, route}) {
     //updateListData(currentQuestion, currentQuestion.STT - 1);
   }, [currentQuestion]);
   //
-  function requestJoinTest(MaSV, MaBaiKT, TenSV) {
+  function requestJoinTest(MaSV, MaBaiKT, TenSV, Info, Status) {
+    socket.connect();
+    let data = {
+      id: MaSV,
+      room: MaBaiKT,
+      name: TenSV,
+      is_teacher: false,
+      socket_id: '',
+    };
     socket.emit('client-join-test', {
-      MaSV: MaSV,
-      MaBaiKT: MaBaiKT,
-      TenSV: TenSV,
+      data: data,
+      info: Info,
+      status: Status,
     });
   }
   //

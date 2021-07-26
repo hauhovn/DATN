@@ -22,11 +22,27 @@ export const WaitingScreen = ({route, navigation}) => {
   //Consts
   const data = route.params?.data;
   const [status, setStatus] = React.useState(0);
+  let [stop, setStop] = React.useState(false);
 
   React.useEffect(() => {
     checkTest(data.MaSV, data.MaBaiKT);
-    requestJoinTest(data.MaSV, data.MaBaiKT, data.TenSV);
   }, [data]);
+  React.useEffect(() => {
+    if (status == 1 && !stop) {
+      requestJoinTest(
+        data.MaSV,
+        data.MaBaiKT,
+        data.TenSV,
+        'Đã vào phòng chờ',
+        1,
+      );
+      setStop(true);
+    }
+    if (status == 2 && !stop) {
+      requestJoinTest(data.MaSV, data.MaBaiKT, data.TenSV, 'Đã vào trễ', 2);
+      setStop(true);
+    }
+  }, [status]);
 
   React.useEffect(() => {
     console.log('STATUS: ', status);
@@ -40,12 +56,19 @@ export const WaitingScreen = ({route, navigation}) => {
     setStatus(res.status);
   }
   // Socket request
-  function requestJoinTest(MaSV, MaBaiKT, TenSV) {
+  function requestJoinTest(MaSV, MaBaiKT, TenSV, Info, Status) {
     socket.connect();
+    let data = {
+      id: MaSV,
+      room: MaBaiKT,
+      name: TenSV,
+      is_teacher: false,
+      socket_id: '',
+    };
     socket.emit('client-join-test', {
-      MaSV: MaSV,
-      MaBaiKT: MaBaiKT,
-      TenSV: TenSV,
+      data: data,
+      info: Info,
+      status: Status,
     });
   }
   // SocketIO listen
