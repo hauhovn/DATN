@@ -27,11 +27,7 @@ import {UpdateQuestion} from '../../../../../../../server/JointTest/update-answe
 export function TestScreen({navigation, route}) {
   const fo = useIsFocused();
   //Socket
-  // const socket = io('https://da-tot-nghiep.herokuapp.com', {
-  //   autoConnect: false,
-  // });
-  // Localhost
-  const socket = io('http://10.0.2.2:3000', {autoConnect: false});
+  const socket = io(settings.NodeJsServer, {autoConnect: false});
   const [isRunning, setIsRunning] = useState(true);
   const [isShowMenuQuest, setIsShowMenuQuest] = useState(false);
   const [testData, setTestData] = useState('');
@@ -93,7 +89,7 @@ export function TestScreen({navigation, route}) {
   const [colorAnswerC, setColorAnswerC] = useState(settings.colors.colorGreen);
   const [colorAnswerD, setColorAnswerD] = useState(settings.colors.colorGreen);
 
-  let questionQuantity = testData.length;
+  let questionQuantity = testData?.length;
   let demoData = [
     {
       STT: 123,
@@ -124,7 +120,7 @@ export function TestScreen({navigation, route}) {
         socket.disconnect();
         socket.connect();
         getListQuestion(data.MaSV, data.MaBaiKT);
-        requestJoinTest(data.MaSV, data.MaBaiKT, data.TenSV);
+        //requestJoinTest(data.MaSV, data.MaBaiKT, data.TenSV);
         console.log('Nav route data: ', data);
       }
       try {

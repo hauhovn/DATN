@@ -1,5 +1,6 @@
 export const settings = {
   hostURL: 'https://doan-totnghiep.000webhostapp.com/api/', // Link to api
+  NodeJsServer: 'http://10.0.2.2:3000', //real: https://da-tot-nghiep.herokuapp.com local: http://10.0.2.2:3000
   oneSignalKey: '',
   userToken: '',
   colors: {

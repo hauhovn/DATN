@@ -53,6 +53,9 @@ export const DemoView = () => {
     socket.connect();
     socket.emit('client-set-time', {room: room, isStart: isStart});
     console.log('client-set-time: ', isStart, '  input: ', room);
+    if (isStart) {
+      socket.emit('client-start-test', {room: room});
+    }
   }
 
   function connectAndJoinRoom(isConnect) {
