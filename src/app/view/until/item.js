@@ -3,32 +3,34 @@ import {View, Text, StyleSheet} from 'react-native';
 
 export const ItemJoinLeaveRoom = ({item}) => {
   let brColor = '#118011';
+  console.log(item.status);
 
-  switch (item.status) {
-    case 1: {
-      brColor = '#02ad02';
-      break;
-    }
-    case 2: {
-      brColor = '#d1660f';
-      break;
-    }
-    case 3: {
-      brColor = '#d1b10f';
-      break;
-    }
-    case 0: {
-      brColor = '#ed1818';
-      break;
-    }
+  if (item.status == 0) {
+    brColor = '#ed1818';
   }
+  if (item.status == 1) {
+    brColor = '#02ad02';
+  }
+  if (item.status == 2) {
+    brColor = '#d1660f';
+  }
+  if (item.status == 3) {
+    brColor = '#d1b10f';
+  }
+  console.log(brColor);
   var today = new Date();
   var date = today.getHours() + 'h' + today.getMinutes() + 'm';
+  let showDate;
+  if (item.create_at != '') {
+    showDate = item.create_at;
+  } else {
+    showDate = date;
+  }
   return (
     <View style={[styles.container, {backgroundColor: brColor}]}>
       <Text style={[styles.text]}>{item?.name}</Text>
       <Text style={{fontSize: 13, color: '#e9e9e9'}}>
-        {item?.info} [{date}]
+        {item?.info} [{showDate}]
       </Text>
     </View>
   );

@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import io from 'socket.io-client/dist/socket.io.js';
 import {ItemJoinLeaveRoom} from './item';
+import {getTestInfo} from '../../../server/TestInfo/get-test-info';
 
 export const DemoView = () => {
   const socket = io('http://10.0.2.2:3000', {autoConnect: false});
@@ -18,15 +19,10 @@ export const DemoView = () => {
   const [reRender, setReRender] = useState(false);
   var render2 = 0;
   let flatList = React.useRef();
-  var temp = [];
 
   const [data, setData] = useState([]);
-  const section = [
-    {
-      id: 0,
-      data: data,
-    },
-  ];
+  const [stop, setStop] = useState(false);
+
   //sockets on
 
   //get new status
@@ -41,8 +37,19 @@ export const DemoView = () => {
   });
 
   //Effect
-
+  React.useEffect(() => {
+    if (!stop) {
+      getOldInfo(room);
+      setStop(true);
+    }
+  }, []);
   //funcs
+  async function getOldInfo(MaBKT) {
+    setData([]);
+    let res = await getTestInfo(MaBKT);
+    //console.log(MaBKT + 'RES: ', JSON.stringify(res));
+    setData(res.data);
+  }
 
   function pressStart(isStart) {
     socket.connect();
@@ -75,6 +82,7 @@ export const DemoView = () => {
       status: 1,
     });
     socket.connect();
+    getOldInfo(room);
   }
   function leaveRoom(room) {
     socket.emit('client-leave-room', room);
