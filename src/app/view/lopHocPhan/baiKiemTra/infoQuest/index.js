@@ -8,6 +8,7 @@ import {
   StatusBar,
   TextInput,
   Clipboard,
+  Alert,
 } from 'react-native';
 import {useNavigation, useRoute, useIsFocused} from '@react-navigation/native';
 import {settings} from '../../../../config';
@@ -22,18 +23,20 @@ import {RenderItem} from './renderItem';
 import {updateBaiKT} from '../../../../../server/BaiKiemTra/updateBaiKT';
 import {getCTBKT} from '../../../../../server/BaiKiemTra/getCTBKT';
 import {deleteCTBKT} from '../../../../../server/BaiKiemTra/deleteCTBKT';
+import {updateTestStatus} from '../../../../../server/BaiKiemTra/update-status';
 
 export const InfomationQuestion = () => {
   const nav = useNavigation();
   const route = useRoute();
   const focused = useIsFocused();
-  const item = route.params.item;
   const user = route.params.user;
+  var item = route.params.item;
 
   const [showModal, setModal] = useState(false);
   const [tenBaiKT, setTenBaiKT] = useState(item.TenBaiKT);
   const [ngay, setNgay] = useState(new Date(item.Ngay));
-  const [thoiGian, setThoiGian] = useState(0);
+  const [lableButton, setLableButton] = useState('Hoàn thành');
+  const [thoiGian, setThoiGian] = useState('Hoàn thành');
   const [datePicker, setDatePicker] = useState(false);
   const [questions, setQuestions] = useState('');
 
@@ -44,6 +47,7 @@ export const InfomationQuestion = () => {
   // Focus vô thì chạy
   useEffect(() => {
     if (focused) {
+      setTestState(item.TrangThai);
       timeToNumber(item.ThoiGianLam);
       getQuestion(route.params.item.MaBaiKT);
     }
@@ -65,6 +69,15 @@ export const InfomationQuestion = () => {
     }
   };
 
+  // Set test state
+  const setTestState = status => {
+    if (status > 1) {
+      setLableButton('Thông tin');
+    } else if (status > 0) {
+      setLableButton('Bắt đầu');
+    }
+  };
+
   // Gọi api lấy danh sách câu hỏi theo mã môn học
   const getQuestion = async data => {
     try {
@@ -74,6 +87,23 @@ export const InfomationQuestion = () => {
       //
     }
   };
+
+  // const update test status
+  async function _updateTestStatus(MaGV, MaBaiKT, toStatus) {
+    try {
+      let rs = await updateTestStatus(MaGV, MaBaiKT, toStatus);
+      console.log(rs?.code, ' ?= ', toStatus);
+      if (rs?.code == toStatus) {
+        //Alert.alert('ok');
+        item.TrangThai = toStatus;
+        setTestState(toStatus);
+      } else {
+        Alert.alert('Failed');
+      }
+    } catch (error) {
+      console.log('_updateTestStatus has error');
+    }
+  }
 
   // Gọi api xóa câu hỏi
   const deleteCauHoi = async data => {
@@ -148,12 +178,41 @@ export const InfomationQuestion = () => {
 
   // Nhấn nút bắt đầu
   const handleStart = () => {
-    console.log('handleStart');
-    nav.navigate(AppRouter.TEACHERCONTROLL, {
-      MaMH: route.params.MaMH,
-      BaiKiemTra: item,
-      user: user,
-    });
+    let TrangThai = item.TrangThai;
+    if (TrangThai > 1) {
+      // When test status =  2 (testing)
+      nav.navigate(AppRouter.TEACHERCONTROLL, {
+        MaMH: route.params.MaMH,
+        BaiKiemTra: item,
+        user: user,
+      });
+    } else
+      Alert.alert('Bạn có chắc', lableButton + ' bài kiểm tra này?', [
+        {
+          text: 'Đồng ý',
+          style: 'OK',
+          onPress: () => {
+            if (TrangThai > 2) {
+              // Navi to info testing
+              nav.navigate(AppRouter.TEACHERCONTROLL, {
+                MaMH: route.params.MaMH,
+                BaiKiemTra: item,
+                user: user,
+              });
+            } else if (TrangThai > 0) {
+              // When test status =  1 (ready)
+              _updateTestStatus(user[0].MaGV, item.MaBaiKT, 2);
+            } else {
+              // When test status =  0 (waiting)
+              _updateTestStatus(user[0].MaGV, item.MaBaiKT, 1);
+            }
+          },
+        },
+        {
+          text: 'Bỏ qua',
+          style: 'cancel',
+        },
+      ]);
   };
 
   // Render screen
@@ -196,8 +255,8 @@ export const InfomationQuestion = () => {
               }}
               activeOpacity={0.7}
               style={{
-                height: 30,
-                width: 74,
+                paddingVertical: 5,
+                paddingHorizontal: 9,
                 backgroundColor: settings.colors.colorGreen,
                 marginRight: 5,
                 alignItems: 'center',
@@ -211,7 +270,7 @@ export const InfomationQuestion = () => {
                   fontSize: 14,
                   textTransform: 'uppercase',
                 }}>
-                Bắt đầu
+                {lableButton}
               </Text>
             </TouchableOpacity>
           </View>
