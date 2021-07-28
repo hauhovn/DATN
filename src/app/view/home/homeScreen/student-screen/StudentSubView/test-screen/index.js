@@ -348,7 +348,7 @@ export function TestScreen({navigation, route}) {
             onPress={() => {
               {
                 socket.disconnect();
-                navigation.goBack();
+                navigation.navigate(AppRouter.MAIN, {screen: AppRouter.TAB});
               } // Quay về màn hình trước
             }}
             style={appBar.leftButton}>

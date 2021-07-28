@@ -89,10 +89,10 @@ export const RenderItem = ({item, data, handle, handleDelete}) => {
         <Text numberOfLines={1} style={{width: '100%', fontSize: 12}}>
           Ngày: {getDate(item?.Ngay)} -{' '}
           {parseInt(item?.TrangThai) === 0
-            ? 'Chưa làm'
+            ? 'Chưa sẵn sàng'
             : parseInt(item?.TrangThai) === 1
-            ? 'Đang làm'
-            : 'Đã làm'}
+            ? 'Đã sẵn sằng'
+            : 'Đang làm bài'}
         </Text>
       </View>
       <TouchableOpacity

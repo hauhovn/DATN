@@ -5,7 +5,7 @@ import {settings} from '../../../config';
 
 export const RenderItem = ({item, data, handle, handleDelete}) => {
   const getMarginTop = () => {
-    if (item.id === data[0].id) {
+    if (item?.id === data[0]?.id) {
       return 5;
     } else {
       return 0;
@@ -13,7 +13,7 @@ export const RenderItem = ({item, data, handle, handleDelete}) => {
   };
 
   const marginBottom = () => {
-    if (item.MaCauHoi === data[data.length - 1].MaCauHoi) {
+    if (item?.MaBaiKT === data[data.length - 1]?.MaBaiKT) {
       return 10;
     } else {
       return 5;
@@ -26,6 +26,23 @@ export const RenderItem = ({item, data, handle, handleDelete}) => {
 
   const deleteQuest = () => {
     handleDelete(item);
+  };
+
+  // vậy đó
+  const getNum = num => {
+    return num < 10 ? '0' + num : num;
+  };
+
+  // Lấy ra dạng ngày-tháng-năm
+  const getDate = date => {
+    const newDate = new Date(date);
+    return (
+      getNum(newDate.getDate()) +
+      '-' +
+      getNum(newDate.getMonth() + 1) +
+      '-' +
+      newDate.getFullYear()
+    );
   };
 
   return (
@@ -66,14 +83,16 @@ export const RenderItem = ({item, data, handle, handleDelete}) => {
       </View>
 
       <View style={{flex: 1}}>
-        <Text numberOfLines={1} style={{width: '100%', fontSize: 12}}>
-          {item.TrangThaiBatDau === 0 ? 'Chưa làm' : 'Đã làm'}
-        </Text>
         <Text numberOfLines={1} style={{width: '100%', fontWeight: 'bold'}}>
-          {item.TenBaiKT}
+          {item?.TenBaiKT}
         </Text>
         <Text numberOfLines={1} style={{width: '100%', fontSize: 12}}>
-          Thời gian: {item.ThoiGianLam} - {item.Ngay}
+          Ngày: {getDate(item?.Ngay)} -{' '}
+          {parseInt(item?.TrangThai) === 0
+            ? 'Chưa sẵn sàng'
+            : parseInt(item?.TrangThai) === 1
+            ? 'Đã sẵn sằng'
+            : 'Đang làm bài'}
         </Text>
       </View>
       <TouchableOpacity
