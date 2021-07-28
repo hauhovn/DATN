@@ -17,12 +17,9 @@ import {LopHocPhanNav} from '../../view/lopHocPhan';
 import {LopHocPhanSV} from '../../view/home/homeScreen/student-screen/StudentSubView/LopHocPhanSV';
 import {TestScreen} from '../../view/home/homeScreen/student-screen/StudentSubView/test-screen';
 import {KiemTraNav} from '../../view/kiemTra';
-<<<<<<< HEAD
 import {DemoView} from '../../view/until/demo-view';
-=======
 import {TeacherControl} from '../../view/teacherControl';
 
->>>>>>> upstream/baochau
 const Stack = createStackNavigator();
 
 const HomeNavigator = () => {

@@ -41,9 +41,6 @@ export const AppRouter = {
   KIEMTRA: 'KIEMTRA',
   CHANGEPASS: 'CHANGEPASS',
   PROFILE: 'PROFILE',
-<<<<<<< HEAD
   DEMO_VIEW: 'DEMO_VIEW_V',
-=======
   TEACHERCONTROLL: 'TEACHERCONTROLL',
->>>>>>> upstream/baochau
 };
