@@ -7,6 +7,7 @@ import {UpdateProfile} from '../../view/profile/updateProfile';
 import {DemoView} from '../../view/until/demo-view';
 import {TestScreen} from '../../view/home/homeScreen/student-screen/StudentSubView/test-screen';
 import {TestingNavigation} from '../TestingNavigation';
+import {TeacherControl} from '../../view/teacherControl';
 
 const Stack = createStackNavigator();
 
@@ -42,6 +43,11 @@ function MainNavigation() {
         name={AppRouter.TESTING_NAV}
         component={TestingNavigation}
         options={{title: AppRouter.TESTING_NAV, headerShown: false}}
+      />
+      <Stack.Screen
+        name={AppRouter.TEACHERCONTROLL}
+        component={TeacherControl}
+        options={{title: AppRouter.TEACHERCONTROLL, headerShown: false}}
       />
     </Stack.Navigator>
   );
