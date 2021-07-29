@@ -96,6 +96,11 @@ export const TeacherScreen = ({navigation}) => {
       console.log('acccccc');
       nav.navigate(AppRouter.LISTLHP);
     }
+    // Muon tam man de test
+    if (value === 'About') {
+      console.log('Go');
+      nav.navigate(AppRouter.MAIN, {screen: AppRouter.TEACHERCONTROLL});
+    }
   };
 
   const onRefresh = React.useCallback(() => {

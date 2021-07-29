@@ -1,4 +1,6 @@
 import React from 'react';
+import moment from 'moment';
+moment.locale('vi');
 import {View, Text, StyleSheet} from 'react-native';
 
 export const ItemJoinLeaveRoom = ({item}) => {
@@ -16,7 +18,6 @@ export const ItemJoinLeaveRoom = ({item}) => {
   if (item.status == 3) {
     brColor = '#d1b10f';
   }
-
   var today = new Date();
   var date = today.getHours() + 'h' + today.getMinutes() + 'm';
   let showDate;
@@ -25,11 +26,12 @@ export const ItemJoinLeaveRoom = ({item}) => {
   } else {
     showDate = date;
   }
+
   return (
     <View style={[styles.container, {backgroundColor: brColor}]}>
       <Text style={[styles.text]}>{item?.name}</Text>
       <Text style={{fontSize: 13, color: '#e9e9e9'}}>
-        {item?.info} [{showDate}]
+        {item?.info} [{moment(showDate).format('LT')}]
       </Text>
     </View>
   );

@@ -8,39 +8,50 @@ import {
   Image,
 } from 'react-native';
 //moduns
-import io from 'socket.io-client/dist/socket.io.js';
 //
 import {AppRouter} from '../../../../../../navigation/AppRouter';
 import {settings} from '../../../../../../../app/config';
 import {MyAppBar} from '../../app-bar';
 //APIs
 import {getTestStatus} from '../../../../../../../server/BaiKiemTra/get-status';
+import {
+  inittiateSocket,
+  serverStartTest,
+} from '../../../../../../../server/SocketIO';
+import {check} from 'react-native-permissions';
 
 export const WaitingScreen = ({route, navigation}) => {
-  // Socket IO
-  const socket = io(settings.NodeJsServer, {autoConnect: false});
   //Consts
   const data = route.params?.data;
   const [status, setStatus] = React.useState(0);
-  let [stop, setStop] = React.useState(false);
 
   React.useEffect(() => {
-    checkTest(data.MaSV, data.MaBaiKT);
-  }, [data]);
+    loadOption();
+  }, []);
   React.useEffect(() => {
-    if (status == 1 && !stop) {
-      requestJoinTest(
-        data.MaSV,
-        data.MaBaiKT,
-        data.TenSV,
-        'Đã vào phòng chờ',
-        1,
-      );
-      setStop(true);
+    let _data = {
+      id: data.MaSV,
+      room: data.MaBaiKT,
+      name: data.TenSV,
+      is_teacher: false,
+      socket_id: '',
+    };
+    if (status == 1) {
+      inittiateSocket(data.MaBaiKT, _data, 'Đã vào phòng chờ', 1);
+      serverStartTest((err, data) => {
+        if (err) return;
+        if (data != '') {
+          console.log('hahahahahahaah');
+          setStatus(2);
+        }
+      });
     }
-    if (status == 2 && !stop) {
-      requestJoinTest(data.MaSV, data.MaBaiKT, data.TenSV, 'Đã vào trễ', 2);
-      setStop(true);
+    if (status == 2) {
+      inittiateSocket(data.MaBaiKT, _data, 'Đã vào trễ', 2);
+      serverStartTest((err, data) => {
+        if (err) return;
+        console.log(data);
+      });
     }
   }, [status]);
 
@@ -51,13 +62,17 @@ export const WaitingScreen = ({route, navigation}) => {
     }
   }, [status]);
 
+  async function loadOption() {
+    await checkTest(data.MaSV, data.MaBaiKT);
+  }
+
   async function checkTest(MaSV, MaBaiKT) {
     let res = await getTestStatus(MaSV, MaBaiKT);
     setStatus(res.status);
   }
   // Socket request
   function requestJoinTest(MaSV, MaBaiKT, TenSV, Info, Status) {
-    socket.connect();
+    //socket.connect();
     let data = {
       id: MaSV,
       room: MaBaiKT,
@@ -65,17 +80,17 @@ export const WaitingScreen = ({route, navigation}) => {
       is_teacher: false,
       socket_id: '',
     };
-    socket.emit('client-join-test', {
-      data: data,
-      info: Info,
-      status: Status,
-    });
+    // socket.emit('client-join-test', {
+    //   data: data,
+    //   info: Info,
+    //   status: Status,
+    // });
   }
   // SocketIO listen
-  socket.on('server-start-test', function (res) {
-    console.log(res);
-    setStatus(2);
-  });
+  //   socket.on('server-start-test', function (res) {
+  //     console.log(res);
+  //     setStatus(2);
+  //   });
 
   return (
     <SafeAreaView style={styles.container}>

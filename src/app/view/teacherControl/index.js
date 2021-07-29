@@ -4,23 +4,62 @@ import {
   TouchableOpacity,
   Text,
   FlatList,
-  TextInput,
   StyleSheet,
   AppState,
+  Alert,
 } from 'react-native';
-
 import {useNavigation, useIsFocused, useRoute} from '@react-navigation/native';
 
+// Items
 import {Header} from '../../components/header';
-import io from 'socket.io-client/dist/socket.io.js';
 import {ItemJoinLeaveRoom} from './join-leave-room-item';
+
+// Socket IO
+import {
+  inittiateSocket,
+  requestServerLogs,
+  disconnectSocket,
+  subscribeToChat,
+  sendMessage,
+  reconectSocketAuto,
+  listenStudentInOut,
+  requestStartTest,
+} from '../../../server/SocketIO';
+
+// APIs
+import {updateTestStatus} from '../../../server/BaiKiemTra/update-status';
 import {getTestInfo} from '../../../server/TestInfo/get-test-info';
+import {getInfoBeforeTest} from '../../../server/TestInfo/get-info-before-test';
 
 export const TeacherControl = () => {
   const nav = useNavigation();
   const route = useRoute();
-  const user = route.params?.user;
-  const BaiKiemTra = route.params?.BaiKiemTra;
+  //   const user = route.params?.user;
+  //   const BaiKiemTra = route.params?.BaiKiemTra;
+  var user = [
+    {
+      DiaChi: 'Nguyễn Thị Thập',
+      GIoiTinh: '0',
+      MaGV: '1',
+      Mail: 'chau@gmail.com',
+      Password: '111111',
+      SDT: '0775712017',
+      TenGV: 'Nguyễn Phúc Bảo Châu',
+      TrangThai: '1',
+      isAdmin: '1',
+    },
+  ];
+  let _user = user[0];
+  var BaiKiemTra = {
+    KeyBaiKT: '1',
+    MaBaiKT: '22',
+    Ngay: '2021-07-01',
+    TenBaiKT: 'MCV_1',
+    TenGV: 'Nguyễn Phúc Bảo Châu',
+    TenLopHP: 'Một con vịt',
+    ThoiGianLam: '01:51:00',
+    TrangThai: '2',
+  };
   // Refs
 
   let flatList = React.useRef();
@@ -31,70 +70,24 @@ export const TeacherControl = () => {
   const [reRender, setReRender] = useState(false);
 
   const [stopRender, setStopRender] = useState(false);
-  // Socket
-  const socket = io('http://10.0.2.2:3000', {autoConnect: true});
 
-  // Socket ONs
-
-  // Join room affter connect
-  socket.on('connect', function () {
-    console.log('connected . . .');
-    joinRoom(BaiKiemTra.MaBaiKT, user.MaGV, user.TenGV);
-  });
-
-  // get new status
-  socket.on('server-send-newstatus', function (res) {
-    console.log('# server-send-newstatus: ', res);
-    // User connect
-    let userA = data;
-    userA.push(res);
-    setUsersStatusList(userA);
-    setUsersStatusList(render2++);
-    flatList.current.scrollToEnd();
-  });
-
-  socket.on('server-accept-logout', function (data) {
-    console.log(data);
-    socket.disconnect();
-  });
-  // Check out app
-  useEffect(() => {
-    AppState.addEventListener('change', _handleAppStateChange);
-
-    return () => {
-      AppState.removeEventListener('change', _handleAppStateChange);
-    };
-  }, []);
-
-  const _handleAppStateChange = nextAppState => {
-    if (
-      appState.current.match(/inactive|background/) &&
-      nextAppState === 'active'
-    ) {
-      console.log('App has come to the foreground!');
-      socket.connect();
-      // requestJoinTest(data.MaSV, data.MaBaiKT, data.TenSV, 'Đã kết nối lại', 3);
-    }
-
-    appState.current = nextAppState;
-    setAppStateVisible(appState.current);
-    console.log('AppState', appState.current);
-    if (appState.current === 'background') {
-      // Connect to server
-      // socket.emit('client-get-userquanlity', 'ouut');
-      if (!socket.connected) socket.connect();
-    }
-  };
   //Effect
   useEffect(() => {
+    pressConnect();
+    reconectSocketAuto((err, data) => {
+      if (err) return;
+      console.log(data);
+    });
+    listenStudentInOut((err, data) => {
+      if (err) return;
+      Alert.alert(`NHE_123; ` + JSON.stringify(data));
+    });
     loadOption();
   }, []);
 
   //funcs
   async function loadOption() {
-    let _user = user[0];
-    await joinRoom(BaiKiemTra.MaBaiKT, _user.MaGV, _user.TenGV);
-    await getOldInfo(BaiKiemTra.MaBaiKT);
+    await getOldInfoBefore(BaiKiemTra.MaBaiKT);
   }
 
   async function getOldInfo(MaBKT) {
@@ -103,46 +96,55 @@ export const TeacherControl = () => {
     //console.log(MaBKT + 'RES: ', JSON.stringify(res));
     setUsersStatusList(res.data);
   }
-
-  function pressStart(isStart) {
-    // socket.connect();
-    // socket.emit('client-set-time', {room: room, isStart: isStart});
-    // console.log('client-set-time: ', isStart, '  input: ', room);
-    // if (isStart) {
-    //   socket.emit('client-start-test', {room: room});
-    // }
+  async function getOldInfoBefore(MaBKT) {
+    setUsersStatusList([]);
+    let res = await getInfoBeforeTest(MaBKT);
+    //console.log(MaBKT + 'RES: ', JSON.stringify(res));
+    setUsersStatusList(res.data);
   }
 
-  function joinRoom(room, userID, userName) {
-    if (!socket.connected) socket.connect();
+  function pressConnect() {
+    console.log('con');
     let data = {
-      id: userID,
-      room: room,
-      name: userName,
+      id: _user.MaGV,
+      room: BaiKiemTra.MaBaiKT,
+      name: _user.TenGV,
       is_teacher: true,
       socket_id: null,
     };
-    socket.emit('client-request-join', {
-      data: data,
-      info: 'Day la giang vien',
-      status: 1,
-    });
-    // socket.connect();
-    // getOldInfo(room);
+    inittiateSocket(BaiKiemTra.MaBaiKT, data);
   }
 
-  function _disconnect() {
-    //socket.disconnect();
-    console.log('client-request-logout');
-    socket.emit('client-request-logout', {code: 202, info: 'logout_me'});
+  // Press students list
+  function pressStudentsList() {
+    requestServerLogs();
   }
 
+  // Back button
   const _leftHandle = () => {
-    if (socket.connected) {
-      socket.disconnect();
-    }
+    disconnectSocket();
     nav.goBack();
   };
+  function startTest(isStart) {
+    Alert.alert(
+      'Bạn có chắc',
+      (isStart ? 'Bắt đầu' : 'Hủy bỏ') + ' bài kiểm tra này?',
+      [
+        {
+          text: 'Đồng ý',
+          onPress: () => {
+            if (isStart) {
+              requestStartTest(_user.MaGV, BaiKiemTra.MaBaiKT);
+            } else {
+            }
+          },
+        },
+        {
+          text: 'Bỏ qua',
+        },
+      ],
+    );
+  }
 
   return (
     <View style={{flex: 1}}>
@@ -152,23 +154,53 @@ export const TeacherControl = () => {
           _leftHandle();
         }}
       />
-      <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-        <TouchableOpacity
-          onPress={() => _disconnect()}
-          style={([styles.button], {backgroundColor: 'orange'})}>
-          <Text style={styles.texts}>Disconnect</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => {
-            // Log rooms
-            if (socket.connected) {
-              console.log('log rooms');
-              socket.emit('client-request-logroom');
-            }
-          }}
-          style={([styles.button], {backgroundColor: 'purple'})}>
-          <Text style={styles.texts}>Log Rooms</Text>
-        </TouchableOpacity>
+      <View style={{flex: 1}}>
+        <View style={actionBar.container}>
+          <View style={actionBar.row}>
+            <Text style={[actionBar.text, {color: '#000', marginLeft: 15}]}>
+              Thí sinh đã vào: 30/69
+            </Text>
+            <TouchableOpacity
+              onPress={() => startTest(true)}
+              style={[
+                actionBar.button,
+                actionBar.shortButton,
+                {backgroundColor: '#02ad02'},
+              ]}>
+              <Text style={actionBar.text}>Bắt đầu</Text>
+            </TouchableOpacity>
+          </View>
+          <View style={actionBar.row}>
+            <TouchableOpacity
+              onPress={() => pressStudentsList()}
+              style={[actionBar.button, actionBar.longButton]}>
+              <Text style={[actionBar.text]}>Danh Sách Thí Sinh</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => startTest(false)}
+              style={[
+                actionBar.button,
+                actionBar.shortButton,
+                {backgroundColor: 'red'},
+              ]}>
+              <Text style={[actionBar.text]}>Hủy bỏ</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            backgroundColor: '#ebebeb',
+          }}>
+          <View style={{flex: 1, height: 1, backgroundColor: 'black'}} />
+          <View>
+            <Text style={{width: 170, textAlign: 'center', fontWeight: 'bold'}}>
+              LỊCH SỬ TRUY CẬP
+            </Text>
+          </View>
+          <View style={{flex: 1, height: 1, backgroundColor: 'black'}} />
+        </View>
         <FlatList
           ref={flatList}
           style={styles.flatList}
@@ -187,22 +219,25 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     flexDirection: 'column',
+    backgroundColor: '#ebebeb',
   },
   buttons: {
     flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
   },
+  actionBar: {},
+  listActionsTitle: {},
   flatList: {
-    backgroundColor: '#d9d9d9',
+    flex: 1,
+    backgroundColor: '#ebebeb',
+    paddingTop: 15,
   },
   buttonBox: {
-    width: '100%',
-    alignItems: 'center',
-    justifyContent: 'center',
+    width: 120,
+    alignSelf: 'center',
     flexDirection: 'row',
   },
   button: {
+    width: 60,
     padding: 15,
     borderRadius: 5,
   },
@@ -216,5 +251,33 @@ const styles = StyleSheet.create({
     width: '50%',
     color: '#fff',
     backgroundColor: '#537067',
+  },
+});
+const actionBar = StyleSheet.create({
+  container: {
+    flexDirection: 'column',
+    padding: 12,
+    borderColor: '#888',
+    backgroundColor: '#ebebeb',
+  },
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 6,
+  },
+  text: {fontSize: 15, color: '#fff'},
+  button: {
+    backgroundColor: 'blue',
+    paddingVertical: 5,
+    paddingHorizontal: 19,
+    borderRadius: 15,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  shortButton: {
+    width: 100,
+  },
+  longButton: {
+    width: 170,
   },
 });

@@ -71,11 +71,7 @@ export const InfomationQuestion = () => {
 
   // Set test state
   const setTestState = status => {
-    if (status > 1) {
-      setLableButton('Thông tin');
-    } else if (status > 0) {
-      setLableButton('Bắt đầu');
-    }
+    if (status > 0) setLableButton('Chi tiết');
   };
 
   // Gọi api lấy danh sách câu hỏi theo mã môn học
@@ -179,33 +175,21 @@ export const InfomationQuestion = () => {
   // Nhấn nút bắt đầu
   const handleStart = () => {
     let TrangThai = item.TrangThai;
-    if (TrangThai > 1) {
-      // When test status =  2 (testing)
+    if (TrangThai > 0) {
+      // When test status =  1 (ready)
       nav.navigate(AppRouter.TEACHERCONTROLL, {
         MaMH: route.params.MaMH,
         BaiKiemTra: item,
         user: user,
       });
-    } else
-      Alert.alert('Bạn có chắc', lableButton + ' bài kiểm tra này?', [
+    } else if (TrangThai == 0)
+      Alert.alert('Bạn có chắc', 'Hoàn thành bài kiểm tra này?', [
         {
           text: 'Đồng ý',
           style: 'OK',
           onPress: () => {
-            if (TrangThai > 2) {
-              // Navi to info testing
-              nav.navigate(AppRouter.TEACHERCONTROLL, {
-                MaMH: route.params.MaMH,
-                BaiKiemTra: item,
-                user: user,
-              });
-            } else if (TrangThai > 0) {
-              // When test status =  1 (ready)
-              _updateTestStatus(user[0].MaGV, item.MaBaiKT, 2);
-            } else {
-              // When test status =  0 (waiting)
-              _updateTestStatus(user[0].MaGV, item.MaBaiKT, 1);
-            }
+            // When test status =  0 (waiting)
+            _updateTestStatus(user[0].MaGV, item.MaBaiKT, 1);
           },
         },
         {
