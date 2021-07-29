@@ -6,6 +6,7 @@ import {
   FlatList,
   StyleSheet,
   AppState,
+  Image,
   Alert,
 } from 'react-native';
 import {useNavigation, useIsFocused, useRoute} from '@react-navigation/native';
@@ -19,8 +20,6 @@ import {
   inittiateSocket,
   requestServerLogs,
   disconnectSocket,
-  subscribeToChat,
-  sendMessage,
   reconectSocketAuto,
   listenStudentInOut,
   requestStartTest,
@@ -68,8 +67,7 @@ export const TeacherControl = () => {
   const [appStateVisible, setAppStateVisible] = useState(appState.current);
   const [usersStatusList, setUsersStatusList] = useState([]);
   const [reRender, setReRender] = useState(false);
-
-  const [stopRender, setStopRender] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   //Effect
   useEffect(() => {
@@ -80,19 +78,21 @@ export const TeacherControl = () => {
     });
     listenStudentInOut((err, data) => {
       if (err) return;
-      Alert.alert(`NHE_123; ` + JSON.stringify(data));
+      console.log(data);
+      setUsersStatusList(usersStatusList.concat(data));
     });
     loadOption();
   }, []);
 
   //funcs
   async function loadOption() {
-    await getOldInfoBefore(BaiKiemTra.MaBaiKT);
+    await getOldInfo(BaiKiemTra.MaBaiKT);
+    setIsLoading(false);
   }
 
   async function getOldInfo(MaBKT) {
     setUsersStatusList([]);
-    let res = await getTestInfo(MaBKT);
+    let res = await getTestInfo(MaBKT, 1);
     //console.log(MaBKT + 'RES: ', JSON.stringify(res));
     setUsersStatusList(res.data);
   }
@@ -201,16 +201,45 @@ export const TeacherControl = () => {
           </View>
           <View style={{flex: 1, height: 1, backgroundColor: 'black'}} />
         </View>
-        <FlatList
-          ref={flatList}
-          style={styles.flatList}
-          data={usersStatusList}
-          extraData={reRender}
-          keyExtractor={item =>
-            item.socketid + (Math.random() * 1000).toString()
-          }
-          renderItem={({item}) => <ItemJoinLeaveRoom item={item} />}
-        />
+        {isLoading ? (
+          <View
+            style={{
+              width: '100%',
+              height: '80%',
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: '#ebebeb',
+            }}>
+            <Image
+              source={require('../../../app/asset/gif/load321.gif')}
+              style={{height: 120, width: 120, marginTop: -250}}
+            />
+          </View>
+        ) : usersStatusList?.length > 0 ? (
+          <FlatList
+            ref={flatList}
+            style={styles.flatList}
+            data={usersStatusList}
+            extraData={reRender}
+            keyExtractor={item =>
+              item.socketid + (Math.random() * 1000).toString()
+            }
+            renderItem={({item}) => <ItemJoinLeaveRoom item={item} />}
+          />
+        ) : (
+          <View
+            style={{
+              width: '100%',
+              height: '80%',
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: '#ebebeb',
+            }}>
+            <Text style={{fontSize: 14, marginTop: -250}}>
+              Chưa có thí sinh tham gia
+            </Text>
+          </View>
+        )}
       </View>
     </View>
   );

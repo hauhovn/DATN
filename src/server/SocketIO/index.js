@@ -47,10 +47,14 @@ export const listenStudentInOut = sio => {
   });
 };
 
-export const requestStartTest = (userID, room) => {
+export const requestStartTest = (userID, room, isStart) => {
   if (!socket) return;
   console.log(`teacher-start-test  ${userID}  to room: ${room}`);
-  socket.emit('teacher-start-test', {userID: userID, room: room});
+  socket.emit('teacher-start-test', {
+    userID: userID,
+    room: room,
+    isStart: isStart,
+  });
 };
 // ==================================== student ===============================================
 

@@ -129,7 +129,8 @@ export function TestScreen({navigation, route}) {
 
   useEffect(() => {
     if (testData !== '' && testData.length > 0) {
-      setCurrentQuestion(testData[0]);
+      if (testData[0] != undefined && testData[0] != null)
+        setCurrentQuestion(testData[0]);
       console.log('# List quests: ', testData);
     }
   }, [testData]);
