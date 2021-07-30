@@ -14,6 +14,7 @@ import {Icon, Picker} from 'native-base';
 import {ItemTest} from '../../item-test';
 //api
 import {getBaiKiemTra} from '../../../../../../../server/BaiKiemTra';
+import {teacherEditTest} from '../../../../../../../server/SocketIO';
 import {getMiniLopHocPhan} from '../../../../../../../server/LopHP/getListNameLHP';
 //settting
 import {settings} from '../../../../../../config';
@@ -25,10 +26,8 @@ export const StudentTestList = ({navigation, route}) => {
   const nav = useNavigation();
   const fo = useIsFocused();
   const [isShowDialog, setIsShowDialog] = useState(false);
-  const [pickedValue, setPickedValue] = useState({
-    label: '',
-    value: '',
-  });
+  const [refeshing, setRefeshing] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [data, setData] = useState('');
   const [listTenLHP, setListTenLHP] = useState('');
 
@@ -39,14 +38,22 @@ export const StudentTestList = ({navigation, route}) => {
   const SinhVien = route.params;
 
   useEffect(() => {
-    if (fo) {
-      try {
-        console.log('MaSV: ', SinhVien.MaSV);
-        getListLPH();
-        getTests();
-      } catch (error) {}
-    }
-  }, [fo]);
+    teacherEditTest((err, isRemove) => {
+      if (err) return;
+      if (isRemove != undefined) {
+        refeshData();
+      }
+    });
+    loadOption();
+  }, []);
+
+  async function loadOption() {
+    try {
+      await getListLPH();
+      await getTests();
+      setLoading(false);
+    } catch (error) {}
+  }
 
   const getListLPH = async () => {
     let res = await getMiniLopHocPhan(SinhVien.MaSV);
@@ -77,6 +84,11 @@ export const StudentTestList = ({navigation, route}) => {
       },
     });
   };
+  async function refeshData() {
+    setRefeshing(true);
+    await loadOption();
+    setRefeshing(false);
+  }
 
   return (
     <SafeAreaView style={{flex: 1}}>
@@ -111,6 +123,8 @@ export const StudentTestList = ({navigation, route}) => {
       </View>
 
       <FlatList
+        refreshing={refeshing}
+        onRefresh={refeshData}
         data={data}
         showsVerticalScrollIndicator={false}
         renderItem={({item}) => (

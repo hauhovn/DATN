@@ -5,10 +5,6 @@ import Moment from 'moment';
 const mainColor = '#FF7043';
 
 export const ItemTest = ({item, handle}) => {
-  const pressItem = () => {
-    handle(item);
-  };
-
   return (
     <TouchableOpacity style={styles.container} onPress={() => handle(item)}>
       <View style={styles.title}>

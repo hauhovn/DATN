@@ -26,40 +26,20 @@ export const TestDetailModal = ({modalVisible, close, data, pressHandle}) => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (data != undefined && modalVisible) {
-      getResponse();
-      setIsLoading(false);
-    }
+    setIsLoading(true);
+    loadOption();
   }, [close]);
 
-  async function getResponse() {
-    console.log(
-      'item.MaBaiKT: ',
-      data.MaBaiKT,
-      ' & SinhVien.MaSV: ',
-      data.MaSV,
-    );
-    const res = await getCTBaiKiemTra(data.MaSV, data.MaBaiKT);
-    setResData(res.data[0]);
-    console.log('getResponse: ', resData);
-    await new Promise(a => setTimeout(a, 5000));
+  async function loadOption() {
+    await getResponse();
+
+    setIsLoading(false);
   }
 
-  function resetView() {
-    try {
-      resData.TenBaiKT = '';
-      resData.TenGV = '';
-      resData.TenLopHP = '';
-      resData.ThoiGianLam = '00:00:00';
-      resData.Mail = 'contact@me.com';
-      resData.Ngay = '';
-      resData.TenMonHoc = '';
-
-      setResData(resData);
-    } catch (error) {
-      console.log('@Close no go test');
-    }
-    setIsLoading(true);
+  async function getResponse() {
+    const res = await getCTBaiKiemTra(data.MaSV, data.MaBaiKT);
+    await setResData(res.data[0]);
+    console.log('getResponse: ', resData);
   }
 
   return (
@@ -70,13 +50,25 @@ export const TestDetailModal = ({modalVisible, close, data, pressHandle}) => {
             <TouchableOpacity
               style={styles.button}
               onPress={() => {
-                resetView();
                 close(false);
               }}>
               <Icon type="AntDesign" name="close" style={styles.icon} />
             </TouchableOpacity>
           </View>
-          {!isLoading ? (
+          {isLoading ? (
+            <View
+              style={{
+                width: '100%',
+                height: '80%',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}>
+              <Image
+                source={require('../../../../../../../asset/gif/loading-3dot.gif')}
+                style={{height: 80, width: 80}}
+              />
+            </View>
+          ) : resData != undefined ? (
             <View
               style={{
                 flex: 1,
@@ -119,10 +111,8 @@ export const TestDetailModal = ({modalVisible, close, data, pressHandle}) => {
                 <TouchableOpacity
                   onPress={() => {
                     if (resData?.KeyBaiKT == keyInput) {
-                      console.log('Nhap dung key');
                       pressHandle(true);
                     } else {
-                      console.log('Nhap sai key');
                       Alert.alert('Thông báo', 'Bạn đã nhập sai mã');
                     }
                   }}
@@ -144,20 +134,7 @@ export const TestDetailModal = ({modalVisible, close, data, pressHandle}) => {
                 <Text style={textStyles.contact}>Email: {resData?.Mail}</Text>
               </View>
             </View>
-          ) : (
-            <View
-              style={{
-                width: '100%',
-                height: '80%',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}>
-              <Image
-                source={require('../../../../../../../asset/gif/loading-3dot.gif')}
-                style={{height: 80, width: 80}}
-              />
-            </View>
-          )}
+          ) : null}
         </View>
       </View>
     </Modal>

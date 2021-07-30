@@ -23,12 +23,14 @@ import {
   reconectSocketAuto,
   listenStudentInOut,
   requestStartTest,
+  requestUpdateTestList,
 } from '../../../server/SocketIO';
 
 // APIs
 import {updateTestStatus} from '../../../server/BaiKiemTra/update-status';
 import {getTestInfo} from '../../../server/TestInfo/get-test-info';
 import {getInfoBeforeTest} from '../../../server/TestInfo/get-info-before-test';
+import {AppRouter} from '../../../app/navigation/AppRouter';
 
 export const TeacherControl = () => {
   const nav = useNavigation();
@@ -79,7 +81,9 @@ export const TeacherControl = () => {
     listenStudentInOut((err, data) => {
       if (err) return;
       console.log(data);
-      setUsersStatusList(usersStatusList.concat(data));
+      setUsersStatusList(currentList => {
+        return [...currentList, data];
+      });
     });
     loadOption();
   }, []);
@@ -134,8 +138,29 @@ export const TeacherControl = () => {
           text: 'Đồng ý',
           onPress: () => {
             if (isStart) {
-              requestStartTest(_user.MaGV, BaiKiemTra.MaBaiKT);
+              // Start test
+              requestStartTest(_user.MaGV, BaiKiemTra.MaBaiKT, true);
+              setUsersStatusList(currentList => {
+                return [
+                  ...currentList,
+                  {
+                    isConnect: true,
+                    status: 5,
+                    name: 'CÁC THÍ SINH ĐÃ BẮT ĐẦU LÀM BÀI',
+                  },
+                ];
+              });
             } else {
+              // Cancel test
+
+              updateTestStatus(_user.MaGV, BaiKiemTra.MaBaiKT, 0);
+              requestUpdateTestList(false);
+              Alert.alert(
+                `Thông báo`,
+                `Bài kiểm tra ${BaiKiemTra.TenBaiKT} đã bị hủy bỏ`,
+              );
+              nav.navigate(AppRouter.MAIN, {screen: AppRouter.TAB});
+              // TODO: cancel this test
             }
           },
         },

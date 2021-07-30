@@ -18,6 +18,10 @@ export const ItemJoinLeaveRoom = ({item}) => {
   if (item.status == 3) {
     brColor = '#d1b10f';
   }
+  if (item.status == 5) {
+    brColor = '#03a1fc';
+  }
+
   var today = new Date();
   var date = today.getHours() + 'h' + today.getMinutes() + 'm';
   let showDate;
@@ -46,9 +50,15 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     flexDirection: 'row',
     alignItems: 'center',
+    shadowOffset: {width: 2, height: 2},
+    shadowColor: '#000',
+    shadowRadius: 1,
+    shadowOpacity: 1,
+    elevation: 4,
   },
   text: {
     fontSize: 14,
     color: '#fff',
+    maxWidth: '60%',
   },
 });

@@ -20,7 +20,7 @@ import {KEYS_VALUE} from './key_value';
 //Item
 import {ItemTest} from './item-test';
 //APIs
-import {getCTBaiKiemTra} from '../../../../../server/BaiKiemTra/getTestDetail';
+import {inittiateSocket, teacherEditTest} from '../../../../../server/SocketIO';
 import {getBaiKiemTra} from '../../../../../server/BaiKiemTra';
 
 import {AppRouter} from '../../../../navigation/AppRouter';
@@ -38,11 +38,19 @@ export const StudentScreen = () => {
     MaBaiKT: '',
   });
   const [isShowDialog, setIsShowDialog] = useState(false);
+  const [refeshing, setRefeshing] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isNullTest, setIsNullTest] = useState(false);
 
   useEffect(() => {
+    inittiateSocket();
     getAccount();
+    teacherEditTest((err, isRemove) => {
+      if (err) return;
+      if (isRemove != undefined) {
+        refeshListTetst();
+      }
+    });
   }, []);
 
   useEffect(() => {
@@ -68,7 +76,6 @@ export const StudentScreen = () => {
   const getTests = async () => {
     let data = await getBaiKiemTra(user[0]?.MaSV, 3);
     setListTest(data);
-    console.log(listTest);
   };
 
   const HeaderHandle = value => {
@@ -78,6 +85,8 @@ export const StudentScreen = () => {
     if (value === KEYS_VALUE.BAI_KIEM_TRA) nav.navigate(AppRouter.DEMO_VIEW);
     if (value === KEYS_VALUE.LOP_HOC_PHAN)
       nav.navigate(AppRouter.LOP_HOC_PHAN, {SinhVien: user[0]});
+    if (value === KEYS_VALUE.DA_KET_THUC) {
+    }
   };
   // Nhấn vô item
   const handlePressItem = item => {
@@ -98,6 +107,21 @@ export const StudentScreen = () => {
         screen: AppRouter.WAITING_SCREEN,
         params: {data: sentData},
       },
+    });
+  };
+
+  // Refesh test list
+  const refeshListTetst = async () => {
+    setRefeshing(true);
+    await getTests();
+    if (listTest?.lenght < 1) setIsNullTest(true);
+    setRefeshing(false);
+  };
+
+  // Remote item from test list
+  const removeTest = id => {
+    setListTest(prevList => {
+      return prevList.filter(test => test?.MaBaiKT != id);
     });
   };
 
@@ -202,6 +226,8 @@ export const StudentScreen = () => {
           {!isLoading ? (
             !isNullTest ? (
               <FlatList
+                refreshing={refeshing}
+                onRefresh={refeshListTetst}
                 data={listTest}
                 showsVerticalScrollIndicator={false}
                 renderItem={({item}) => (
@@ -240,6 +266,7 @@ export const StudentScreen = () => {
           )}
         </View>
         <TestDetailModal
+          navigation={nav}
           modalVisible={isShowDialog}
           close={() => {
             setIsShowDialog(false);

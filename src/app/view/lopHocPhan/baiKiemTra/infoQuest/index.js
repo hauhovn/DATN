@@ -24,6 +24,10 @@ import {updateBaiKT} from '../../../../../server/BaiKiemTra/updateBaiKT';
 import {getCTBKT} from '../../../../../server/BaiKiemTra/getCTBKT';
 import {deleteCTBKT} from '../../../../../server/BaiKiemTra/deleteCTBKT';
 import {updateTestStatus} from '../../../../../server/BaiKiemTra/update-status';
+import {
+  inittiateSocket,
+  requestUpdateTestList,
+} from '../../../../../server/SocketIO';
 
 export const InfomationQuestion = () => {
   const nav = useNavigation();
@@ -47,6 +51,7 @@ export const InfomationQuestion = () => {
   // Focus vô thì chạy
   useEffect(() => {
     if (focused) {
+      inittiateSocket(null, null, null, null);
       setTestState(item.TrangThai);
       timeToNumber(item.ThoiGianLam);
       getQuestion(route.params.item.MaBaiKT);
@@ -190,6 +195,7 @@ export const InfomationQuestion = () => {
           onPress: () => {
             // When test status =  0 (waiting)
             _updateTestStatus(user[0].MaGV, item.MaBaiKT, 1);
+            requestUpdateTestList(false);
           },
         },
         {

@@ -56,6 +56,14 @@ export const requestStartTest = (userID, room, isStart) => {
     isStart: isStart,
   });
 };
+
+// #1 emit
+export const requestUpdateTestList = isRemove => {
+  if (!socket) return;
+  console.log('teacher-edit-test ', isRemove);
+  socket.emit('teacher-edit-test', isRemove);
+};
+
 // ==================================== student ===============================================
 
 export const serverStartTest = tt => {
@@ -64,6 +72,23 @@ export const serverStartTest = tt => {
   socket.on('server-start-test', data => {
     console.log('That la qua mac hahahahahah: ', data);
     return tt(null, data);
+  });
+};
+
+export const serverCancelTest = cb => {
+  if (!socket) return;
+  socket.on('server-cancel-test', data => {
+    console.log('server-cancel-test: ', data);
+    return cb(null, data);
+  });
+};
+
+// #1 on
+export const teacherEditTest = cb => {
+  if (!socket) return;
+  socket.on('server-edit-test', isRemove => {
+    console.log('server-edit-test isRemove: ', isRemove);
+    return cb(null, isRemove);
   });
 };
 
