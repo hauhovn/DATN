@@ -33,7 +33,8 @@ export const StudentTestList = ({navigation, route}) => {
 
   const [sentData, setSentData] = useState({
     MaBaiKT: '',
-    TenBaiKT: ' listTenLHP[0]?.TenBaiKT',
+    TenBaiKT: '',
+    TenSV: ''
   });
   const SinhVien = route.params;
 
@@ -69,8 +70,9 @@ export const StudentTestList = ({navigation, route}) => {
   // Nhấn vô item
   const handlePressItem = item => {
     sentData.MaBaiKT = item.MaBaiKT;
-    sentData.MaSV = SinhVien.MaSV;
-
+      sentData.MaSV = SinhVien.MaSV;
+      sentData.TenSV = SinhVien.TenSV;
+    console.log('SINH VIEN: ',SinhVien);
     setSentData(sentData);
     setIsShowDialog(true);
   };
@@ -130,7 +132,7 @@ export const StudentTestList = ({navigation, route}) => {
         renderItem={({item}) => (
           <ItemTest item={item} data={data} handle={handlePressItem} />
         )}
-        keyExtractor={item => item.MaBaiKT}
+        keyExtractor={(item, index) => index}
         style={{flex: 1, marginTop: 12, backgroundColor: '#fff'}}
       />
       <TestDetailModal

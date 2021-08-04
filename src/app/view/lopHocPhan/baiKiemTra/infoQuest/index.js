@@ -23,7 +23,8 @@ import {RenderItem} from './renderItem';
 import {updateBaiKT} from '../../../../../server/BaiKiemTra/updateBaiKT';
 import {getCTBKT} from '../../../../../server/BaiKiemTra/getCTBKT';
 import {deleteCTBKT} from '../../../../../server/BaiKiemTra/deleteCTBKT';
-import {updateTestStatus} from '../../../../../server/BaiKiemTra/update-status';
+import { updateTestStatus } from '../../../../../server/BaiKiemTra/update-status';
+import {getTestStatus} from '../../../../../server/BaiKiemTra/get-status'
 import {
   inittiateSocket,
   requestUpdateTestList,
@@ -50,12 +51,13 @@ export const InfomationQuestion = () => {
 
   // Focus vô thì chạy
   useEffect(() => {
-    if (focused) {
+      if (focused) {
       inittiateSocket(null, null, null, null);
       setTestState(item.TrangThai);
-      timeToNumber(item.ThoiGianLam);
-      getQuestion(route.params.item.MaBaiKT);
-    }
+    timeToNumber(item.ThoiGianLam);
+          _get123MongTinhYeuTanRa();
+          
+      }
   }, [focused]);
 
   // Update bài kiểm tra (gọi api)
@@ -74,9 +76,18 @@ export const InfomationQuestion = () => {
     }
   };
 
+  // Update test status
+    async function _get123MongTinhYeuTanRa() {
+        let rs = await getTestStatus(1, item.MaBaiKT);
+        setTestState(rs?.status);
+  }
+    
   // Set test state
-  const setTestState = status => {
-    if (status > 0) setLableButton('Chi tiết');
+    const setTestState = status => {
+        console.log(`status = `, status);
+        item.TrangThai = status;
+        if (status > 0) setLableButton('Chi tiết');
+        else setLableButton('Hoàn thành');
   };
 
   // Gọi api lấy danh sách câu hỏi theo mã môn học
@@ -98,8 +109,6 @@ export const InfomationQuestion = () => {
         //Alert.alert('ok');
         item.TrangThai = toStatus;
         setTestState(toStatus);
-      } else {
-        Alert.alert('Failed');
       }
     } catch (error) {
       console.log('_updateTestStatus has error');

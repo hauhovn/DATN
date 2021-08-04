@@ -81,7 +81,7 @@ export const StudentScreen = () => {
   const HeaderHandle = value => {
     console.log(value);
     if (value === KEYS_VALUE.SAP_DIEN_RA)
-      nav.navigate(AppRouter.STUDENT_LIST_TEST, {MaSV: user[0]?.MaSV});
+      nav.navigate(AppRouter.STUDENT_LIST_TEST, {MaSV: user[0]?.MaSV, TenSV: user[0]?.TenSV});
     if (value === KEYS_VALUE.BAI_KIEM_TRA) nav.navigate(AppRouter.DEMO_VIEW);
     if (value === KEYS_VALUE.LOP_HOC_PHAN)
       nav.navigate(AppRouter.LOP_HOC_PHAN, {SinhVien: user[0]});

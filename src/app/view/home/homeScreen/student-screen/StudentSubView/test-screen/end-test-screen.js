@@ -20,10 +20,10 @@ import {
 } from '../../../../../../../server/SocketIO';
 import {check} from 'react-native-permissions';
 
-export const WaitingScreen = ({route, navigation}) => {
+export const EndTestScreen = ({route, navigation}) => {
   //Consts
   const data = route.params?.data;
-  const [status, setStatus] = React.useState(undefined);
+  const [status, setStatus] = React.useState(0);
 
   React.useEffect(() => {
     loadOption();
@@ -35,9 +35,7 @@ export const WaitingScreen = ({route, navigation}) => {
       name: data.TenSV,
       is_teacher: false,
       socket_id: '',
-      };
-      console.log('Data: ',data);
-      console.log('client: ', _data);
+    };
     if (status == 1) {
       inittiateSocket(data.MaBaiKT, _data, 'Đã vào phòng chờ', 1);
       serverStartTest((err, data) => {
@@ -55,7 +53,7 @@ export const WaitingScreen = ({route, navigation}) => {
         console.log(data);
       });
     }
-  }, []);
+  }, [status]);
 
   React.useEffect(() => {
     console.log('STATUS: ', status);
@@ -117,8 +115,8 @@ export const WaitingScreen = ({route, navigation}) => {
           borderColor: settings.colors.colorGreen,
         }}
       />
-      <Text style={styles.title}>CHƯA BẮT ĐẦU</Text>
-      <Text style={styles.textContent}>Bài kiểm tra này chưa bắt đầu!</Text>
+      <Text style={styles.title}>BẠN ĐÃ KẾT THÚC BÀI KIỂM TRA</Text>
+      <Text style={styles.textContent}>Ahihi.............</Text>
     </SafeAreaView>
   );
 };

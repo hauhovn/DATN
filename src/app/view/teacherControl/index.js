@@ -139,6 +139,7 @@ export const TeacherControl = () => {
           onPress: () => {
             if (isStart) {
               // Start test
+                console.log('Start test');
               requestStartTest(_user.MaGV, BaiKiemTra.MaBaiKT, true);
               setUsersStatusList(currentList => {
                 return [
@@ -152,15 +153,14 @@ export const TeacherControl = () => {
               });
             } else {
               // Cancel test
-
-              updateTestStatus(_user.MaGV, BaiKiemTra.MaBaiKT, 0);
+                console.log('Remove test');     
+             updateTestStatus(_user.MaGV, BaiKiemTra.MaBaiKT, 0);
               requestUpdateTestList(false);
               Alert.alert(
                 `Thông báo`,
                 `Bài kiểm tra ${BaiKiemTra.TenBaiKT} đã bị hủy bỏ`,
               );
-              nav.navigate(AppRouter.MAIN, {screen: AppRouter.TAB});
-              // TODO: cancel this test
+                nav.navigate(AppRouter.LISTLHP);
             }
           },
         },
