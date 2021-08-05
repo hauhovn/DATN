@@ -16,14 +16,15 @@ import {MyAppBar} from '../../app-bar';
 import {getTestStatus} from '../../../../../../../server/BaiKiemTra/get-status';
 import {
   inittiateSocket,
-  serverStartTest,
+  serverStartTest,disconnectSocket
 } from '../../../../../../../server/SocketIO';
 import {check} from 'react-native-permissions';
 
 export const WaitingScreen = ({route, navigation}) => {
   //Consts
   const data = route.params?.data;
-  const [status, setStatus] = React.useState(undefined);
+    const [status, setStatus] = React.useState(undefined);
+    let oneTime = true;
 
   React.useEffect(() => {
     loadOption();
@@ -38,29 +39,32 @@ export const WaitingScreen = ({route, navigation}) => {
       };
       console.log('Data: ',data);
       console.log('client: ', _data);
-    if (status == 1) {
+      if (status == 1 & oneTime) {
+          oneTime = false;
       inittiateSocket(data.MaBaiKT, _data, 'Đã vào phòng chờ', 1);
       serverStartTest((err, data) => {
         if (err) return;
         if (data != '') {
-          console.log('hahahahahahaah');
+          console.log('Đã vào phòng chờ');
           setStatus(2);
         }
       });
-    }
-    if (status == 2) {
+      } else if (status == 2 & oneTime) {
+          oneTime = false;
       inittiateSocket(data.MaBaiKT, _data, 'Đã vào trễ', 2);
       serverStartTest((err, data) => {
         if (err) return;
-        console.log(data);
+        console.log('Đã vào trễ');
       });
-    }
-  }, []);
+    }else 
+    console.log('Đéo thèm vào');
+  }, [status]);
 
   React.useEffect(() => {
     console.log('STATUS: ', status);
     if (status > 1) {
-      navigation.navigate(AppRouter.TESTING, {data: data});
+        navigation.navigate(AppRouter.TESTING, { data: data });
+        
     }
   }, [status]);
 

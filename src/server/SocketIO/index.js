@@ -66,22 +66,22 @@ export const requestUpdateTestList = isRemove => {
 
 // ==================================== student ===============================================
 
-export const serverStartTest = tt => {
+export const serverStartTest = cbx => {
   if (!socket) return;
   console.log(`Server start test`);
   socket.on('server-start-test', data => {
-    console.log('That la qua mac hahahahahah: ', data);
-    return tt(null, data);
+    console.log('server-start-test roi ne: ', data);
+    return cbx(null, data);
   });
 };
 
-export const serverCancelTest = cb => {
-  if (!socket) return;
-  socket.on('server-cancel-test', data => {
-    console.log('server-cancel-test: ', data);
-    return cb(null, data);
-  });
-};
+// export const serverCancelTest = cb => {
+//   if (!socket) return;
+//   socket.on('server-cancel-test', data => {
+//     console.log('server-cancel-test: ', data);
+//     return cb(null, data);
+//   });
+// };
 
 // #1 on
 export const teacherEditTest = cb => {

@@ -34,7 +34,6 @@ import {AppRouter} from '../../../app/navigation/AppRouter';
 
 export const TeacherControl = () => {
   const nav = useNavigation();
-  const route = useRoute();
   //   const user = route.params?.user;
   //   const BaiKiemTra = route.params?.BaiKiemTra;
   var user = [
@@ -70,7 +69,10 @@ export const TeacherControl = () => {
   const [usersStatusList, setUsersStatusList] = useState([]);
   const [reRender, setReRender] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+const [testStatus, setTestStatus] = useState(1);
 
+    const statusInfo = ['Chưa hoàn thành', 'Bắt đầu', 'Tạm dừng', 'Tiếp tục'];
+    const statusInfoAction = ['Chưa hoàn thành', 'Hủy bỏ', 'Kết thúc', 'Kết thúc'];
   //Effect
   useEffect(() => {
     pressConnect();
@@ -132,38 +134,53 @@ export const TeacherControl = () => {
   function startTest(isStart) {
     Alert.alert(
       'Bạn có chắc',
-      (isStart ? 'Bắt đầu' : 'Hủy bỏ') + ' bài kiểm tra này?',
+      `${isStart?statusInfo[testStatus]:statusInfoAction[testStatus]} bài kiểm tra này?`,
       [
         {
           text: 'Đồng ý',
           onPress: () => {
             if (isStart) {
-              // Start test
-                console.log('Start test');
-              requestStartTest(_user.MaGV, BaiKiemTra.MaBaiKT, true);
-              setUsersStatusList(currentList => {
-                return [
-                  ...currentList,
-                  {
-                    isConnect: true,
-                    status: 5,
-                    name: 'CÁC THÍ SINH ĐÃ BẮT ĐẦU LÀM BÀI',
-                  },
-                ];
-              });
+                
+                if (testStatus < 2) {
+                    // Start test
+                    console.log('Start test');
+                    requestStartTest(_user.MaGV, BaiKiemTra.MaBaiKT, true);
+                    setUsersStatusList(currentList => {
+                        return [
+                            ...currentList,
+                            {
+                                isConnect: true,
+                                status: 5,
+                                name: 'CÁC THÍ SINH ĐÃ BẮT ĐẦU LÀM BÀI',
+                            },
+                        ];
+                    });
+                    setTestStatus(2);
+                } else if (testStatus > 2) {
+                    // Tiep tuc
+                    console.log('Lon hon roi ne: Tiep tuc');
+                    requestStartTest(_user.MaGV, BaiKiemTra.MaBaiKT, true);
+                    setTestStatus(2);
+                } else {
+                    // Tam dung
+                    requestStartTest(_user.MaGV, BaiKiemTra.MaBaiKT, false);
+                    console.log('Lon hon roi ne: Tam dung');
+                    setTestStatus(3);
+                }
+                        
             } else {
-              // Cancel test
-                console.log('Remove test');     
-             updateTestStatus(_user.MaGV, BaiKiemTra.MaBaiKT, 0);
-              requestUpdateTestList(false);
-              Alert.alert(
-                `Thông báo`,
-                `Bài kiểm tra ${BaiKiemTra.TenBaiKT} đã bị hủy bỏ`,
-              );
-                nav.navigate(AppRouter.LISTLHP);
+               // Cancel or fini test  
+                updateTestStatus(_user.MaGV, BaiKiemTra.MaBaiKT, 0);
+                 requestUpdateTestList(false);
+                 Alert.alert(
+                   `Thông báo`,
+                   `Đã ${statusInfoAction[testStatus].toLowerCase()} bài kiểm tra ${BaiKiemTra.TenBaiKT} `,
+                 );
+                   nav.navigate(AppRouter.LISTLHP);
+             }
             }
           },
-        },
+        
         {
           text: 'Bỏ qua',
         },
@@ -192,15 +209,16 @@ export const TeacherControl = () => {
                 actionBar.shortButton,
                 {backgroundColor: '#02ad02'},
               ]}>
-              <Text style={actionBar.text}>Bắt đầu</Text>
+            <Text style={actionBar.text}>{statusInfo[testStatus]}</Text>
             </TouchableOpacity>
           </View>
           <View style={actionBar.row}>
-            <TouchableOpacity
+           {testStatus>1?( <TouchableOpacity
               onPress={() => pressStudentsList()}
               style={[actionBar.button, actionBar.longButton]}>
               <Text style={[actionBar.text]}>Danh Sách Thí Sinh</Text>
-            </TouchableOpacity>
+                      </TouchableOpacity>) : <View />
+                      }
             <TouchableOpacity
               onPress={() => startTest(false)}
               style={[
@@ -208,7 +226,7 @@ export const TeacherControl = () => {
                 actionBar.shortButton,
                 {backgroundColor: 'red'},
               ]}>
-              <Text style={[actionBar.text]}>Hủy bỏ</Text>
+                          <Text style={[actionBar.text]}>{statusInfoAction[testStatus]}</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -319,11 +337,11 @@ const actionBar = StyleSheet.create({
     justifyContent: 'space-between',
     marginBottom: 6,
   },
-  text: {fontSize: 15, color: '#fff'},
+  text: {fontSize: 14, color: '#fff', textTransform: 'uppercase'},
   button: {
     backgroundColor: 'blue',
-    paddingVertical: 5,
-    paddingHorizontal: 19,
+    paddingVertical: 6,
+    paddingHorizontal: 10,
     borderRadius: 15,
     alignItems: 'center',
     justifyContent: 'center',

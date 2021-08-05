@@ -14,7 +14,6 @@ import {
 import {useNavigation, useIsFocused} from '@react-navigation/native';
 import {Icon, Item} from 'native-base';
 import CountDown from 'react-native-countdown-component';
-import io from 'socket.io-client/dist/socket.io.js';
 //others
 import {settings} from '../../../../../../config';
 import {appBar, body, navigator, styles, pauseModal} from './styles';
@@ -22,12 +21,11 @@ import {AppRouter} from '../../../../../../navigation/AppRouter';
 import {MenuQuestionModal} from '../modals/MenuQuestionModal';
 //APIs
 import {JointTest} from '../../../../../../../server/JointTest';
-import {UpdateQuestion} from '../../../../../../../server/JointTest/update-answer';
+import { UpdateQuestion } from '../../../../../../../server/JointTest/update-answer';
+import {serverStartTest, inittiateSocket} from '../../../../../../../server/SocketIO'
 
 export function TestScreen({navigation, route}) {
   const fo = useIsFocused();
-  //Socket
-  const socket = io(settings.NodeJsServer, {autoConnect: false});
   const [isRunning, setIsRunning] = useState(true);
   const [isShowMenuQuest, setIsShowMenuQuest] = useState(false);
   const [testData, setTestData] = useState('');
@@ -35,12 +33,24 @@ export function TestScreen({navigation, route}) {
   const appState = useRef(AppState.currentState);
   const [appStateVisible, setAppStateVisible] = useState(appState.current);
 
-  useEffect(() => {
-    AppState.addEventListener('change', _handleAppStateChange);
-
-    return () => {
-      AppState.removeEventListener('change', _handleAppStateChange);
-    };
+    
+     //Effect
+ 
+    useEffect(() => {
+        // SOCKET ONs
+        inittiateSocket(22,{id:'06',room: 22,name: 'lol', is_teacher: false, socket_id: ''},'An lol',3);
+        serverStartTest((err, data) => {
+            if (err) return;
+            if (data != '') {
+              console.log('afsgusnfl__________________________________________LOL');
+              
+            }
+          });
+    // Check on background
+    // AppState.addEventListener('change', _handleAppStateChange);
+    // return () => {
+    //   AppState.removeEventListener('change', _handleAppStateChange);
+    // };
   }, []);
 
   const _handleAppStateChange = nextAppState => {
@@ -49,36 +59,18 @@ export function TestScreen({navigation, route}) {
       nextAppState === 'active'
     ) {
       console.log('App has come to the foreground!');
-      socket.connect();
-      requestJoinTest(data.MaSV, data.MaBaiKT, data.TenSV, 'Đã kết nối lại', 3);
+        // TODO: reconnect in here
     }
 
     appState.current = nextAppState;
     setAppStateVisible(appState.current);
     console.log('AppState', appState.current);
     if (appState.current === 'background') {
-      // Connect to server
-      // socket.emit('client-get-userquanlity', 'ouut');
-      socket.disconnect();
+      // TODO: disconnect in here
     }
   };
 
-  socket.on('server-set-time', function (isStart) {
-    console.log('server-set-time ', isStart);
-    setIsRunning(isStart);
-    //socket.off('server-set-time');
-  });
 
-  socket.on('server-report-failed', function (data) {
-    console.log(data);
-    //socket.off();
-  });
-
-  socket.on('server-report-joined', function (data) {
-    console.log(data);
-
-    //socket.off();
-  });
   //Consts
   const data = route.params?.data;
   const [currentQuestion, setCurrentQuestion] = useState('');
@@ -159,22 +151,6 @@ export function TestScreen({navigation, route}) {
     //updateListData(currentQuestion, currentQuestion.STT - 1);
   }, [currentQuestion]);
   //
-  function requestJoinTest(MaSV, MaBaiKT, TenSV, Info, Status) {
-    socket.connect();
-    let data = {
-      id: MaSV,
-      room: MaBaiKT,
-      name: TenSV,
-      is_teacher: false,
-      socket_id: '',
-    };
-    socket.emit('client-join-test', {
-      data: data,
-      info: Info,
-      status: Status,
-    });
-  }
-  //
   function updateListData(item, index) {
     let newArr = testData;
     newArr[index] = item;
@@ -182,25 +158,7 @@ export function TestScreen({navigation, route}) {
     console.log(testData);
   }
   //func
-  function initSocket(__bool) {
-    if (__bool) {
-      if (!socket) {
-        socket = io.connect('http://xxx.xxx.xxx.xxx:8081', {secure: false});
-        socket.on('connect', function () {
-          console.log('connected');
-        });
-        socket.on('disconnect', function () {
-          console.log('disconnected');
-        });
-      } else {
-        socket.socket.connect(); // Yep, socket.socket ( 2 times )
-      }
-    } else {
-      socket.disconnect();
-      // socket = null; <<< We don't need this anymore
-    }
-  }
-  //
+    
   const updateQuestion = next => {
     try {
       let num = parseInt(currentQuestion?.STT);
@@ -348,7 +306,7 @@ export function TestScreen({navigation, route}) {
           <TouchableOpacity
             onPress={() => {
               {
-                socket.disconnect();
+                // TODO: disconnect
                 navigation.navigate(AppRouter.MAIN, {screen: AppRouter.TAB});
               } // Quay về màn hình trước
             }}
