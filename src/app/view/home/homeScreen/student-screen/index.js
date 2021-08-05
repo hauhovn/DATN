@@ -111,9 +111,9 @@ export const StudentScreen = () => {
 
     // Refesh test list
     const refeshListTetst = async () => {
-        setRefeshing(true);
+        await setRefeshing(true);
         await getTests();
-        if (listTest?.lenght < 1) setIsNullTest(true);
+        if (listTest?.lenght < 1) await setIsNullTest(true);
         setRefeshing(false);
     };
 

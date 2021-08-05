@@ -166,7 +166,7 @@ export const TeacherControl = ({ route }) => {
                             // Cancel or fini test  
                             updateTestStatus(_user.MaGV, BaiKiemTra.MaBaiKT, 0);
                             setTimeout(() => {
-                                requestUpdateTestList(true);
+                                requestUpdateTestList(true, BaiKiemTra.MaBaiKT);
                             }, 2000);
                             Alert.alert(
                                 `Thông báo`,
@@ -258,6 +258,7 @@ export const TeacherControl = ({ route }) => {
                     <FlatList
                         ref={flatList}
                         style={styles.flatList}
+                        onContentSizeChange={() => flatList.current.scrollToEnd()}
                         data={usersStatusList}
                         extraData={reRender}
                         keyExtractor={item =>
@@ -297,7 +298,7 @@ const styles = StyleSheet.create({
     flatList: {
         flex: 1,
         backgroundColor: '#ebebeb',
-        paddingTop: 15,
+        marginVertical: 15,
     },
     buttonBox: {
         width: 120,

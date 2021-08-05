@@ -9,6 +9,7 @@ import {
     Image,
     AppState,
     Alert,
+    BackHandler
 } from 'react-native';
 //Screens
 //Moduns
@@ -80,7 +81,7 @@ export function TestScreen({ navigation, route }) {
     //----------------------------------EFFECTs----------------------------------
 
     // SOCKET
-    React.useEffect(() => {
+    useEffect(() => {
         let _data = {
             id: data.MaSV,
             room: data.MaBaiKT,
@@ -148,6 +149,34 @@ export function TestScreen({ navigation, route }) {
         AppState.addEventListener('change', _handleAppStateChange);
         return () => AppState.removeEventListener('change', _handleAppStateChange);
 
+    }, []);
+
+    // Check back boutton
+    useEffect(() => {
+        const backAction = () => {
+            Alert.alert("Bạn có chắc", "Thoát khỏi bài kiểm tra này?", [
+                {
+                    text: "Trở lại",
+                    onPress: () => null,
+                    style: "cancel"
+                },
+                {
+                    text: "Đồng ý",
+                    onPress: () => {
+                        // TODO: disconnect
+                        BackHandler.exitApp()
+                    }
+                }
+            ]);
+            return true;
+        };
+
+        const backHandler = BackHandler.addEventListener(
+            "hardwareBackPress",
+            backAction
+        );
+
+        return () => backHandler.remove();
     }, []);
 
     // When comback from menu test
