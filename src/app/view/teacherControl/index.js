@@ -32,36 +32,12 @@ import { getTestInfo } from '../../../server/TestInfo/get-test-info';
 import { getInfoBeforeTest } from '../../../server/TestInfo/get-info-before-test';
 import { AppRouter } from '../../../app/navigation/AppRouter';
 
-export const TeacherControl = () => {
+export const TeacherControl = ({ route }) => {
     const nav = useNavigation();
-    //   const user = route.params?.user;
-    //   const BaiKiemTra = route.params?.BaiKiemTra;
-    var user = [
-        {
-            DiaChi: 'Nguyễn Thị Thập',
-            GIoiTinh: '0',
-            MaGV: '1',
-            Mail: 'chau@gmail.com',
-            Password: '111111',
-            SDT: '0775712017',
-            TenGV: 'Nguyễn Phúc Bảo Châu',
-            TrangThai: '1',
-            isAdmin: '1',
-        },
-    ];
+    const user = route.params?.user;
+    const BaiKiemTra = route.params?.BaiKiemTra;
     let _user = user[0];
-    var BaiKiemTra = {
-        KeyBaiKT: '1',
-        MaBaiKT: '22',
-        Ngay: '2021-07-01',
-        TenBaiKT: 'MCV_1',
-        TenGV: 'Nguyễn Phúc Bảo Châu',
-        TenLopHP: 'Một con vịt',
-        ThoiGianLam: '01:51:00',
-        TrangThai: '2',
-    };
     // Refs
-
     let flatList = React.useRef();
     const appState = React.useRef(AppState.currentState);
 
@@ -189,7 +165,9 @@ export const TeacherControl = () => {
                         } else {
                             // Cancel or fini test  
                             updateTestStatus(_user.MaGV, BaiKiemTra.MaBaiKT, 0);
-                            requestUpdateTestList(false);
+                            setTimeout(() => {
+                                requestUpdateTestList(true);
+                            }, 2000);
                             Alert.alert(
                                 `Thông báo`,
                                 `Đã ${statusInfoAction[testStatus].toLowerCase()} bài kiểm tra ${BaiKiemTra.TenBaiKT} `,

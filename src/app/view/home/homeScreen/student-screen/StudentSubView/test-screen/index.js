@@ -8,6 +8,7 @@ import {
     Modal,
     Image,
     AppState,
+    Alert,
 } from 'react-native';
 //Screens
 //Moduns
@@ -24,7 +25,13 @@ import { WaitingTestModal } from '../modals/WaitingTestModal';
 import { JointTest } from '../../../../../../../server/JointTest';
 import { UpdateQuestion } from '../../../../../../../server/JointTest/update-answer';
 import { getTestStatus } from '../../../../../../../server/BaiKiemTra/get-status'
-import { serverStartTest, inittiateSocket, requestServerLogs, disconnectSocket } from '../../../../../../../server/SocketIO'
+import {
+    serverStartTest,
+    inittiateSocket,
+    requestServerLogs,
+    disconnectSocket,
+    teacherEditTest
+} from '../../../../../../../server/SocketIO'
 
 export function TestScreen({ navigation, route }) {
 
@@ -70,30 +77,6 @@ export function TestScreen({ navigation, route }) {
     // Get lenght test
     let questionQuantity = testData?.length;
 
-    // Demo data
-    let demoData = [
-        {
-            STT: 123,
-            DapAn: 'A',
-            DASV: 'C',
-        },
-        {
-            STT: 3,
-            DapAn: 'A',
-            DASV: 'A',
-        },
-        {
-            STT: 13,
-            DapAn: 'A',
-            DASV: 'A',
-        },
-        {
-            STT: 93,
-            DapAn: 'A',
-            DASV: 'C',
-        },
-    ];
-
     //----------------------------------EFFECTs----------------------------------
 
     // SOCKET
@@ -107,6 +90,7 @@ export function TestScreen({ navigation, route }) {
         };
         // Out temp connect
         disconnectSocket();
+
 
         checkTest(_data.id, _data.room);
 
@@ -124,6 +108,16 @@ export function TestScreen({ navigation, route }) {
                 console.log('tus = 1 ne: data= ', data);
 
             });
+
+            // Check if teacher cancel test
+            teacherEditTest((err, data) => {
+                if (err) return;
+                console.log(`gv da lam cai nay --------: `, data);
+                if (data) {
+                    Alert.alert('Thông báo', `Bài kiểm tra này đã bị hủy bỏ`);
+                    navigation.goBack();
+                }
+            });
         } else if (testStatus == 2) {
 
             inittiateSocket(data.MaBaiKT, _data, 'Đã vào trễ', 2);
@@ -133,6 +127,16 @@ export function TestScreen({ navigation, route }) {
                 setWaiting(false);
                 setIsRunning(data);
                 console.log('tus = 2 ne: data= ', data);
+            });
+            // Check if teacher cancel test
+            teacherEditTest((err, data) => {
+                if (err) return;
+                console.log(`gv da lam cai nay --------: `, data);
+
+                if (data) {
+                    Alert.alert('Thông báo', `Bài kiểm tra này đã bị hủy bỏ`);
+                    navigation.goBack();
+                }
             });
         } else
             console.log('Đéo thèm vào');
