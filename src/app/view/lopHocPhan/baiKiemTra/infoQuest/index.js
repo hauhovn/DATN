@@ -185,6 +185,14 @@ export const InfomationQuestion = () => {
         setDetails(a);
         setShowDetails(true);
     };
+    // Nhấn nút bắt đầu
+    const handleStart = () => {
+        nav.navigate(AppRouter.TEACHERCONTROLL, {
+            MaMH: route.params.MaMH,
+            BaiKiemTra: item,
+            user: user,
+        });
+    };
 
     // Nhấn nút bắt đầu
     const handleStart = () => {
