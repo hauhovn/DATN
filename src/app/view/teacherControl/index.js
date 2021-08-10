@@ -107,6 +107,7 @@ export const TeacherControl = ({ route }) => {
         disconnectSocket();
         nav.goBack();
     };
+
     function startTest(isStart) {
         Alert.alert(
             'Bạn có chắc',
@@ -184,6 +185,46 @@ export const TeacherControl = ({ route }) => {
         );
     }
 
+    // Control Bar Render
+    function renderControlBar() {
+        return (
+            <View style={actionBar.container}>
+                <View style={actionBar.row}>
+                    <Text style={[actionBar.text, { color: '#000', marginLeft: 15 }]}>
+                        Thí sinh đã vào: 30/69
+                    </Text>
+                    <TouchableOpacity
+                        onPress={() => startTest(true)}
+                        style={[
+                            actionBar.button,
+                            actionBar.shortButton,
+                            { backgroundColor: '#02ad02' },
+                        ]}>
+                        <Text style={actionBar.text}>{statusInfo[testStatus]}</Text>
+                    </TouchableOpacity>
+                </View>
+                <View style={actionBar.row}>
+                    {testStatus > 1 ? (<TouchableOpacity
+                        onPress={() => pressStudentsList()}
+                        style={[actionBar.button, actionBar.longButton]}>
+                        <Text style={[actionBar.text]}>Danh Sách Thí Sinh</Text>
+                    </TouchableOpacity>) : <View />
+                    }
+                    <TouchableOpacity
+                        onPress={() => startTest(false)}
+                        style={[
+                            actionBar.button,
+                            actionBar.shortButton,
+                            { backgroundColor: 'red' },
+                        ]}>
+                        <Text style={[actionBar.text]}>{statusInfoAction[testStatus]}</Text>
+                    </TouchableOpacity>
+                </View>
+            </View>
+        );
+    };
+
+    // Render function main
     return (
         <View style={{ flex: 1 }}>
             <Header
@@ -193,39 +234,11 @@ export const TeacherControl = ({ route }) => {
                 }}
             />
             <View style={{ flex: 1 }}>
-                <View style={actionBar.container}>
-                    <View style={actionBar.row}>
-                        <Text style={[actionBar.text, { color: '#000', marginLeft: 15 }]}>
-                            Thí sinh đã vào: 30/69
-                        </Text>
-                        <TouchableOpacity
-                            onPress={() => startTest(true)}
-                            style={[
-                                actionBar.button,
-                                actionBar.shortButton,
-                                { backgroundColor: '#02ad02' },
-                            ]}>
-                            <Text style={actionBar.text}>{statusInfo[testStatus]}</Text>
-                        </TouchableOpacity>
-                    </View>
-                    <View style={actionBar.row}>
-                        {testStatus > 1 ? (<TouchableOpacity
-                            onPress={() => pressStudentsList()}
-                            style={[actionBar.button, actionBar.longButton]}>
-                            <Text style={[actionBar.text]}>Danh Sách Thí Sinh</Text>
-                        </TouchableOpacity>) : <View />
-                        }
-                        <TouchableOpacity
-                            onPress={() => startTest(false)}
-                            style={[
-                                actionBar.button,
-                                actionBar.shortButton,
-                                { backgroundColor: 'red' },
-                            ]}>
-                            <Text style={[actionBar.text]}>{statusInfoAction[testStatus]}</Text>
-                        </TouchableOpacity>
-                    </View>
-                </View>
+
+                {/** ---Control bar--- */}
+                {renderControlBar()}
+
+                {/**  Title actions list*/}
                 <View
                     style={{
                         flexDirection: 'row',
@@ -240,7 +253,11 @@ export const TeacherControl = ({ route }) => {
                     </View>
                     <View style={{ flex: 1, height: 1, backgroundColor: 'black' }} />
                 </View>
+
+                {/** ---Action list--- */}
                 {isLoading ? (
+
+                    /** Loading */
                     <View
                         style={{
                             width: '100%',
@@ -255,6 +272,8 @@ export const TeacherControl = ({ route }) => {
                         />
                     </View>
                 ) : usersStatusList?.length > 0 ? (
+
+                    /** List history */
                     <FlatList
                         ref={flatList}
                         style={styles.flatList}
@@ -267,6 +286,8 @@ export const TeacherControl = ({ route }) => {
                         renderItem={({ item }) => <ItemJoinLeaveRoom item={item} />}
                     />
                 ) : (
+
+                    /** When list null */
                     <View
                         style={{
                             width: '100%',
@@ -281,7 +302,7 @@ export const TeacherControl = ({ route }) => {
                     </View>
                 )}
             </View>
-        </View>
+        </View >
     );
 };
 const styles = StyleSheet.create({
