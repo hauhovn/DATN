@@ -1,5 +1,3 @@
-import { Thumbnail } from 'native-base';
-import React from 'react';
 import { StyleSheet } from 'react-native';
 import { settings } from '../../../../../../../config';
 
