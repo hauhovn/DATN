@@ -36,7 +36,7 @@ import {
 import { WaitingTestModal, MenuQuestionModal, MyCountDown } from '../../components';
 
 // Constants
-import { COLORS, GIFS, SIZES } from '../../../../assets/constants'
+import { COLORS, GIFS, SIZES, STYLES } from '../../../../assets/constants'
 
 // Components
 import { MyAlert } from '../../components';
@@ -50,6 +50,13 @@ function TestScreen({ navigation, route }) {
     //Consts
     const data = route.params?.data;
     const [currentQuestion, setCurrentQuestion] = useState('');
+    let _data = {
+        id: data?.MaSV,
+        room: data?.MaBaiKT,
+        name: data?.TenSV,
+        is_teacher: false,
+        socket_id: '',
+    };
 
     //color answers
     const [colorAnswerA, setColorAnswerA] = useState(settings.colors.colorGreen);
@@ -63,10 +70,11 @@ function TestScreen({ navigation, route }) {
     const [isShowMenuQuest, setIsShowMenuQuest] = useState(false);
     const [waiting, setWaiting] = useState(true);
     const [autoNext, setAutoNext] = useState(true);
+    const [showResult, setShowResult] = useState(false);
 
     const [testData, setTestData] = useState('');
-    const [testStatus, setTestStatus] = useState(1);
-
+    const [testStatus, setTestStatus] = useState(0);
+    ``
     const appState = useRef(AppState.currentState);
     const [appStateVisible, setAppStateVisible] = useState(appState.current);
 
@@ -77,14 +85,15 @@ function TestScreen({ navigation, route }) {
             nextAppState === 'active'
         ) {
             console.log('App has come to the foreground!');
-            // TODO: reconnect in here
+            // Reconnect
+            inittiateSocket(data?.MaBaiKT, _data, 'Đã quay trở lại', 2);
         }
 
         appState.current = nextAppState;
         setAppStateVisible(appState.current);
         console.log('AppState', appState.current);
         if (appState.current === 'background') {
-            // TODO: disconnect in here
+            disconnectSocket();
         }
     };
 
@@ -95,21 +104,17 @@ function TestScreen({ navigation, route }) {
 
     // SOCKET
     useEffect(() => {
-        let _data = {
-            id: data?.MaSV,
-            room: data?.MaBaiKT,
-            name: data?.TenSV,
-            is_teacher: false,
-            socket_id: '',
-        };
         // Out temp connect
         disconnectSocket();
 
         checkTest(_data.id, _data.room);
 
+        if (testStatus == 0) return;
+
         if (testStatus == 1) {
             // Connect and join room
             inittiateSocket(data?.MaBaiKT, _data, 'Đã vào phòng chờ', 1);
+            console.log('RUN ! LAN');
 
             // On request
             serverStartTest((err, data) => {
@@ -134,6 +139,7 @@ function TestScreen({ navigation, route }) {
         } else if (testStatus == 2) {
 
             inittiateSocket(data.MaBaiKT, _data, 'Đã vào trễ', 2);
+            setWaiting(false);
             serverStartTest((err, data) => {
                 if (err) return;
                 console.log('Đã vào trễ ne');
@@ -153,6 +159,7 @@ function TestScreen({ navigation, route }) {
             });
         } else if (testStatus > 2) {
             setWaiting(false)
+
         }
 
     }, [testStatus]);
@@ -165,23 +172,29 @@ function TestScreen({ navigation, route }) {
 
     }, []);
 
+    // Go back
+    const checkAndGoBack = (ísBack) => {
+        Alert.alert("Bạn có chắc", "Thoát khỏi bài kiểm tra này?", [
+            {
+                text: "Trở lại",
+                onPress: () => null,
+                style: "cancel"
+            },
+            {
+                text: "Đồng ý",
+                onPress: () => {
+                    disconnectSocket();
+                    if (ísBack) { navigation.goBack() }
+                }
+            }
+        ]);
+    }
+
     // Check back boutton
     useEffect(() => {
         const backAction = () => {
-            Alert.alert("Bạn có chắc", "Thoát khỏi bài kiểm tra này?", [
-                {
-                    text: "Trở lại",
-                    onPress: () => null,
-                    style: "cancel"
-                },
-                {
-                    text: "Đồng ý",
-                    onPress: () => {
-                        // TODO: disconnect
-                        BackHandler.exitApp()
-                    }
-                }
-            ]);
+
+            checkAndGoBack(true);
             return true;
         };
 
@@ -391,7 +404,9 @@ function TestScreen({ navigation, route }) {
             <View style={{
                 ...navigator.container,
                 height: 42,
-                marginHorizontal: SIZES.radius / 2,
+                alignSelf: 'center',
+                justifyContent: 'space-around',
+                paddingHorizontal: SIZES.radius,
                 borderTopLeftRadius: SIZES.radius,
                 borderTopRightRadius: SIZES.radius,
                 shadowColor: '#000',
@@ -409,7 +424,7 @@ function TestScreen({ navigation, route }) {
                         name="arrow-undo-circle-outline"
                     />
                 </TouchableOpacity>
-                <Text style={navigator.text}>
+                <Text style={{ ...navigator.text, paddingHorizontal: SIZES.radius, fontSize: 18 }}>
                     {currentQuestion?.STT}/{questionQuantity}
                 </Text>
                 <TouchableOpacity
@@ -441,11 +456,11 @@ function TestScreen({ navigation, route }) {
                 backgroundColor: COLORS.white
             }}>
                 <TouchableOpacity
-                    onPress={() => {
+                    onPress={async () => {
                         {
-                            // TODO: disconnect
-                            navigation.navigate(AppRouter.MAIN, { screen: AppRouter.TAB });
-                        } // Quay về màn hình trước
+                            // Quay về màn hình trước
+                            checkAndGoBack(true);
+                        }
                     }}
                     style={appBar.leftButton}>
                     <Icon
@@ -456,21 +471,23 @@ function TestScreen({ navigation, route }) {
                 </TouchableOpacity>
 
                 {/** Countdown */}
-                <MyCountDown title='123' time={100} isRuning={isRuning} />
+                <MyCountDown title={'\t\t'} time={100} isRuning={isRuning} />
 
 
-                <TouchableOpacity onPress={() => _test_()} style={appBar.rightButton}>
+                <TouchableOpacity
+                    onPress={() => setShowResult(!showResult)}
+                    style={appBar.rightButton}>
                     <Icon
                         type="Ionicons"
                         name={'ios-checkmark-done'}
-                        style={{ ...appBar.buttonIcon, marginRight: 20 }}
+                        style={{ ...appBar.buttonIcon, }}
                     />
                 </TouchableOpacity>
             </View>
         );
     }
 
-    // pause test modal
+    // Pause test modal
     function renderPauseTest() {
         return (
             <Modal animationType={'fade'} transparent={true} visible={!isRuning}>
@@ -502,9 +519,47 @@ function TestScreen({ navigation, route }) {
         );
     }
 
+    // Test Result modal
+    function renderTestResult() {
+        return (
+            <Modal animationType={'fade'} transparent={true} visible={showResult}>
+                <View style={pauseModal.container}>
+                    <View style={pauseModal.box}>
+                        <Image
+                            style={pauseModal.gif}
+                            source={GIFS.loading_cat}
+                        />
+                        <View
+                            style={{
+                                borderRadius: 60,
+                                width: 106,
+                                height: 106,
+                                marginTop: -150,
+                                marginRight: -0.8,
+                                backgroundColor: 'rgba(0,0,0,0)',
+                                borderWidth: 1,
+                                borderColor: settings.colors.colorGreen,
+                            }}
+                        />
+                        <TouchableOpacity
+                            onPress={() => setShowResult(!showResult)}
+                        >
+                            <Text style={pauseModal.title}>TẠM DỪNG1234213</Text>
+                            <Text style={pauseModal.textContent}>
+                                Bài kiểm tra này đã được giám thị dừng lại!
+                            </Text>
+                        </TouchableOpacity>
+
+                    </View>
+                </View>
+            </Modal>
+        );
+    }
+
+
     // Renders
     return (
-        <SafeAreaView style={{ flex: 1 }}>
+        <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.white }}>
             <WaitingTestModal isVisible={waiting} navigation={navigation} />
 
             <View style={styles.container}>
@@ -523,19 +578,22 @@ function TestScreen({ navigation, route }) {
                             style={{ paddingRight: 15 }}
                             onPress={() => openMenuQuestion()}>
                             <Icon
-                                type="MaterialCommunityIcons"
-                                name={'microsoft-xbox-controller-menu'}
-                                style={{ ...appBar.buttonIcon, fontSize: 36 }}
+                                type="AntDesign"
+                                name={'menufold'}
+                                style={{ ...appBar.buttonIcon, fontSize: 26 }}
                             />
                         </TouchableOpacity>
                     </View>
 
                     {/** Question */}
                     <View style={body.question}>
-                        <ScrollView>
-                            <Text style={body.questionText}>
-                                {'\t\t'}
+                        <ScrollView style={{ marginHorizontal: SIZES.radius, borderRadius: SIZES.base, ...STYLES.shadow, }}>
+                            <Text style={{ ...body.questionText, padding: SIZES.base, textAlign: 'auto' }}>
+                                {'\t\t\t'}
                                 {currentQuestion?.CauHoi}
+                                {'\t'}- buổi phỏng vấn với talkSports, trung vệ Jose Fonte bày tỏ cảm nghĩ về sự kiện Lionel Messi đầu quân cho PSG: "Tôi thấy rất vui. Tôi thật sự bất ngờ khi hay tin một siêu sao như Lionel Messi đã đến Ligue 1. Điều này thực sự thú vị. Rõ ràng chúng tôi sẽ gặp nhiều khó khăn khi đối mặt với cậu ấy nhưng chúng tôi đều đã sẵn sàng
+                                g buổi phỏng vấn với talkSports, trung vệ Jose Fonte bày tỏ cảm nghĩ về sự kiện Lionel Messi đầu quân cho PSG: "Tôi thấy rất vui. Tôi thật sự bất ngờ khi hay tin một siêu sao như Lionel Messi đã đến Ligue 1. Điều này thực sự thú vị. Rõ ràng chúng tôi sẽ gặp nhiều khó khăn khi đối mặt với cậu ấy nhưng chúng tôi đều đã sẵn sàng
+
                             </Text>
                         </ScrollView>
 
@@ -599,6 +657,9 @@ function TestScreen({ navigation, route }) {
 
             {/** Pause test modal */}
             {renderPauseTest()}
+
+            {/** Test result */}
+            {renderTestResult()}
         </SafeAreaView>
     );
 }
