@@ -1,16 +1,15 @@
-import React, { useState } from 'react';
-import { Text, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
+import React from 'react';
+import { Text, StyleSheet, TouchableOpacity, View } from 'react-native';
 
 // Constants
-import { COLORS } from '../../../../assets/constants'
+import { COLORS, SIZES, STYLES } from '../../../../assets/constants'
 
 export const ItemQuestion = ({ item, handle }) => {
     const pressItem = () => {
         handle(item.STT);
     };
-    const { width, height } = Dimensions.get('window');
     let itemColor = COLORS.colorMain;
-    if (item?.DASV == 'X') {
+    if (item?.DASV == 'X' || item?.DASV == 'X') {
         itemColor = COLORS.colorGreen;
     } else if (item?.DapAn != undefined) {
         if (item?.DapAn != item?.DASV) {
@@ -24,34 +23,34 @@ export const ItemQuestion = ({ item, handle }) => {
     }
 
     return (
-        <TouchableOpacity
-            activeOpacity={0.5}
-            onPress={() => {
-                pressItem();
-            }}
+        <View
             style={{
-                height: width / 7,
-                width: width / 7,
-                marginHorizontal: 10,
-                padding: 10,
-                alignItems: 'center',
-                justifyContent: 'center',
-                marginVertical: 5,
-                borderRadius: 10,
+                ...STYLES.shadow,
+                height: SIZES.padding * 2,
+                width: SIZES.padding * 2,
+                margin: SIZES.base,
                 backgroundColor: itemColor,
-                borderWidth: 1,
-                borderColor: '#CFD8DC',
+                borderRadius: SIZES.radius,
+                justifyContent: 'center'
             }}>
-            <Text
-                style={{
-                    flex: 10,
-                    fontSize: 18,
-                    fontWeight: 'bold',
-                    color: '#fff',
-                }}>
-                {item?.STT}
-            </Text>
-        </TouchableOpacity>
+            <TouchableOpacity
+                activeOpacity={0.5}
+                onPress={() => {
+                    pressItem();
+                }}
+            >
+                <Text
+                    style={{
+                        fontSize: 18,
+                        fontWeight: 'bold',
+                        color: COLORS.white,
+                        textAlign: 'center',
+                        textTransform: 'uppercase'
+                    }}>
+                    {item?.STT}
+                </Text>
+            </TouchableOpacity>
+        </View>
     );
 };
 

@@ -27,7 +27,10 @@ export const inittiateSocket = (room, user, info = 'Not known', status = 1) => {
 
 export const disconnectSocket = () => {
     console.log(`Disconnecting socket . . . `);
-    if (socket) socket.disconnect();
+    if (socket) {
+        socket.disconnect();
+        socket.connect();
+    }
 };
 
 export const requestServerLogs = () => {

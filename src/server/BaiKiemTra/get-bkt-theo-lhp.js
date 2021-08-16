@@ -2,18 +2,18 @@ import { settings } from '../../app/config';
 
 let api = settings.hostURL;
 
-const getBaiKiemTra = async (MaSV, SoLuong, Page) => {
+const getBaiKiemTraTheoLopHocPhan = async (MaSV, MaLopHP, SoLuong, Page) => {
 
 
     let res = '';
     var data = new FormData();
     data.append('MaSV', MaSV);
+    data.append('MaLopHP', MaLopHP);
 
     if (Page != undefined) {
         data.append('page', Page);
         data.append('quantity', SoLuong);
-    } else
-        if (SoLuong != undefined) data.append('SoLuong', SoLuong);
+    }
 
     var requestOptions = {
         method: 'POST',
@@ -21,7 +21,7 @@ const getBaiKiemTra = async (MaSV, SoLuong, Page) => {
         redirect: 'follow',
     };
 
-    await fetch(api + 'BaiKiemTra/get-bai-kiem-tra.php', requestOptions)
+    await fetch(api + 'BaiKiemTra/get-bai-kiem-tra-theo-LPH.php', requestOptions)
         .then(response => response.json())
         .then(data => {
             res = data;
@@ -30,4 +30,4 @@ const getBaiKiemTra = async (MaSV, SoLuong, Page) => {
     return res;
 };
 
-export { getBaiKiemTra };
+export { getBaiKiemTraTheoLopHocPhan };

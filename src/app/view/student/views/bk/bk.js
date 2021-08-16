@@ -44,12 +44,11 @@ import { MyAlert } from '../../components';
 export default TestScreen;
 function TestScreen({ navigation, route }) {
 
-    // Answers quantity
-    const answersQuantity = ['A', 'B', 'C', 'D'];
 
     //Consts
     const data = route.params?.data;
     const [currentQuestion, setCurrentQuestion] = useState('');
+    const [sendQuestion, setSendQuestion] = useState('');
     let _data = {
         id: data?.MaSV,
         room: data?.MaBaiKT,
@@ -66,16 +65,16 @@ function TestScreen({ navigation, route }) {
 
     // Focus
     const fo = useIsFocused();
-    const [isRuning, setisRuning] = useState(true);
-    const [isShowMenuQuest, setIsShowMenuQuest] = useState(false);
-    const [waiting, setWaiting] = useState(true);
-    const [autoNext, setAutoNext] = useState(true);
-    const [showResult, setShowResult] = useState(false);
+    const [isRuning, setisRuning] = useState(true); // Testing
+    const [isShowMenuQuest, setIsShowMenuQuest] = useState(false); // Open list question
+    const [waiting, setWaiting] = useState(true); // When teacher stop test
+    const [autoNext, setAutoNext] = useState(true); // Auto next question after answer
+    const [showResult, setShowResult] = useState(false); // If end test or . . .
 
-    const [testData, setTestData] = useState('');
-    const [testStatus, setTestStatus] = useState(0);
+    const [testData, setTestData] = useState(''); // Data
+    const [testStatus, setTestStatus] = useState(0); // Test status
     ``
-    const appState = useRef(AppState.currentState);
+    const appState = useRef(AppState.currentState); // Get app state
     const [appStateVisible, setAppStateVisible] = useState(appState.current);
 
     // Report background state
@@ -104,11 +103,13 @@ function TestScreen({ navigation, route }) {
 
     // SOCKET
     useEffect(() => {
-        // Out temp connect
+
+        // Kill temp connect
         disconnectSocket();
 
         checkTest(_data.id, _data.room);
 
+        // If can not get test status
         if (testStatus == 0) return;
 
         if (testStatus == 1) {
@@ -119,18 +120,15 @@ function TestScreen({ navigation, route }) {
             // On request
             serverStartTest((err, data) => {
                 if (err) return;
-
                 console.log('Đã vào phòng chờ ne');
                 setWaiting(false);
                 setisRuning(data);
-                console.log('tus = 1 ne: data= ', data);
 
             });
 
             // Check if teacher cancel test
             teacherEditTest((err, data) => {
                 if (err) return;
-                console.log(`gv da lam cai nay --------: `, data);
                 if (data) {
                     Alert.alert('Thông báo', `Bài kiểm tra này đã bị hủy bỏ`);
                     navigation.goBack();
@@ -145,13 +143,10 @@ function TestScreen({ navigation, route }) {
                 console.log('Đã vào trễ ne');
                 setWaiting(false);
                 setisRuning(data);
-                console.log('tus = 2 ne: data= ', data);
             });
             // Check if teacher cancel test
             teacherEditTest((err, data) => {
                 if (err) return;
-                console.log(`gv da lam cai nay --------: `, data);
-
                 if (data) {
                     Alert.alert('Thông báo', `Bài kiểm tra này đã bị hủy bỏ`);
                     navigation.goBack();
@@ -253,7 +248,9 @@ function TestScreen({ navigation, route }) {
             setColorAnswerD(settings.colors.colorMain);
         }
 
-        //updateListData(currentQuestion, currentQuestion.STT - 1);
+        let temp = new Object({ DapAn: currentQuestion.DASV, MaCH: currentQuestion.MaCH });
+        setSendQuestion(temp);
+
     }, [currentQuestion]);
 
     //----------------------------------GET API DATA----------------------------------
@@ -291,6 +288,8 @@ function TestScreen({ navigation, route }) {
 
     //  Press button next or rev
     const updateQuestion = next => {
+
+        console.log(sendQuestion);
         try {
             let num = parseInt(currentQuestion?.STT);
             if (next) {
@@ -312,6 +311,7 @@ function TestScreen({ navigation, route }) {
 
     // Press answer
     const pressingAnswer = answer => {
+
         setColorAnswerA(settings.colors.colorGreen);
         setColorAnswerB(settings.colors.colorGreen);
         setColorAnswerC(settings.colors.colorGreen);
@@ -322,18 +322,17 @@ function TestScreen({ navigation, route }) {
             D = 'D',
             X = 'X';
         let newAnswer = currentQuestion;
+
         switch (answer) {
             case A: {
                 if (currentQuestion.DASV === X || currentQuestion.DASV !== A) {
                     //Update
                     setColorAnswerA(settings.colors.colorMain); // Set ui
-                    changeAnwer(A); // Set server
                     newAnswer.DASV = A; // Set local
                     if (autoNext) updateQuestion(true); // Next question
                 } else {
                     //Cancel
                     setColorAnswerA(settings.colors.colorGreen);
-                    changeAnwer(X);
                     newAnswer.DASV = X;
                 }
                 break;
@@ -342,13 +341,11 @@ function TestScreen({ navigation, route }) {
                 if (currentQuestion.DASV === X || currentQuestion.DASV !== B) {
                     //Update
                     setColorAnswerB(settings.colors.colorMain);
-                    changeAnwer(B);
                     newAnswer.DASV = B;
                     if (autoNext) updateQuestion(true); // Next question
                 } else {
                     //Cancel
                     setColorAnswerB(settings.colors.colorGreen);
-                    changeAnwer(X);
                     newAnswer.DASV = X;
                 }
                 break;
@@ -357,13 +354,11 @@ function TestScreen({ navigation, route }) {
                 if (currentQuestion.DASV === X || currentQuestion.DASV !== C) {
                     //Update
                     setColorAnswerC(settings.colors.colorMain);
-                    changeAnwer(C);
                     newAnswer.DASV = C;
                     if (autoNext) updateQuestion(true); // Next question
                 } else {
                     //Cancel
                     setColorAnswerC(settings.colors.colorGreen);
-                    changeAnwer(X);
                     newAnswer.DASV = X;
                 }
                 break;
@@ -385,6 +380,9 @@ function TestScreen({ navigation, route }) {
             }
             default:
         }
+
+        newAnswer.sended = false;
+        setCurrentQuestion(newAnswer);
     };
 
     // Press item in menu test
@@ -471,11 +469,24 @@ function TestScreen({ navigation, route }) {
                 </TouchableOpacity>
 
                 {/** Countdown */}
-                <MyCountDown title={'\t\t'} time={100} isRuning={isRuning} />
+                <MyCountDown title={'\t\t'} time={1200} isRuning={isRuning} />
 
 
                 <TouchableOpacity
-                    onPress={() => setShowResult(!showResult)}
+                    onPress={() => Alert.alert("Bạn có chắc", "Thoát 123 khỏi bài kiểm tra này?", [
+                        {
+                            text: "Trở lại",
+                            onPress: () => null,
+                            style: "cancel"
+                        },
+                        {
+                            text: "Đồng ý",
+                            onPress: () => {
+                                disconnectSocket();
+                                navigation.navigate(AppRouter.TEST_RESULT)
+                            }
+                        }
+                    ])}
                     style={appBar.rightButton}>
                     <Icon
                         type="Ionicons"
@@ -519,44 +530,6 @@ function TestScreen({ navigation, route }) {
         );
     }
 
-    // Test Result modal
-    function renderTestResult() {
-        return (
-            <Modal animationType={'fade'} transparent={true} visible={showResult}>
-                <View style={pauseModal.container}>
-                    <View style={pauseModal.box}>
-                        <Image
-                            style={pauseModal.gif}
-                            source={GIFS.loading_cat}
-                        />
-                        <View
-                            style={{
-                                borderRadius: 60,
-                                width: 106,
-                                height: 106,
-                                marginTop: -150,
-                                marginRight: -0.8,
-                                backgroundColor: 'rgba(0,0,0,0)',
-                                borderWidth: 1,
-                                borderColor: settings.colors.colorGreen,
-                            }}
-                        />
-                        <TouchableOpacity
-                            onPress={() => setShowResult(!showResult)}
-                        >
-                            <Text style={pauseModal.title}>TẠM DỪNG1234213</Text>
-                            <Text style={pauseModal.textContent}>
-                                Bài kiểm tra này đã được giám thị dừng lại!
-                            </Text>
-                        </TouchableOpacity>
-
-                    </View>
-                </View>
-            </Modal>
-        );
-    }
-
-
     // Renders
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.white }}>
@@ -571,7 +544,8 @@ function TestScreen({ navigation, route }) {
 
                     {/** Number quest*/}
                     <View style={body.title}>
-                        <Text style={appBar.textTitle}>Câu: {currentQuestion?.STT}</Text>
+                        <Text style={appBar.textTitle}>
+                            {currentQuestion?.STT}</Text>
 
                         {/** Button open quest picker */}
                         <TouchableOpacity
@@ -658,8 +632,6 @@ function TestScreen({ navigation, route }) {
             {/** Pause test modal */}
             {renderPauseTest()}
 
-            {/** Test result */}
-            {renderTestResult()}
         </SafeAreaView>
     );
 }

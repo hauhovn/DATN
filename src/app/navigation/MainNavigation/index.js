@@ -5,11 +5,10 @@ import TabNavigator from '../TabNavigation/index';
 import { ChangePassword } from '../../view/profile/changePassword';
 import { UpdateProfile } from '../../view/profile/updateProfile';
 import { DemoView } from '../../view/until/demo-view';
-import { TestingNavigation } from '../TestingNavigation';
 import { TeacherControl } from '../../view/teacherControl';
 
 // Student
-import { TestScreen } from '../../view/student/views'
+import { TestScreen, TestResultScreen } from '../../view/student/views'
 
 const Stack = createStackNavigator();
 
@@ -45,6 +44,11 @@ function MainNavigation() {
                 name={AppRouter.TESTING}
                 component={TestScreen}
                 options={{ title: AppRouter.TESTING, headerShown: false }}
+            />
+            <Stack.Screen
+                name={AppRouter.TEST_RESULT}
+                component={TestResultScreen}
+                options={{ title: AppRouter.TEST_RESULT, headerShown: false }}
             />
             <Stack.Screen
                 name={AppRouter.TEACHERCONTROLL}

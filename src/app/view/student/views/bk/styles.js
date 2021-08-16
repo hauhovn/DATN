@@ -1,5 +1,5 @@
 import { StyleSheet, Dimensions } from 'react-native';
-import { COLORS } from '../../../../assets/constants'
+import { COLORS, STYLES } from '../../../../assets/constants'
 
 export { styles, appBar, body, navigator, menuQuestion, pauseModal };
 
@@ -63,7 +63,6 @@ const body = StyleSheet.create({
     answersContainer: {
         flex: 6,
         backgroundColor: '#fff',
-        paddingTop: 15,
     },
     answer: {
         flex: 0.238,
@@ -72,6 +71,7 @@ const body = StyleSheet.create({
         padding: 8,
         alignItems: 'center',
         justifyContent: 'center',
+        ...STYLES.shadow
     },
     answerText: {
         fontSize: 15,

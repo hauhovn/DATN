@@ -1,49 +1,38 @@
 import React from 'react';
 import {
-    SafeAreaView,
     View,
     Text,
     StyleSheet,
     Image,
-    Modal
 } from 'react-native';
 
 // Constants
 import { COLORS, GIFS, SIZES } from '../../../assets/constants';
 
-// Components
-import { MyAppBar } from './app-bar';
-
-export const WaitingTestModal = ({ isVisible, navigation }) => {
+export const WaitingTest = () => {
     //Consts
 
     return (
-        <Modal visible={isVisible}>
-            <SafeAreaView>
-
-                <MyAppBar iconRightStyle={{ fontSize: 0 }} title={''} leftHandle={() => navigation.goBack()} />
-                <View style={styles.container}>
-                    <Image
-                        style={styles.gif}
-                        source={GIFS.doremon_are_you_there}
-                    />
-                    <View
-                        style={{
-                            borderRadius: 60,
-                            width: 106,
-                            height: 106,
-                            marginTop: -150,
-                            marginRight: -0.8,
-                            backgroundColor: 'rgba(0,0,0,0)',
-                            borderWidth: 0,
-                            borderColor: COLORS.colorGreen,
-                        }}
-                    />
-                    <Text style={styles.title}>CHƯA BẮT ĐẦU</Text>
-                    <Text style={styles.textContent}>Bài kiểm tra này chưa bắt đầu!</Text>
-                </View>
-            </SafeAreaView>
-        </Modal>
+        <View style={styles.container}>
+            <Image
+                style={styles.gif}
+                source={GIFS.doremon_are_you_there}
+            />
+            <View
+                style={{
+                    borderRadius: 60,
+                    width: 106,
+                    height: 106,
+                    marginTop: -150,
+                    marginRight: -0.8,
+                    backgroundColor: 'rgba(0,0,0,0)',
+                    borderWidth: 0,
+                    borderColor: COLORS.colorGreen,
+                }}
+            />
+            <Text style={styles.title}>CHƯA BẮT ĐẦU</Text>
+            <Text style={styles.textContent}>Bài kiểm tra này chưa bắt đầu!</Text>
+        </View>
     );
 };
 

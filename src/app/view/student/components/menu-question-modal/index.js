@@ -11,13 +11,11 @@ import {
 import { Icon } from 'native-base';
 //views
 import { ItemQuestion } from './item';
-import { appBar } from '../../views/test-screen/styles';
 
 // Constants
-import { COLORS } from '../../../../assets/constants'
+import { COLORS, SIZES, STYLES } from '../../../../assets/constants'
 
-export const MenuQuestionModal = ({ isVisible, close, data, menuHandle }) => {
-    const { width, height } = Dimensions.get('window');
+export const MenuQuestionModal = ({ isVisible, onRequestClose, data, onPressItem }) => {
 
     let isCheck = {
         //is check or correct
@@ -40,26 +38,41 @@ export const MenuQuestionModal = ({ isVisible, close, data, menuHandle }) => {
 
     //funcs
     const handlePressItem = item => {
-        menuHandle(item);
-        close();
+        onPressItem(item);
+        onRequestClose();
     };
 
     return (
-        <Modal visible={isVisible}>
+        <Modal visible={isVisible}
+            onRequestClose={() => close(true)}
+            animationType='slide'>
             <View style={{ flex: 1 }}>
-                <View style={appBar.container}>
+
+                {/** Appbar */}
+                <View style={{
+                    ...STYLES.appBar, flexDirection: 'row',
+                    height: 46, marginTop: SIZES.radius,
+                    borderRadius: SIZES.radius, alignItems: 'center',
+                    justifyContent: 'space-between', marginHorizontal: SIZES.padding
+                }}>
+                    <View />
+                    <Text style={{
+                        textTransform: 'uppercase',
+                        fontSize: 14,
+                        color: COLORS.colorMain,
+                        fontWeight: 'bold',
+                        marginLeft: SIZES.padding
+                    }}>Danh sách câu hỏi</Text>
                     <TouchableOpacity
                         onPress={() => {
-                            close(false);
+                            onRequestClose(false);
                         }}>
                         <Icon
-                            type="MaterialIcons"
-                            name="keyboard-arrow-left"
-                            style={appBar.buttonIcon}
+                            type="FontAwesome"
+                            name="close"
+                            style={{ fontSize: 26, color: COLORS.colorMain, marginRight: SIZES.padding }}
                         />
                     </TouchableOpacity>
-                    <Text style={appBar.textTitle}>Danh sách câu hỏi</Text>
-                    <Text />
                 </View>
                 <View
                     style={{
@@ -72,8 +85,9 @@ export const MenuQuestionModal = ({ isVisible, close, data, menuHandle }) => {
                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                         <TouchableOpacity
                             style={{
-                                height: width / 10 - 12,
-                                width: width / 10 - 12,
+                                ...STYLES.shadow,
+                                height: SIZES.width / 10 - 12,
+                                width: SIZES.width / 10 - 12,
                                 borderRadius: 10,
                                 backgroundColor: isCheck.color,
                                 borderWidth: 1,
@@ -85,8 +99,9 @@ export const MenuQuestionModal = ({ isVisible, close, data, menuHandle }) => {
                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                         <TouchableOpacity
                             style={{
-                                height: width / 10 - 12,
-                                width: width / 10 - 12,
+                                ...STYLES.shadow,
+                                height: SIZES.width / 10 - 12,
+                                width: SIZES.width / 10 - 12,
                                 borderRadius: 10,
                                 backgroundColor: unCheck.color,
                                 borderWidth: 1,
@@ -105,7 +120,7 @@ export const MenuQuestionModal = ({ isVisible, close, data, menuHandle }) => {
                     }}>
                     <FlatList
                         data={data}
-                        numColumns={5}
+                        numColumns={Math.round(SIZES.width / (2 * SIZES.padding + SIZES.base))}
                         horizontal={false}
                         showsVerticalScrollIndicator={false}
                         renderItem={({ item }) => (

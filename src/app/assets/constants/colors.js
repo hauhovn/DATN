@@ -25,6 +25,7 @@ export default COLORS = {
     lightGray: '#d3d3d3',
     darkGray: '#a9a9a9',
     backgroundFade: 'rgba(255, 255, 255,0.33)',
+    backgroundFade1: 'rgba(255, 255, 255,0.66)',
     orangeLight: '#f8a825',
     orangeDark: '#ee7c2a'
 };

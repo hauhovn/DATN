@@ -6,12 +6,14 @@ import {
     FlatList,
     TouchableOpacity,
     StyleSheet,
+    ActivityIndicator
 } from 'react-native';
 //modun
 import { useNavigation, useIsFocused } from '@react-navigation/native';
 import { Icon, Picker } from 'native-base';
 //api
 import { getBaiKiemTra } from '../../../../server/BaiKiemTra';
+import { getBaiKiemTraTheoLopHocPhan } from '../../../../server/BaiKiemTra/get-bkt-theo-lhp';
 import { teacherEditTest } from '../../../../server/SocketIO';
 import { getMiniLopHocPhan } from '../../../../server/LopHP/getListNameLHP';
 //settting
@@ -19,16 +21,20 @@ import { settings } from '../../../config';
 import { AppRouter } from '../../../../app/navigation/AppRouter';
 
 // Components
-import { ItemTest, TestDetailModal } from '../components';
+import { ItemTest, TestDetailModal, MyAppBar, DialogPickerModal, LoadingIndicator } from '../components';
+import { COLORS, SIZES } from '../../../assets/constants';
 
 const StudentTestList = ({ navigation, route }) => {
+
+
     const nav = useNavigation();
-    const fo = useIsFocused();
     const [isShowDialog, setIsShowDialog] = useState(false);
     const [refeshing, setRefeshing] = useState(false);
+    const [getMore, setGetMore] = useState(false);
     const [loading, setLoading] = useState(true);
     const [data, setData] = useState('');
     const [listTenLHP, setListTenLHP] = useState('');
+    const [pickerLHP, setPickerLHP] = useState({ MaLopHP: -1, TenLopHP: 'Tất cả' });
 
     const [sentData, setSentData] = useState({
         MaBaiKT: '',
@@ -36,6 +42,9 @@ const StudentTestList = ({ navigation, route }) => {
         TenSV: ''
     });
     const SinhVien = route.params;
+
+    let page = 0;
+    const quantity = 10;
 
     useEffect(() => {
         teacherEditTest((err, isRemove) => {
@@ -50,7 +59,7 @@ const StudentTestList = ({ navigation, route }) => {
     async function loadOption() {
         try {
             await getListLPH();
-            await getTests();
+            await getTests(quantity, page);
             setLoading(false);
         } catch (error) { }
     }
@@ -60,11 +69,44 @@ const StudentTestList = ({ navigation, route }) => {
         setListTenLHP(res.data);
         console.log('LIST LHPs: ', res.data);
     };
-    const getTests = async () => {
-        let res = await getBaiKiemTra(SinhVien.MaSV);
-        setData(res);
-        console.log('LIST TESTs: ', res);
+
+    // Get test = LHP
+    const getTestWith = async (MaSV, MaLHP, SL, Page, add) => {
+        let res = await getBaiKiemTraTheoLopHocPhan(MaSV, MaLHP, SL, Page);
+        add ? setData(data.concat(res?.data)) : setData(res.data);
+    }
+
+    const getTests = async (quantity, page, add) => {
+        let res = await getBaiKiemTra(SinhVien.MaSV, quantity, page);
+        add ? setData(data.concat(res?.data)) : setData(res.data);
     };
+
+    // Fake
+    const fake = async () => {
+        let res = await getBaiKiemTra(SinhVien.MaSV, quantity, ++page);
+        setData(data.concat(res.data));
+    }
+
+    // Class picker
+    const classPicker = (item) => {
+
+        setLoading(true);
+        page = 0;
+        setPickerLHP(item);
+
+        if (item.MaLopHP == -1) {
+            // Get all
+            loadOption();
+        } else {
+            // get with code
+            getTestWith(SinhVien.MaSV, item.MaLopHP, quantity, page);
+        }
+
+        setTimeout(() => {
+            setLoading(false)
+        }, 500)
+        //fake();
+    }
 
     // Nhấn vô item
     const handlePressItem = item => {
@@ -82,55 +124,89 @@ const StudentTestList = ({ navigation, route }) => {
             params: { data: sentData },
         });
     };
+
+    // Refesh data
     async function refeshData() {
+
         setRefeshing(true);
-        await loadOption();
+        page = 0;
+
+        // All
+        if (pickerLHP.MaLopHP == -1) {
+
+            await loadOption();
+        } else {
+            getTestWith(SinhVien.MaSV, pickerLHP.MaLopHP, quantity, page, false);
+        }
         setRefeshing(false);
+    }
+
+    // Get more data
+    async function getMoreData() {
+        console.log('get get');
+        if (pickerLHP == -1) {
+            // All
+            setGetMore(true);
+            //await fake();
+            setGetMore(false);
+        } else {
+            // getTestWith(SinhVien.MaSV, pickerLHP, quantity, ++page, true)
+        }
+    }
+
+    // Footer component
+    function ListFooterComponent() {
+        return (
+            getMore ?
+                <View style={{ marginBottom: SIZES.padding }}>
+                    <ActivityIndicator size='large' color={COLORS.black} />
+                </View> : (data == undefined ? (
+                    <Text>
+                        Không còn bài kiểm tra nào khác
+                    </Text>
+                ) : null)
+
+        );
     }
 
     return (
         <SafeAreaView style={{ flex: 1 }}>
-            <View style={styles.appBar}>
-                <TouchableOpacity
-                    onPress={() => {
-                        navigation.goBack();
-                    }}>
-                    <Icon
-                        type="MaterialIcons"
-                        name="keyboard-arrow-left"
-                        style={{ color: '#fff', fontSize: 32, marginLeft: 2 }}
-                    />
-                </TouchableOpacity>
-                <Text style={{ fontSize: 18, color: '#fff' }}>
-                    DANH SÁCH BÀI KIỂM TRA
-                </Text>
-                <Text></Text>
-            </View>
 
-            <View style={styles.filerBox}>
-                <Picker selectedValue={1} mode="dialog" style={styles.picker}>
-                    <Picker.Item label="Tất cả" value="0" />
-                    {listTenLHP != '' ? (
-                        listTenLHP?.map(i => (
-                            <Picker.Item key={i.MaLopHP} label={i.TenLopHP} value={i.MaLopHP} />
-                        ))
-                    ) : (
-                        <Picker label=". . ." />
-                    )}
-                </Picker>
-            </View>
-
-            <FlatList
-                refreshing={refeshing}
-                onRefresh={refeshData}
-                data={data}
-                showsVerticalScrollIndicator={false}
-                renderItem={({ item }) => (
-                    <ItemTest item={item} data={data} handle={handlePressItem} />
-                )}
-                keyExtractor={(item, index) => `${index}_${Math.random()}`}
-                style={{ flex: 1, marginTop: 12, backgroundColor: '#fff' }}
+            {/** Appbar */}
+            <MyAppBar
+                title='Danh sách bài kiểm tra'
+                leftHandle={() => navigation.goBack()}
+                iconRightStyle={{ fontSize: 0 }}
+                titleStyle={{ fontSize: 18 }}
+                iconLeftStyle={{ marginTop: SIZES.appBarHeight / 6 }}
             />
+
+            {/** Filter */}
+            <DialogPickerModal
+                data={listTenLHP}
+                handle={(item) => classPicker(item)}
+                displayValue={pickerLHP} />
+
+            {/** List */}
+
+            {
+                !loading ? <FlatList
+                    refreshing={refeshing}
+                    onRefresh={refeshData}
+                    onEndReachedThreshold={0.2}
+                    onEndReached={getMoreData}
+                    data={data}
+                    showsVerticalScrollIndicator={false}
+                    renderItem={({ item }) => (
+                        <ItemTest item={item} data={data} handle={handlePressItem} />
+                    )}
+                    keyExtractor={(item, index) => `${index}_${Math.random()}`}
+                    style={{ flex: 1, marginTop: 12, backgroundColor: '#fff' }}
+                    ListFooterComponent={ListFooterComponent}
+                /> : <LoadingIndicator style={{ marginTop: - SIZES.height * .3 }} />
+            }
+
+            {/** Detail */}
             <TestDetailModal
                 modalVisible={isShowDialog}
                 close={() => {
@@ -145,24 +221,4 @@ const StudentTestList = ({ navigation, route }) => {
     );
 };
 export default StudentTestList;
-const styles = StyleSheet.create({
-    appBar: {
-        backgroundColor: settings.colors.colorMain,
-        height: 40,
-        justifyContent: 'space-between',
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
-    filerBox: {
-        height: 46,
-        width: '100%',
-        alignItems: 'flex-end',
-        padding: 8,
-        backgroundColor: '#b1b4b5',
-    },
-    picker: {
-        height: 42,
-        width: '100%',
-    },
-    textFiler: {},
-});
+

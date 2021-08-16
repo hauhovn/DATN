@@ -76,7 +76,7 @@ const StudentScreen = () => {
         teacherEditTest((err, isRemove) => {
             if (err) return;
             if (isRemove != undefined) {
-                refeshListTetst();
+                getTests();
             }
         });
     }, []);
@@ -103,7 +103,7 @@ const StudentScreen = () => {
 
     const getTests = async () => {
         let data = await getBaiKiemTra(user[0]?.MaSV, 3);
-        setListTest(data);
+        setListTest(data.data);
     };
 
     const HeaderHandle = value => {

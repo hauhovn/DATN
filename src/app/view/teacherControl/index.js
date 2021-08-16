@@ -68,7 +68,7 @@ export const TeacherControl = ({ route }) => {
 
     //funcs
     async function loadOption() {
-        await getOldInfo(BaiKiemTra.MaBaiKT);
+        //await getOldInfo(BaiKiemTra.MaBaiKT);
         setIsLoading(false);
     }
 
@@ -131,6 +131,7 @@ export const TeacherControl = ({ route }) => {
                                         },
                                     ];
                                 });
+                                updateTestStatus(_user.MaGV, BaiKiemTra.MaBaiKT, 2);
                                 setTestStatus(2);
                             } else if (testStatus > 2) {
                                 // Tiep tuc
@@ -145,8 +146,8 @@ export const TeacherControl = ({ route }) => {
                                         },
                                     ];
                                 });
+                                updateTestStatus(_user.MaGV, BaiKiemTra.MaBaiKT, 2);
                                 setTestStatus(2);
-
                             } else {
                                 // Tam dung
                                 requestStartTest(_user.MaGV, BaiKiemTra.MaBaiKT, false);
@@ -161,6 +162,7 @@ export const TeacherControl = ({ route }) => {
                                     ];
                                 });
                                 setTestStatus(3);
+                                updateTestStatus(_user.MaGV, BaiKiemTra.MaBaiKT, 3);
                             }
 
                         } else {
@@ -190,9 +192,13 @@ export const TeacherControl = ({ route }) => {
         return (
             <View style={actionBar.container}>
                 <View style={actionBar.row}>
+
+                    {/** Class quantity */}
                     <Text style={[actionBar.text, { color: '#000', marginLeft: 15 }]}>
                         Thí sinh đã vào: 30/69
                     </Text>
+
+                    {/** Button start/pause/resume */}
                     <TouchableOpacity
                         onPress={() => startTest(true)}
                         style={[
@@ -204,6 +210,8 @@ export const TeacherControl = ({ route }) => {
                     </TouchableOpacity>
                 </View>
                 <View style={actionBar.row}>
+
+                    {/** Button cancel */}
                     {testStatus > 1 ? (<TouchableOpacity
                         onPress={() => pressStudentsList()}
                         style={[actionBar.button, actionBar.longButton]}>
@@ -297,7 +305,7 @@ export const TeacherControl = ({ route }) => {
                             backgroundColor: '#ebebeb',
                         }}>
                         <Text style={{ fontSize: 14, marginTop: -250 }}>
-                            Chưa có thí sinh tham gia
+                            Chưa có thông tin mới
                         </Text>
                     </View>
                 )}
