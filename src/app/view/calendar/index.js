@@ -20,6 +20,7 @@ import {CalendarTheme, HeaderStyles, MainStyles, LoadingStyles} from './styles';
 import {getTestByDate} from '../../../server/calen/getTestByDate';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {AppRouter} from '../../navigation/AppRouter';
+import {getAllTest} from '../../../server/calen/getAllTest';
 
 const {width: dW, height: dH} = Dimensions.get('window'); // Lấy width và height của màn hình điện thoại
 
@@ -35,6 +36,9 @@ export const CalendarScreen = ({navigation}) => {
   const [calendarShow, setCalendar] = useState(true);
   const [dataNull, setDataNull] = useState(false);
   const [user, setUser] = useState('');
+
+  const [dataAll, setDataAll] = useState('');
+  const [dataMark, setDataMark] = useState('');
 
   // Định dạng lại thư viện calendar
   LocaleConfig.locales['VN'] = {
@@ -86,6 +90,7 @@ export const CalendarScreen = ({navigation}) => {
   useEffect(() => {
     if (user != '') {
       getData(user[0]?.MaGV, getStrDay(dateSelected));
+      getAllData(user[0]?.MaGV);
     }
   }, [user]);
 
@@ -115,6 +120,50 @@ export const CalendarScreen = ({navigation}) => {
   // Khi dateSelected thay đổi thì sẽ chạy
   useEffect(() => {
     getData(user[0]?.MaGV, getStrDay(dateSelected));
+
+    if (dataAll !== '') {
+      let temp = dataAll.map(x => x.Ngay);
+
+      let flag = 0;
+
+      let json = {...temp};
+
+      json = Object.assign({}, temp);
+
+      json = temp.reduce((json, value, key) => {
+        key = value;
+        key = value;
+        value != dateSelected
+          ? (json[key] = {marked: true, dotColor: 'red'})
+          : (json[key] = {
+              color: '#000',
+              textColor: 'white',
+              endingDay: true,
+              startingDay: true,
+            });
+
+        if (value == dateSelected) {
+          flag = 1;
+        }
+
+        return json;
+      }, {});
+
+      setDataMark(json);
+
+      if (flag == 0) {
+        let test = {
+          [dateSelected]: {
+            color: '#000',
+            textColor: 'white',
+            endingDay: true,
+            startingDay: true,
+          },
+        };
+        var oxo = Object.assign({}, json, test);
+        setDataMark(oxo);
+      }
+    }
   }, [dateSelected]);
 
   const getStrDay = date => {
@@ -132,10 +181,41 @@ export const CalendarScreen = ({navigation}) => {
   const getData = async (MaGV, Ngay) => {
     try {
       const res = await getTestByDate(MaGV, Ngay);
-      console.log('res: ', res);
       setData(res?.data);
     } catch (error) {
-      console.log(error);
+      //
+    }
+  };
+
+  // lấy api chổ này
+  const getAllData = async MaGV => {
+    try {
+      const res = await getAllTest(MaGV);
+      setDataAll(res?.data);
+
+      let temp = res?.data.map(x => x.Ngay);
+
+      let json = {...temp};
+
+      json = Object.assign({}, temp);
+
+      json = temp.reduce((json, value, key) => {
+        key = value;
+        key = value;
+        value != dateSelected
+          ? (json[key] = {marked: true, dotColor: 'red'})
+          : (json[key] = {
+              color: '#000',
+              textColor: 'white',
+              endingDay: true,
+              startingDay: true,
+            });
+        return json;
+      }, {});
+
+      setDataMark(json);
+    } catch (error) {
+      //
     }
   };
 
@@ -226,21 +306,14 @@ export const CalendarScreen = ({navigation}) => {
                 style={{width: dW, marginTop: -5}}
                 markingType={'period'}
                 current={dateNow}
-                monthFormat={'dd-MM-yyyy'}
+                monthFormat={'MM-yyyy'}
                 minDate={'2018-02-02'}
                 enableSwipeMonths={true}
                 theme={CalendarTheme}
                 onDayPress={day => {
                   setDateSelected(day.dateString);
                 }}
-                markedDates={{
-                  [dateSelected]: {
-                    color: '#000',
-                    textColor: 'white',
-                    endingDay: true,
-                    startingDay: true,
-                  },
-                }}
+                markedDates={dataMark}
               />
             </ScrollView>
           )}
