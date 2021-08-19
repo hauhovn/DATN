@@ -351,7 +351,7 @@ export const TeacherControl = ({ route, navigation }) => {
                     </Text>
 
                     <Text>
-                        {item.TongSoCauDung} /{item.TongSoCauSai}/ {item.TongSoCauSai + item.TongSoCauDung}
+                        {item.TongSoCauDung} /{item.TongSoCauSai}/ {parseInt(item.TongSoCauSai) + parseInt(item.TongSoCauDung)}
                     </Text>
 
                 </View>

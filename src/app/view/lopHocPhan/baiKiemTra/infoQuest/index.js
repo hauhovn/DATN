@@ -29,6 +29,7 @@ import {
     inittiateSocket,
     requestUpdateTestList,
 } from '../../../../../server/SocketIO';
+import { createTestDetailt } from '../../../../../server'
 
 export const InfomationQuestion = () => {
     const nav = useNavigation();
@@ -186,6 +187,12 @@ export const InfomationQuestion = () => {
         setShowDetails(true);
     };
 
+    // _createTestDetail
+    const _createTestDetail = async (testID) => {
+        let rs = await createTestDetailt(testID);
+        if (rs.code > 0) console.log(rs);
+    }
+
     // Nhấn nút bắt đầu
     const handleStart = () => {
         let TrangThai = item.TrangThai;
@@ -205,6 +212,7 @@ export const InfomationQuestion = () => {
                         // When test status =  0 (waiting)
                         _updateTestStatus(user[0].MaGV, item.MaBaiKT, 1);
                         requestUpdateTestList(false);
+                        _createTestDetail(item.MaBaiKT);
                     },
                 },
                 {
