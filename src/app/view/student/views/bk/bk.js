@@ -33,7 +33,11 @@ import {
 } from '../../../../../server/SocketIO'
 
 // Components
-import { WaitingTestModal, MenuQuestionModal, MyCountDown } from '../../components';
+import {
+    WaitingTestModal,
+    MenuQuestionModal,
+    MyCountDown
+} from '../../components';
 
 // Constants
 import { COLORS, GIFS, SIZES, STYLES } from '../../../../assets/constants'

@@ -17,7 +17,10 @@ const DialogPickerModal = ({ data, handle, style, displayValue }) => {
 
     function renderItem(item) {
         return (
-            <View style={{ borderBottomColor: COLORS.black, borderBottomWidth: .3, marginHorizontal: SIZES.width * .1 }}>
+            <View style={{
+                borderBottomColor: COLORS.black,
+                borderBottomWidth: .3, marginHorizontal: SIZES.width * .1
+            }}>
                 <TouchableOpacity
                     onPress={() => pressHandle(item)}
                     style={{ flex: 1, alignItems: 'center' }}>
@@ -29,20 +32,26 @@ const DialogPickerModal = ({ data, handle, style, displayValue }) => {
     }
 
     return (
-        <View>
+        <View >
 
             {/** Show button */}
-            <View style={{ ...STYLES.shadow, borderRadius: SIZES.radius / 2, paddingBottom: SIZES.base }}>
+            <View style={{ backgroundColor: COLORS.white }}>
                 <TouchableOpacity
                     onPress={() => setShow(!show)}
                     style={{
-                        flexDirection: 'row', paddingHorizontal: SIZES.padding,
-                        paddingTop: SIZES.radius,
+                        flexDirection: 'row',
+                        marginTop: SIZES.base,
+                        alignSelf: 'flex-end',
                     }}
                 >
-                    <Icon type='MaterialCommunityIcons' name='filter-menu' style={{ fontSize: 20 }} />
-                    <Text style={{ marginHorizontal: SIZES.padding, fontSize: 16, alignSelf: 'center' }}>
+                    <Text style={{
+                        marginHorizontal: SIZES.padding,
+                        fontSize: 16, alignSelf: 'center'
+                    }}>
                         {displayValue?.TenLopHP}</Text>
+                    <Icon type='MaterialCommunityIcons' name='filter-menu'
+                        style={{ marginHorizontal: SIZES.padding, fontSize: 20 }} />
+
                 </TouchableOpacity>
             </View>
 

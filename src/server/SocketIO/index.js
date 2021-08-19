@@ -61,10 +61,10 @@ export const requestStartTest = (userID, room, isStart) => {
 };
 
 // #1 emit
-export const requestUpdateTestList = (isRemove, room) => {
+export const requestUpdateTestList = (isRemove, room, isComplete) => {
     if (!socket) return;
     console.log('teacher-edit-test ', { isRemove: isRemove, room: room });
-    socket.emit('teacher-edit-test', { isRemove: isRemove, room: room });
+    socket.emit('teacher-edit-test', { isRemove: isRemove, room: room, isComplete: isComplete });
 };
 
 // ==================================== student ===============================================

@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useRef, useState } from 'react';
 import {
     View, Text, TouchableOpacity,
     StyleSheet, Image, ScrollView,
-    Switch
+    Switch, AppState
 } from 'react-native';
 
 import { Icon } from 'native-base';
@@ -35,9 +35,10 @@ import { SIZES, STYLES, COLORS } from '../../../assets/constants';
 const TestScreen = ({ route, navigation }) => {
 
     const stateInfo = {
-        waiting: 'waiting_k',
-        testing: 'testing_k',
-        paused: 'paused_k'
+        waiting: 'Đã vào phòng chờ',
+        testing: 'Đang kiểm tra',
+        paused: 'Đã dừng lại',
+        reconnect: 'Đã vào lại phòng'
     }
     /** Get routes MaBaiKT, MaSV, TenSV*/
     const data = route.params?.data;
@@ -47,7 +48,7 @@ const TestScreen = ({ route, navigation }) => {
     }, thisTest = { id: data?.MaBaiKT }
 
 
-    const [state, setState] = React.useState(stateInfo.waiting);
+    const [state, setState] = React.useState(undefined);
     const [autoNext, setAutoNext] = React.useState(true);
     const [isShowMenuQuestion, setShowMenuQuestion] = React.useState(false);
     const [isLoading, setLoading] = React.useState(false);
@@ -59,6 +60,9 @@ const TestScreen = ({ route, navigation }) => {
     const [questList, setQuestList] = React.useState([]);
     const [currentQuestion, setCurrentQuestion] = React.useState(undefined);
 
+    const appState = useRef(AppState.currentState);
+    const [appStateVisible, setAppStateVisible] = useState(appState.current);
+
 
     React.useEffect(() => {
 
@@ -67,6 +71,9 @@ const TestScreen = ({ route, navigation }) => {
 
         /** Socket IO Listener */
         SocketIO();
+
+        /** App state effect */
+        AppStateEffect();
 
     }, [])
 
@@ -93,7 +100,8 @@ const TestScreen = ({ route, navigation }) => {
             socket_id: '',
         };
         disconnectSocket();
-        inittiateSocket(thisTest.id, userForSocket, state, 1);
+
+        inittiateSocket(thisTest.id, userForSocket, stateInfo.waiting, 1);
 
         /** Listener */
 
@@ -104,9 +112,9 @@ const TestScreen = ({ route, navigation }) => {
             else setState(stateInfo.paused);
         });
 
-        teacherEditTest((err, data) => {
+        teacherEditTest((err, isRemove) => {
             if (err) return;
-            console.log(`t edit t: `, data);
+
         });
 
     }
@@ -124,6 +132,50 @@ const TestScreen = ({ route, navigation }) => {
 
         setLoading(false);
     }
+
+    /** App state effects */
+    const AppStateEffect = () => {
+
+        AppState.addEventListener("change", _handleAppStateChange);
+        return () => {
+            AppState.removeEventListener("change", _handleAppStateChange);
+        };
+    }
+
+    /** Handle app state change */
+    const _handleAppStateChange = (nextAppState) => {
+        if (
+            appState.current.match(/inactive|background/) &&
+            nextAppState === "active"
+        ) {
+            // console.log("App has come to the foreground!");
+        }
+
+        appState.current = nextAppState;
+        setAppStateVisible(appState.current);
+
+        if (appState.current == 'active') {
+            console.log(`[+] App comeback`);
+
+            let userForSocket = {
+                id: thisStudent.id,
+                room: thisTest.id,
+                name: thisStudent.name,
+                is_teacher: false,
+                socket_id: '',
+            };
+
+            /** Init */
+            disconnectSocket();
+            inittiateSocket(thisTest.id, userForSocket, stateInfo.reconnect, 3);
+        }
+        if (appState.current == 'background') {
+            console.log(`[-] App in background`);
+
+            /** Disconnect */
+            disconnectSocket();
+        }
+    };
 
     /** Get test status */
     const getTest_Status = async () => {
@@ -225,7 +277,7 @@ const TestScreen = ({ route, navigation }) => {
     function renderFooter() {
         return (
             <View style={{
-                ...styles.nextRevertBox
+                ...styles.nextAndPreviousBox
             }}>
                 <TouchableOpacity
                     onPress={() => {
@@ -355,25 +407,35 @@ const TestScreen = ({ route, navigation }) => {
     return (
         <View style={{ ...styles.container }}>
 
+            {/** Loading */}
+            <LoadingIndicator isLoading={isLoading}
+                style={{
+                    backgroundColor: state == undefined ? COLORS.white : COLORS.backgroundFade1
+                }} />
+
+
             {/** Navigate Bar*/}
             {renderNavigateBar()}
 
             {/** Contents */}
 
-            {state == stateInfo.waiting ?
-                (
-                    /** Waiting */
-                    <WaitingTest />
-                ) :
+            {state != stateInfo.testing &&
+
+                /** Waiting */
+                <WaitingTest />
+            }
+
+            {
+                state != stateInfo.waiting &&
+
                 /** Testing */
-                <View style={{ flex: 1 }}>
+                <View style={{ flex: 1, }}>
 
                     {/** Ques num && menu button */}
                     {renderNumberAndMenuButton()}
 
 
                     {/** Question */}
-
                     <ScrollView
                         showsVerticalScrollIndicator={false}
                         style={{
@@ -426,9 +488,6 @@ const TestScreen = ({ route, navigation }) => {
                 onPressItem={(item) => setCurrentQuestion(questList[item - 1])}
             />
 
-            {/** Loading . . . */}
-            <LoadingIndicator isLoading={isLoading} />
-
             {/** Pause test */}
             <PauseTestModal isShow={state == stateInfo.paused} />
 
@@ -445,7 +504,7 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: COLORS.white
     },
-    nextRevertBox: {
+    nextAndPreviousBox: {
         alignItems: 'center',
         flexDirection: 'row',
         position: 'absolute',

@@ -2,15 +2,14 @@ import { settings } from '../../app/config';
 
 let api = settings.hostURL;
 
-export const updateTestStatus = async (MaGV, MaBaiKT, toStatus) => {
+const getSubjectDetail = async (MaLopHP, MaBaiKT) => {
     let res = '';
 
     var data = new FormData();
+    data.append('MaLopHP', MaLopHP);
     data.append('MaBaiKT', MaBaiKT);
-    data.append('MaGV', MaGV);
-    data.append('toStatus', toStatus);
 
-    console.log(`thong tin: ${MaBaiKT} - ${MaGV} - ${toStatus}`);
+    console.log(MaBaiKT);
 
     var requestOptions = {
         method: 'POST',
@@ -18,7 +17,7 @@ export const updateTestStatus = async (MaGV, MaBaiKT, toStatus) => {
         redirect: 'follow',
     };
 
-    await fetch(api + 'BaiKiemTra/update-status.php', requestOptions)
+    await fetch(api + 'LopHocPhan/get-subject-detail.php', requestOptions)
         .then(response => response.json())
         .then(data => {
             res = data;
@@ -27,3 +26,5 @@ export const updateTestStatus = async (MaGV, MaBaiKT, toStatus) => {
 
     return res;
 };
+
+export { getSubjectDetail };

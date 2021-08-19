@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import {
     View,
     TouchableOpacity,
@@ -8,8 +8,8 @@ import {
     AppState,
     Image,
     Alert,
+    Animated
 } from 'react-native';
-import { useNavigation, useIsFocused, useRoute } from '@react-navigation/native';
 
 // Items
 import { Header } from '../../components/header';
@@ -20,7 +20,6 @@ import {
     inittiateSocket,
     requestServerLogs,
     disconnectSocket,
-    reconectSocketAuto,
     listenStudentInOut,
     requestStartTest,
     requestUpdateTestList,
@@ -31,31 +30,89 @@ import { updateTestStatus } from '../../../server/BaiKiemTra/update-status';
 import { getTestInfo } from '../../../server/TestInfo/get-test-info';
 import { getInfoBeforeTest } from '../../../server/TestInfo/get-info-before-test';
 import { AppRouter } from '../../../app/navigation/AppRouter';
+import { getTestStatus } from '../../../server/student-apis';
+import { getSubjectDetail, getTestingDetailt } from '../../../server';
 
-export const TeacherControl = ({ route }) => {
-    const nav = useNavigation();
-    const user = route.params?.user;
+/** Components */
+import { LoadingIndicator } from '../student/components'
+import { COLORS, STYLES, SIZES } from '../../assets/constants';
+
+export const TeacherControl = ({ route, navigation }) => {
+
+    const nav = navigation;
+    const _user = route.params?.user;
     const BaiKiemTra = route.params?.BaiKiemTra;
-    let _user = user[0];
+    const user = { id: _user[0]?.MaGV, name: _user[0]?.TenGV };
+
     // Refs
     let flatList = React.useRef();
     const appState = React.useRef(AppState.currentState);
 
     const [appStateVisible, setAppStateVisible] = useState(appState.current);
     const [usersStatusList, setUsersStatusList] = useState([]);
+    const [usersTestDetailList, setUsersTestDetailList] = useState([]);
     const [reRender, setReRender] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
+    const [isLoadingMain, setLoadingMain] = useState(false);
     const [testStatus, setTestStatus] = useState(1);
+    const [studentsQuantity, setStudentsQuantity] = useState(0);
+    const [studentTestQuantity, setStudentTestQuantity] = useState(0);
 
-    const statusInfo = ['Chưa hoàn thành', 'Bắt đầu', 'Tạm dừng', 'Tiếp tục'];
-    const statusInfoAction = ['Chưa hoàn thành', 'Hủy bỏ', 'Kết thúc', 'Kết thúc'];
+    const statusInfo = ['Chưa hoàn thành', 'Bắt đầu', 'Tạm dừng', 'Tiếp tục', 'Tạm dừng'];
+    const statusColor = [COLORS.black, COLORS.black, COLORS.black, COLORS.black, COLORS.black];
+    const statusInfoAction = ['Chưa hoàn thành', 'Hủy bỏ', 'Kết thúc', 'Kết thúc', 'Kết thúc'];
+    const textButton = ['chi tiết kiểm tra', 'lịch sử truy cập'];
+    const [buttonText, setButtonText] = useState(textButton[0]);
+    const [titleListText, setTitleListText] = useState(textButton[1]);
+
+    const listMarginRight = useRef(new Animated.Value(0)).current;
+    const listOpacity = new Animated.Value(1);
+
     //Effect
     useEffect(() => {
-        pressConnect();
-        reconectSocketAuto((err, data) => {
-            if (err) return;
-            console.log(data);
-        });
+
+        /** Load */
+        loadOption();
+
+        /** Socket listen */
+        socketIOListener();
+
+    }, []);
+
+    useEffect(() => {
+    })
+
+    useEffect(() => {
+
+        if (titleListText == textButton[1]) return;
+
+        /** Get testing detail */
+        getTesting_detail(BaiKiemTra.MaBaiKT);
+
+    }, [titleListText])
+
+    /** Load option */
+    const loadOption = async () => {
+
+        /** check test */
+        await checkTestStatus(BaiKiemTra.MaBaiKT);
+
+        /** get old data */
+        await getOldInfo(BaiKiemTra.MaBaiKT);
+
+        /** Get student quantity */
+        await getStudentQuantity(BaiKiemTra.MaBaiKT);
+
+        /** stop loading */
+        setIsLoading(false);
+    }
+
+    /** Socket IO */
+    const socketIOListener = async () => {
+
+        disconnectSocket();
+        inittiateSocket(BaiKiemTra.MaBKT, user, 'ko', 1);
+
         listenStudentInOut((err, data) => {
             if (err) return;
             console.log(data);
@@ -63,12 +120,32 @@ export const TeacherControl = ({ route }) => {
                 return [...currentList, data];
             });
         });
-        loadOption();
-    }, []);
+    }
 
-    //funcs
-    async function loadOption() {
-        //await getOldInfo(BaiKiemTra.MaBaiKT);
+    /** Check test status */
+    const checkTestStatus = async (testID) => {
+
+        let response = await getTestStatus(null, testID);
+        console.log(`res=`, response);
+        setTestStatus(response.status)
+    }
+
+    /** Get students quantity */
+    const getStudentQuantity = async (MaBKT) => {
+        let rs = await getSubjectDetail(1, MaBKT);
+        if (rs.code > 0) setStudentsQuantity(rs.data?.SoLuongSinhVien)
+    }
+
+    /** Testing detailt */
+    const getTesting_detail = async (testID, sort) => {
+        setIsLoading(true);
+        console.log(`dattestIDa_`, testID);
+        let rs = await getTestingDetailt(testID, sort);
+        if (rs.code <= 0) {
+            setIsLoading(false); return;
+        };
+        console.log(`data_`, rs.data);
+        await setUsersTestDetailList(rs.data)
         setIsLoading(false);
     }
 
@@ -81,25 +158,38 @@ export const TeacherControl = ({ route }) => {
     async function getOldInfoBefore(MaBKT) {
         setUsersStatusList([]);
         let res = await getInfoBeforeTest(MaBKT);
-        //console.log(MaBKT + 'RES: ', JSON.stringify(res));
+        console.log(MaBKT + 'RES: ', JSON.stringify(res));
         setUsersStatusList(res.data);
-    }
-
-    function pressConnect() {
-        disconnectSocket();
-        let data = {
-            id: _user.MaGV,
-            room: BaiKiemTra.MaBaiKT,
-            name: _user.TenGV,
-            is_teacher: true,
-            socket_id: null,
-        };
-        inittiateSocket(BaiKiemTra.MaBaiKT, data);
     }
 
     // Press students list
     function pressStudentsList() {
-        requestServerLogs();
+
+        if (listMarginRight._value > 0) {
+            setButtonText(textButton[0]);
+            setTitleListText(textButton[1])
+        } else {
+
+            setButtonText(textButton[1]);
+            setTitleListText(textButton[0])
+        }
+
+        const listMarginRightAnim = Animated.timing(listMarginRight, {
+            toValue: listMarginRight._value > 0 ? 0 : SIZES.width,
+            duration: 300,
+            useNativeDriver: false
+        })
+
+        const listOpacityAnim = Animated.timing(listOpacity, {
+            toValue: listMarginRight._value > 0 ? 0 : 1,
+            duration: listMarginRight._value > 0 ? 0 : 300,
+            useNativeDriver: false
+        })
+
+        Animated.stagger(300, [
+            listOpacityAnim,
+            listMarginRightAnim,
+        ]).start();
     }
 
     // Back button
@@ -107,6 +197,18 @@ export const TeacherControl = ({ route }) => {
         disconnectSocket();
         nav.goBack();
     };
+
+    /** Update test status */
+    const testStatusUpdate = async (toStatus) => {
+
+        setLoadingMain(true);
+
+        let rs = await updateTestStatus(user.id, BaiKiemTra.MaBaiKT, toStatus);
+
+        await setTimeout(() => {
+            rs?.code == toStatus && setLoadingMain(false)
+        }, 2000);
+    }
 
     function startTest(isStart) {
         Alert.alert(
@@ -118,56 +220,62 @@ export const TeacherControl = ({ route }) => {
                     onPress: () => {
                         if (isStart) {
 
-                            if (testStatus < 2) {
-                                // Start test
-                                requestStartTest(_user.MaGV, BaiKiemTra.MaBaiKT, true);
-                                setUsersStatusList(currentList => {
-                                    return [
-                                        ...currentList,
-                                        {
-                                            isConnect: true,
-                                            status: 5,
-                                            name: 'CÁC THÍ SINH ĐÃ BẮT ĐẦU LÀM BÀI',
-                                        },
-                                    ];
-                                });
-                                updateTestStatus(_user.MaGV, BaiKiemTra.MaBaiKT, 2);
-                                setTestStatus(2);
-                            } else if (testStatus > 2) {
-                                // Tiep tuc
-                                requestStartTest(_user.MaGV, BaiKiemTra.MaBaiKT, true);
-                                setUsersStatusList(currentList => {
-                                    return [
-                                        ...currentList,
-                                        {
-                                            isConnect: true,
-                                            status: 2,
-                                            name: 'BÀI KIỂM TRA ĐÃ TIẾP TỤC',
-                                        },
-                                    ];
-                                });
-                                updateTestStatus(_user.MaGV, BaiKiemTra.MaBaiKT, 2);
-                                setTestStatus(2);
-                            } else {
-                                // Tam dung
-                                requestStartTest(_user.MaGV, BaiKiemTra.MaBaiKT, false);
-                                setUsersStatusList(currentList => {
-                                    return [
-                                        ...currentList,
-                                        {
-                                            isConnect: true,
-                                            status: 3,
-                                            name: 'BÀI KIỂM TRA ĐÃ DỪNG LẠI',
-                                        },
-                                    ];
-                                });
-                                setTestStatus(3);
-                                updateTestStatus(_user.MaGV, BaiKiemTra.MaBaiKT, 3);
+                            switch (testStatus) {
+                                case '1': {
+                                    /** Waiting =>  Start test */
+                                    requestStartTest(user.id, BaiKiemTra.MaBaiKT, true);
+                                    setUsersStatusList(currentList => {
+                                        return [
+                                            ...currentList,
+                                            {
+                                                isConnect: true,
+                                                status: 5,
+                                                name: 'CÁC THÍ SINH ĐÃ \n BẮT ĐẦU LÀM BÀI',
+                                            },
+                                        ];
+                                    });
+                                    testStatusUpdate(2);
+                                    setTestStatus(2);
+                                } break;
+                                case '2': {
+                                    /**Runing => Pause test */
+                                    requestStartTest(user.id, BaiKiemTra.MaBaiKT, true);
+                                    setUsersStatusList(currentList => {
+                                        return [
+                                            ...currentList,
+                                            {
+                                                isConnect: true,
+                                                status: 3,
+                                                name: 'BÀI KIỂM TRA \nĐÃ DỪNG LẠI',
+                                            },
+                                        ];
+                                    });
+                                    testStatusUpdate(3);
+                                    setTestStatus(3);
+                                } break;
+                                case '3': {
+                                    /**Pause => Continue test (Runing)*/
+                                    requestStartTest(user.id, BaiKiemTra.MaBaiKT, true);
+                                    setUsersStatusList(currentList => {
+                                        return [
+                                            ...currentList,
+                                            {
+                                                isConnect: true,
+                                                status: 2,
+                                                name: 'BÀI KIỂM TRA \nĐÃ TIẾP TỤC',
+                                            },
+                                        ];
+                                    });
+                                    testStatusUpdate(2);
+                                    setTestStatus(2);
+                                } break;
+                                case '4': console.log(4); break;
+                                default: break;
                             }
 
                         } else {
                             // Cancel or fini test  
-                            updateTestStatus(_user.MaGV, BaiKiemTra.MaBaiKT, 0);
+                            testStatusUpdate(0);
                             setTimeout(() => {
                                 requestUpdateTestList(true, BaiKiemTra.MaBaiKT);
                             }, 2000);
@@ -195,7 +303,7 @@ export const TeacherControl = ({ route }) => {
 
                     {/** Class quantity */}
                     <Text style={[actionBar.text, { color: '#000', marginLeft: 15 }]}>
-                        Thí sinh đã vào: 30/69
+                        Thí sinh đã vào: {studentTestQuantity}/{studentsQuantity}
                     </Text>
 
                     {/** Button start/pause/resume */}
@@ -215,7 +323,7 @@ export const TeacherControl = ({ route }) => {
                     {testStatus > 1 ? (<TouchableOpacity
                         onPress={() => pressStudentsList()}
                         style={[actionBar.button, actionBar.longButton]}>
-                        <Text style={[actionBar.text]}>Danh Sách Thí Sinh</Text>
+                        <Text style={[actionBar.text]}>{buttonText}</Text>
                     </TouchableOpacity>) : <View />
                     }
                     <TouchableOpacity
@@ -232,11 +340,65 @@ export const TeacherControl = ({ route }) => {
         );
     };
 
-    // Render function main
+    /** List history & test detail */
+    function renderListAction() {
+
+        const renderItem = (item) => {
+            return (
+                <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between' }}>
+                    <Text>
+                        {item.TenSV}
+                    </Text>
+
+                    <Text>
+                        {item.TongSoCauDung} /{item.TongSoCauSai}/ {item.TongSoCauSai + item.TongSoCauDung}
+                    </Text>
+
+                </View>
+            )
+        }
+
+        return (
+            <View style={{ flex: 1, flexDirection: 'row' }}>
+
+                {/** List history */}
+                <Animated.View style={{ width: SIZES.width, right: listMarginRight }}>
+                    <FlatList
+                        ref={flatList}
+                        style={{ ...styles.flatList }}
+                        onContentSizeChange={() => flatList.current.scrollToEnd()}
+                        data={usersStatusList}
+                        extraData={reRender}
+                        keyExtractor={item =>
+                            item.socketid + (Math.random() * 1000).toString()
+                        }
+                        renderItem={({ item }) => <ItemJoinLeaveRoom item={item} />}
+                    />
+                </Animated.View>
+
+                {/** List test detail */}
+                <Animated.View style={{ width: SIZES.width, right: listMarginRight }}>
+                    <FlatList
+                        style={{ ...styles.flatList }}
+                        data={usersTestDetailList}
+                        extraData={reRender}
+                        keyExtractor={(item, index) => `${item}_${index}`
+                        }
+                        renderItem={({ item }) => renderItem(item)}
+                    />
+                </Animated.View>
+            </View>
+        )
+    }
+
+    // Render main
     return (
         <View style={{ flex: 1 }}>
+            <LoadingIndicator isLoading={isLoadingMain} />
             <Header
-                user={user}
+                isTeacher={true}
+                name={user.name}
+                user={[]}
                 leftHandle={() => {
                     _leftHandle();
                 }}
@@ -255,8 +417,8 @@ export const TeacherControl = ({ route }) => {
                     }}>
                     <View style={{ flex: 1, height: 1, backgroundColor: 'black' }} />
                     <View>
-                        <Text style={{ width: 170, textAlign: 'center', fontWeight: 'bold' }}>
-                            LỊCH SỬ TRUY CẬP
+                        <Text style={{ width: 170, textAlign: 'center', fontWeight: 'bold', textTransform: 'uppercase' }}>
+                            {titleListText}
                         </Text>
                     </View>
                     <View style={{ flex: 1, height: 1, backgroundColor: 'black' }} />
@@ -281,18 +443,9 @@ export const TeacherControl = ({ route }) => {
                     </View>
                 ) : usersStatusList?.length > 0 ? (
 
-                    /** List history */
-                    <FlatList
-                        ref={flatList}
-                        style={styles.flatList}
-                        onContentSizeChange={() => flatList.current.scrollToEnd()}
-                        data={usersStatusList}
-                        extraData={reRender}
-                        keyExtractor={item =>
-                            item.socketid + (Math.random() * 1000).toString()
-                        }
-                        renderItem={({ item }) => <ItemJoinLeaveRoom item={item} />}
-                    />
+                    /** List history & test detail*/
+                    renderListAction()
+
                 ) : (
 
                     /** When list null */
@@ -365,7 +518,8 @@ const actionBar = StyleSheet.create({
     },
     text: { fontSize: 14, color: '#fff', textTransform: 'uppercase' },
     button: {
-        backgroundColor: 'blue',
+        ...STYLES.shadow,
+        backgroundColor: COLORS.blue,
         paddingVertical: 6,
         paddingHorizontal: 10,
         borderRadius: 15,

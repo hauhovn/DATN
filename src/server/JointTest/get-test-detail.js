@@ -2,15 +2,13 @@ import { settings } from '../../app/config';
 
 let api = settings.hostURL;
 
-export const updateTestStatus = async (MaGV, MaBaiKT, toStatus) => {
+const getTestingDetailt = async (MaBaiKT, sort) => {
     let res = '';
 
     var data = new FormData();
     data.append('MaBaiKT', MaBaiKT);
-    data.append('MaGV', MaGV);
-    data.append('toStatus', toStatus);
 
-    console.log(`thong tin: ${MaBaiKT} - ${MaGV} - ${toStatus}`);
+    if (sort != undefined && sort != '') data.append('TuXauDenTot', sort);
 
     var requestOptions = {
         method: 'POST',
@@ -18,12 +16,15 @@ export const updateTestStatus = async (MaGV, MaBaiKT, toStatus) => {
         redirect: 'follow',
     };
 
-    await fetch(api + 'BaiKiemTra/update-status.php', requestOptions)
+    await fetch(api + 'ChiTietKQ/get-detail.php', requestOptions)
         .then(response => response.json())
         .then(data => {
             res = data;
+            //console.log('API LOGs: jont-test: ', data);
         })
         .catch(error => console.log('error', error));
 
     return res;
 };
+
+export { getTestingDetailt };
