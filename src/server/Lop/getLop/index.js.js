@@ -2,13 +2,8 @@ import {settings} from '../../../app/config';
 
 let api = settings.hostURL;
 
-const getLop = async MaGV => {
+const getLop = async () => {
   let res = '';
-
-  var data = new FormData();
-  data.append('MaGV', MaGV);
-
-  console.log('MaGV: ', MaGV);
 
   var requestOptions = {
     method: 'GET',

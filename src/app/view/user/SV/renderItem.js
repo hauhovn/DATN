@@ -13,7 +13,7 @@ export const RenderItem = ({item, data, handle, handleDelete}) => {
   };
 
   const marginBottom = () => {
-    if (item?.MaGV === data[data.length - 1]?.MaGV) {
+    if (item?.MaSV === data[data.length - 1]?.MaSV) {
       return 30;
     } else {
       return 5;
@@ -74,7 +74,7 @@ export const RenderItem = ({item, data, handle, handleDelete}) => {
             style={{fontSize: 14, color: '#9e2a2b', width: 20}}
           />
           <Text numberOfLines={1} style={{width: '100%', fontSize: 14}}>
-            Gới tính: {parseInt(item?.GioiTinh) === 1 ? 'Nam' : 'Nữ'}
+            Gới tính: {parseInt(item?.GioiTinh) === 0 ? 'Nam' : 'Nữ'}
           </Text>
         </View>
         <View
@@ -136,17 +136,24 @@ export const RenderItem = ({item, data, handle, handleDelete}) => {
             <Icon
               type="Fontisto"
               name="radio-btn-active"
-              style={{fontSize: 14, color: 'green', width: 20}}
+              style={{fontSize: 14, color: '#4CAF50', width: 20}}
             />
           ) : (
             <Icon
               type="FontAwesome5"
               name="lock"
-              style={{fontSize: 14, color: '#ee6123', width: 20}}
+              style={{fontSize: 14, color: Colors.red, width: 20}}
             />
           )}
 
-          <Text numberOfLines={1} style={{width: '100%', fontSize: 14}}>
+          <Text
+            numberOfLines={1}
+            style={{
+              width: '100%',
+              fontSize: 14,
+              color: parseInt(item?.TrangThai) === 0 ? '#4CAF50' : Colors.red,
+              fontWeight: parseInt(item?.TrangThai) === 0 ? 'bold' : 'normal',
+            }}>
             {parseInt(item?.TrangThai) === 0 ? 'Hoạt động' : 'Không hoạt động'}
           </Text>
         </View>

@@ -72,7 +72,11 @@ export const ListSV = () => {
 
   // Nhấn vô item để nhảy qua trang thông tin
   const handlePressItem = item => {
-    //
+    nav.navigate('NEWSV', {
+      type: 1,
+      user: par.user,
+      data: item,
+    });
   };
 
   // Nhấn nút delete
@@ -129,7 +133,10 @@ export const ListSV = () => {
                 }}>
                 <TouchableOpacity
                   onPress={() => {
-                    // ----------------------------------------
+                    nav.navigate('NEWSV', {
+                      type: 0,
+                      user: par.user,
+                    });
                   }}
                   activeOpacity={0.5}
                   style={{

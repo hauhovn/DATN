@@ -2,34 +2,41 @@ import {settings} from '../../../app/config';
 
 let api = settings.hostURL;
 
-const updateGVnew = async (
-  MaGV,
-  TenGV,
+const createSV = async (
+  TenSV,
   GioiTinh,
   DiaChi,
-  isAdmin,
-  TrangThai,
+  SDT,
+  Mail,
+  Password,
+  MaLop,
 ) => {
   let res = '';
 
   console.log(
-    'TenGV: ',
-    TenGV,
+    'TenSV: ',
+    TenSV,
     ' GioiTinh: ',
     GioiTinh,
     ' DiaChi: ',
     DiaChi,
-    ' isAdmin: ',
-    isAdmin,
+    ' SDT: ',
+    SDT,
+    ' Mail: ',
+    Mail,
+    ' Password: ',
+    Password,
+    ' MaLop: ',
+    MaLop,
   );
 
   var data = new FormData();
-  data.append('MaGV', MaGV);
-  data.append('TenGV', TenGV);
+  data.append('TenSV', TenSV);
   data.append('GioiTinh', GioiTinh);
   data.append('DiaChi', DiaChi);
-  data.append('isAdmin', isAdmin);
-  data.append('TrangThai', TrangThai);
+  data.append('Password', Password);
+  data.append('Mail', Mail);
+  data.append('MaLop', MaLop);
 
   var requestOptions = {
     method: 'POST',
@@ -37,7 +44,7 @@ const updateGVnew = async (
     redirect: 'follow',
   };
 
-  await fetch(api + 'GiangVien/updateGVnew.php', requestOptions)
+  await fetch(api + 'SinhVien/createSV.php', requestOptions)
     .then(response => response.json())
     .then(data => {
       res = data;
@@ -48,4 +55,4 @@ const updateGVnew = async (
   return res;
 };
 
-export {updateGVnew};
+export {createSV};
