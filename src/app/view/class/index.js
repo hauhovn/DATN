@@ -10,21 +10,25 @@ import {
   Modal,
   TextInput,
 } from 'react-native';
-import {settings} from '../../../config';
+import {settings} from '../../config';
 import {Icon, Fab} from 'native-base';
-import {AppRouter} from '../../../navigation/AppRouter';
-import {Header} from '../../../components/header';
+import {AppRouter} from '../../navigation/AppRouter';
+import {Header} from '../../components/header';
 import {RenderItem} from './renderItem';
 import {useNavigation} from '@react-navigation/native';
 
-import {getMH} from '../../../../server/MonHoc/getMH';
-import {createMH} from '../../../../server/MonHoc/createMH';
-import {deleteMH} from '../../../../server/MonHoc/deleteMH';
+import {getMH} from '../../../server/MonHoc/getMH';
+import {createMH} from '../../../server/MonHoc/createMH';
+import {deleteMH} from '../../../server/MonHoc/deleteMH';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {updateMH} from '../../../../server/MonHoc/updateMH';
+import {updateMH} from '../../../server/MonHoc/updateMH';
+import {getLop} from '../../../server/Lop/getLop/index.js';
+import {createLop} from '../../../server/Lop/createLop/index.js';
+import {updateLop} from '../../../server/Lop/updateLop/index.js';
+import {deleteLop} from '../../../server/Lop/deleteLop';
 
-export const ListObject = () => {
+export const ListClass = () => {
   const nav = useNavigation();
   const [data, setData] = useState('');
   const [refreshing, setRefreshing] = React.useState(false);
@@ -76,7 +80,6 @@ export const ListObject = () => {
       setFlag(0);
       setTenMH('');
       setTinChi('');
-      setTiet('');
       setLoading(false);
     }
   }, [showModal]);
@@ -94,7 +97,8 @@ export const ListObject = () => {
   // Lấy danh sách môn học
   const getData = async () => {
     try {
-      const res = await getMH();
+      const res = await getLop();
+      console.log(res);
       setData(res.data);
     } catch (error) {
       console.log(error);
@@ -104,10 +108,9 @@ export const ListObject = () => {
   // Tạo môn học mới
   const postData = async () => {
     try {
-      const res = await createMH(tenMH, tinChi, tiet);
+      const res = await createLop(tenMH, tinChi);
       setTenMH('');
       setTinChi('');
-      setTiet('');
       setResPOST(res);
     } catch (error) {
       console.log(error);
@@ -117,11 +120,10 @@ export const ListObject = () => {
   // Sua môn học
   const postDataEdit = async () => {
     try {
-      const res = await updateMH(currentObject, tenMH, tinChi, tiet);
+      const res = await updateLop(currentObject, tenMH, tinChi);
       setFlag(0);
       setTenMH('');
       setTinChi('');
-      setTiet('');
       setResPOST(res);
     } catch (error) {
       console.log(error);
@@ -131,7 +133,7 @@ export const ListObject = () => {
   // Xóa môn học
   const postDel = async data => {
     try {
-      const res = await deleteMH(data);
+      const res = await deleteLop(data);
     } catch (error) {
       console.log(error);
     }
@@ -139,18 +141,14 @@ export const ListObject = () => {
 
   // Nhấn vô item
   const handlePressItem = item => {
-    // nav.navigate(AppRouter.LISTEXERCISE, {
-    //   item: item,
-    //   user: user,
-    // });
+    console.log(item);
 
     if (user[0]?.isAdmin !== undefined && parseInt(user[0]?.isAdmin) === 1) {
       setFlag(1);
 
-      setCurrentObject(item.MaMH);
-      setTenMH(item.TenMonHoc);
-      setTinChi(item.SoTinChi);
-      setTiet(item.SoTiet);
+      setCurrentObject(item.MaLop);
+      setTenMH(item.TenLop);
+      setTinChi(item.SoLuongSV);
 
       setModal(true);
     }
@@ -164,7 +162,7 @@ export const ListObject = () => {
 
   // Nhấn nút xóa môn học
   const del = item => {
-    postDel(item?.MaMH);
+    postDel(item?.MaLop);
     onRefresh();
   };
 
@@ -187,7 +185,7 @@ export const ListObject = () => {
                         marginBottom: 5,
                         fontSize: 16,
                       }}>
-                      DANH SÁCH MÔN HỌC
+                      DANH SÁCH LỚP HỌC
                     </Text>
                   </View>
                 }
@@ -239,7 +237,7 @@ export const ListObject = () => {
       ) : (
         <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
           <Image
-            source={require('../../../asset/gif/load321.gif')}
+            source={require('../../asset/gif/load321.gif')}
             resizeMode="contain"
             style={{width: 100, height: 100}}
           />
@@ -278,7 +276,7 @@ export const ListObject = () => {
               style={{
                 width: '90%',
                 backgroundColor: '#fff',
-                height: 370,
+                height: 285,
                 borderRadius: 12,
               }}>
               <View
@@ -296,7 +294,7 @@ export const ListObject = () => {
                     fontWeight: 'bold',
                     flex: 1,
                   }}>
-                  THÊM MÔN HỌC
+                  {flag === 0 ? 'THÊM' : 'SỬA'} LỚP HỌC
                 </Text>
                 <TouchableOpacity
                   onPress={() => {
@@ -323,7 +321,7 @@ export const ListObject = () => {
                   color: settings.colors.colorGreen,
                   marginLeft: 10,
                 }}>
-                Tên môn học
+                Tên lớp học
               </Text>
               <View
                 style={{
@@ -335,7 +333,7 @@ export const ListObject = () => {
                   borderRadius: 12,
                 }}>
                 <TextInput
-                  placeholder="Tên môn học"
+                  placeholder="Tên lớp học"
                   placeholderTextColor="#B0BEC5"
                   value={tenMH}
                   onChangeText={t => {
@@ -355,7 +353,7 @@ export const ListObject = () => {
                   color: settings.colors.colorGreen,
                   marginLeft: 10,
                 }}>
-                Số tín chỉ
+                Số sinh viên
               </Text>
               <View
                 style={{
@@ -367,7 +365,7 @@ export const ListObject = () => {
                   borderRadius: 12,
                 }}>
                 <TextInput
-                  placeholder="Số tín chỉ"
+                  placeholder="Số sinh viên"
                   placeholderTextColor="#B0BEC5"
                   value={tinChi}
                   keyboardType="number-pad"
@@ -382,39 +380,7 @@ export const ListObject = () => {
                   }}
                 />
               </View>
-              <Text
-                style={{
-                  marginTop: 10,
-                  color: settings.colors.colorGreen,
-                  marginLeft: 10,
-                }}>
-                Số tiết
-              </Text>
-              <View
-                style={{
-                  height: 50,
-                  marginTop: 5,
-                  marginHorizontal: 10,
-                  borderWidth: 1,
-                  borderColor: settings.colors.colorBoderDark,
-                  borderRadius: 12,
-                }}>
-                <TextInput
-                  placeholder="Số tiết"
-                  placeholderTextColor="#B0BEC5"
-                  keyboardType="number-pad"
-                  value={tiet}
-                  onChangeText={t => {
-                    setTiet(t);
-                  }}
-                  style={{
-                    flex: 1,
-                    marginHorizontal: 10,
-                    marginVertical: 2,
-                    color: '#000',
-                  }}
-                />
-              </View>
+
               <View style={{height: 10}} />
 
               <TouchableOpacity
@@ -432,7 +398,7 @@ export const ListObject = () => {
                   justifyContent: 'center',
                 }}>
                 <Text style={{color: '#ffF', fontSize: 14, fontWeight: 'bold'}}>
-                  {flag === 0 ? 'THÊM MÔN HỌC' : 'LƯU LẠI'}
+                  {flag === 0 ? 'THÊM LỚP HỌC' : 'LƯU LẠI'}
                 </Text>
               </TouchableOpacity>
             </View>

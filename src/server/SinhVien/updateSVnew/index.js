@@ -2,7 +2,7 @@ import {settings} from '../../../app/config';
 
 let api = settings.hostURL;
 
-const updateSVnew = async (MaSV, TenSV, GioiTinh, DiaChi, MaLop) => {
+const updateSVnew = async (MaSV, TenSV, GioiTinh, DiaChi, MaLop, TrangThai) => {
   let res = '';
 
   console.log('TenSV: ', TenSV, ' GioiTinh: ', GioiTinh, ' DiaChi: ', DiaChi);
@@ -13,6 +13,7 @@ const updateSVnew = async (MaSV, TenSV, GioiTinh, DiaChi, MaLop) => {
   data.append('GioiTinh', GioiTinh);
   data.append('DiaChi', DiaChi);
   data.append('MaLop', MaLop);
+  data.append('TrangThai', TrangThai);
 
   var requestOptions = {
     method: 'POST',

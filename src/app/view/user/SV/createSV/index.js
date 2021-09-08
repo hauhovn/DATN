@@ -6,19 +6,14 @@ import {
   TextInput,
   ScrollView,
   StyleSheet,
-  Alert,
   KeyboardAvoidingView,
 } from 'react-native';
 import {settings} from '../../../../config';
-import {Textarea, CheckBox, Icon} from 'native-base';
+import {CheckBox, Icon} from 'native-base';
 import {Header} from '../../../../components/header';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import Toast from 'react-native-simple-toast';
-import {AppRouter} from '../../../../navigation/AppRouter';
-import {createCH} from '../../../../../server/MonHoc/createCH';
-import {Colors, ErrorNotification, GreenStyles} from 'green-native';
-import {createGV} from '../../../../../server/GiangVien/addGV';
-import {updateGVnew} from '../../../../../server/GiangVien/updateGV';
+import {Colors, ErrorNotification} from 'green-native';
 import {getLop} from '../../../../../server/Lop/getLop/index.js';
 import {Picker} from '@react-native-picker/picker';
 import {createSV} from '../../../../../server/SinhVien/addSV';
@@ -33,6 +28,8 @@ export const CreateNewSV = () => {
 
   let pickerRef = useRef();
 
+  const [flag, setFlag] = useState(0);
+
   const [tenGV, setTenGV] = useState('');
   const [gioiTinh, setGioiTinh] = useState(0);
   const [diaChi, setDiaChi] = useState('');
@@ -40,8 +37,7 @@ export const CreateNewSV = () => {
   const [mail, setMail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [lop, setLop] = useState(0);
-  const [admin, setAdmin] = useState(0);
+  const [lop, setLop] = useState(-1);
   const [trangThai, setTrangThai] = useState(0);
 
   const [showPassword, setShowPassword] = useState(true);
@@ -60,10 +56,16 @@ export const CreateNewSV = () => {
       setSoDienThoai(route.params.data?.SDT);
       setMail(route.params.data?.Mail);
       setTrangThai(parseInt(route.params.data?.TrangThai));
-      setLop(parseInt(route.params.data?.MaLop));
-      // setMail(route.params.data?.Mail);
     }
   }, []);
+
+  useEffect(() => {
+    if (lop !== -1 && flag == 0) {
+      setLop(parseInt(route.params.data?.MaLop));
+      setLopLable(route.params.data?.TenLop);
+      setFlag(1);
+    }
+  }, [lop]);
 
   const getDataLop = async () => {
     try {
@@ -86,10 +88,9 @@ export const CreateNewSV = () => {
         lop,
       );
 
-      console.log(response);
       Toast.show(response?.status, Toast.SHORT);
 
-      if (response?.status === 'Thành công"') {
+      if (response?.status === 'Thành công') {
         nav.goBack();
       }
     } catch (error) {
@@ -99,7 +100,14 @@ export const CreateNewSV = () => {
 
   const postEdit = async () => {
     try {
-      await updateSVnew(route.params?.data?.MaSV, tenGV, gioiTinh, diaChi, 1);
+      await updateSVnew(
+        route.params?.data?.MaSV,
+        tenGV,
+        gioiTinh,
+        diaChi,
+        lop,
+        trangThai,
+      );
       Toast.show('Thành công', Toast.SHORT);
       nav.goBack();
     } catch (error) {
@@ -151,7 +159,7 @@ export const CreateNewSV = () => {
   const handleEditGV = () => {
     setErrorText('');
     if (tenGV.trim() === '') {
-      setErrorText('Vui lòng nhập tên giáo viên');
+      setErrorText('Vui lòng nhập tên sinh viên');
     } else {
       if (diaChi.trim() === '') {
         setErrorText('Vui lòng nhập địa chỉ');
@@ -558,6 +566,7 @@ export const CreateNewSV = () => {
             mode="dialog"
             selectedValue={lop}
             onValueChange={(value, index) => {
+              console.log('change: ', value);
               setLop(value);
               setLopLable(dataLop[index].TenLop);
             }}

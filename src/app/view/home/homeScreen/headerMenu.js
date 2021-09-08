@@ -15,7 +15,15 @@ const MAX_HEIGHT = Platform.OS === 'ios' ? 290 : 240;
 
 const mainColor = settings.colors.colorMain;
 
-export const HeaderMenu = ({headerY, imageOpacity, imageY, Handle}) => {
+export const HeaderMenu = ({
+  headerY,
+  imageOpacity,
+  imageY,
+  Handle,
+  changePass,
+}) => {
+  const navigation = useNavigation();
+
   const HeaderHandle = value => {
     Handle(value);
   };
@@ -89,45 +97,45 @@ export const HeaderMenu = ({headerY, imageOpacity, imageY, Handle}) => {
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => {
-              HeaderHandle('Bài kết thúc');
+              HeaderHandle('Lớp học');
             }}
             activeOpacity={0.5}
             style={items.container}>
             <View style={items.button}>
               <Icon
-                type="Ionicons"
-                name="checkmark-done-circle-outline"
+                type="MaterialCommunityIcons"
+                name="home-lightbulb-outline"
                 style={{
                   fontSize: 24,
                   color: mainColor,
                 }}
               />
             </View>
-            <Text style={items.textTitle}>Đã kết thúc</Text>
+            <Text style={items.textTitle}>Lớp học</Text>
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => {
-              HeaderHandle('Sắp diễn ra');
+              HeaderHandle('Đổi thông tin');
             }}
             activeOpacity={0.5}
             style={items.container}>
             <View style={items.button}>
               <Icon
-                type="Ionicons"
-                name="stopwatch-outline"
+                type="SimpleLineIcons"
+                name="user"
                 style={{
-                  fontSize: 26,
+                  fontSize: 18,
                   color: mainColor,
                 }}
               />
             </View>
-            <Text style={items.textTitle}>Sắp diễn ra</Text>
+            <Text style={items.textTitle}>Đổi thông tin</Text>
           </TouchableOpacity>
         </SafeAreaView>
         <View style={{flex: 1, flexDirection: 'row', alignItems: 'center'}}>
           <TouchableOpacity
             onPress={() => {
-              HeaderHandle('Đổi mật khẩu');
+              HeaderHandle('CHANGEPASS');
             }}
             activeOpacity={0.5}
             style={items.container}>

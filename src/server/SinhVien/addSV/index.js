@@ -33,6 +33,7 @@ const createSV = async (
   var data = new FormData();
   data.append('TenSV', TenSV);
   data.append('GioiTinh', GioiTinh);
+  data.append('SDT', SDT);
   data.append('DiaChi', DiaChi);
   data.append('Password', Password);
   data.append('Mail', Mail);

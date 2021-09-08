@@ -2,6 +2,7 @@ import React from 'react';
 import {View, Text, TouchableOpacity, Dimensions} from 'react-native';
 import {Icon} from 'native-base';
 import {settings} from '../../../config';
+import {Colors} from 'green-native';
 
 export const RenderItem = ({item, data, handle, handleDelete}) => {
   const getMarginTop = () => {
@@ -22,10 +23,6 @@ export const RenderItem = ({item, data, handle, handleDelete}) => {
 
   const pressItem = () => {
     handle(item);
-  };
-
-  const deleteQuest = () => {
-    handleDelete(item);
   };
 
   return (
@@ -132,6 +129,22 @@ export const RenderItem = ({item, data, handle, handleDelete}) => {
             alignItems: 'center',
             marginTop: 5,
           }}>
+          <Icon
+            type="FontAwesome"
+            name="building-o"
+            style={{fontSize: 14, color: Colors.purpleDark, width: 20}}
+          />
+          <Text numberOfLines={1} style={{width: '100%', fontSize: 14}}>
+            Lớp: {item?.TenLop}
+          </Text>
+        </View>
+        <View
+          style={{
+            width: '100%',
+            flexDirection: 'row',
+            alignItems: 'center',
+            marginTop: 5,
+          }}>
           {parseInt(item?.TrangThai) === 0 ? (
             <Icon
               type="Fontisto"
@@ -152,7 +165,7 @@ export const RenderItem = ({item, data, handle, handleDelete}) => {
               width: '100%',
               fontSize: 14,
               color: parseInt(item?.TrangThai) === 0 ? '#4CAF50' : Colors.red,
-              fontWeight: parseInt(item?.TrangThai) === 0 ? 'bold' : 'normal',
+              fontWeight: 'bold',
             }}>
             {parseInt(item?.TrangThai) === 0 ? 'Hoạt động' : 'Không hoạt động'}
           </Text>

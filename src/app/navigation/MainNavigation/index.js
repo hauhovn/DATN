@@ -11,6 +11,7 @@ import {TeacherControl} from '../../view/teacherControl';
 import {TestScreen, TestResultScreen} from '../../view/student/views';
 import {CreateNewGV} from '../../view/user/GV/createGV';
 import {CreateNewSV} from '../../view/user/SV/createSV';
+import {AboutMe} from '../../view/about';
 
 const Stack = createStackNavigator();
 
@@ -57,7 +58,6 @@ function MainNavigation() {
         component={TeacherControl}
         options={{headerShown: false}}
       />
-
       <Stack.Screen
         name={'NEWGV'}
         component={CreateNewGV}
@@ -66,6 +66,11 @@ function MainNavigation() {
       <Stack.Screen
         name={'NEWSV'}
         component={CreateNewSV}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen
+        name={'AboutMe'}
+        component={AboutMe}
         options={{headerShown: false}}
       />
     </Stack.Navigator>
