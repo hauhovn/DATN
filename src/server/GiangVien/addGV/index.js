@@ -2,13 +2,14 @@ import {settings} from '../../../app/config';
 
 let api = settings.hostURL;
 
-const updateGVnew = async (
-  MaGV,
+const createGV = async (
   TenGV,
   GioiTinh,
   DiaChi,
+  SDT,
+  Mail,
+  Password,
   isAdmin,
-  TrangThai,
 ) => {
   let res = '';
 
@@ -19,17 +20,17 @@ const updateGVnew = async (
     GioiTinh,
     ' DiaChi: ',
     DiaChi,
-    ' isAdmin: ',
-    isAdmin,
+    ' SDT: ',
+    SDT,
   );
 
   var data = new FormData();
-  data.append('MaGV', MaGV);
   data.append('TenGV', TenGV);
   data.append('GioiTinh', GioiTinh);
   data.append('DiaChi', DiaChi);
+  data.append('Password', Password);
+  data.append('Mail', Mail);
   data.append('isAdmin', isAdmin);
-  data.append('TrangThai', TrangThai);
 
   var requestOptions = {
     method: 'POST',
@@ -37,7 +38,7 @@ const updateGVnew = async (
     redirect: 'follow',
   };
 
-  await fetch(api + 'GiangVien/updateGVnew.php', requestOptions)
+  await fetch(api + 'GiangVien/createGV.php', requestOptions)
     .then(response => response.json())
     .then(data => {
       res = data;
@@ -48,4 +49,4 @@ const updateGVnew = async (
   return res;
 };
 
-export {updateGVnew};
+export {createGV};

@@ -2,15 +2,20 @@ import {settings} from '../../../app/config';
 
 let api = settings.hostURL;
 
-const getLop = async () => {
+const createLop = async (TenLop, SoLuongSV) => {
   let res = '';
 
+  var data = new FormData();
+  data.append('TenLop', TenLop);
+  data.append('SoLuongSV', SoLuongSV);
+
   var requestOptions = {
-    method: 'GET',
+    method: 'POST',
+    body: data,
     redirect: 'follow',
   };
 
-  await fetch(api + 'Lop/getLop.php', requestOptions)
+  await fetch(api + 'Lop/createLop.php', requestOptions)
     .then(response => response.json())
     .then(data => {
       res = data;
@@ -20,4 +25,4 @@ const getLop = async () => {
   return res;
 };
 
-export {getLop};
+export {createLop};

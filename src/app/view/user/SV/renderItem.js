@@ -2,6 +2,7 @@ import React from 'react';
 import {View, Text, TouchableOpacity, Dimensions} from 'react-native';
 import {Icon} from 'native-base';
 import {settings} from '../../../config';
+import {Colors} from 'green-native';
 
 export const RenderItem = ({item, data, handle, handleDelete}) => {
   const getMarginTop = () => {
@@ -13,7 +14,7 @@ export const RenderItem = ({item, data, handle, handleDelete}) => {
   };
 
   const marginBottom = () => {
-    if (item?.MaGV === data[data.length - 1]?.MaGV) {
+    if (item?.MaSV === data[data.length - 1]?.MaSV) {
       return 30;
     } else {
       return 5;
@@ -22,10 +23,6 @@ export const RenderItem = ({item, data, handle, handleDelete}) => {
 
   const pressItem = () => {
     handle(item);
-  };
-
-  const deleteQuest = () => {
-    handleDelete(item);
   };
 
   return (
@@ -74,7 +71,7 @@ export const RenderItem = ({item, data, handle, handleDelete}) => {
             style={{fontSize: 14, color: '#9e2a2b', width: 20}}
           />
           <Text numberOfLines={1} style={{width: '100%', fontSize: 14}}>
-            Gới tính: {parseInt(item?.GioiTinh) === 1 ? 'Nam' : 'Nữ'}
+            Gới tính: {parseInt(item?.GioiTinh) === 0 ? 'Nam' : 'Nữ'}
           </Text>
         </View>
         <View
@@ -132,21 +129,44 @@ export const RenderItem = ({item, data, handle, handleDelete}) => {
             alignItems: 'center',
             marginTop: 5,
           }}>
+          <Icon
+            type="FontAwesome"
+            name="building-o"
+            style={{fontSize: 14, color: Colors.purpleDark, width: 20}}
+          />
+          <Text numberOfLines={1} style={{width: '100%', fontSize: 14}}>
+            Lớp: {item?.TenLop}
+          </Text>
+        </View>
+        <View
+          style={{
+            width: '100%',
+            flexDirection: 'row',
+            alignItems: 'center',
+            marginTop: 5,
+          }}>
           {parseInt(item?.TrangThai) === 0 ? (
             <Icon
               type="Fontisto"
               name="radio-btn-active"
-              style={{fontSize: 14, color: 'green', width: 20}}
+              style={{fontSize: 14, color: '#4CAF50', width: 20}}
             />
           ) : (
             <Icon
               type="FontAwesome5"
               name="lock"
-              style={{fontSize: 14, color: '#ee6123', width: 20}}
+              style={{fontSize: 14, color: Colors.red, width: 20}}
             />
           )}
 
-          <Text numberOfLines={1} style={{width: '100%', fontSize: 14}}>
+          <Text
+            numberOfLines={1}
+            style={{
+              width: '100%',
+              fontSize: 14,
+              color: parseInt(item?.TrangThai) === 0 ? '#4CAF50' : Colors.red,
+              fontWeight: 'bold',
+            }}>
             {parseInt(item?.TrangThai) === 0 ? 'Hoạt động' : 'Không hoạt động'}
           </Text>
         </View>

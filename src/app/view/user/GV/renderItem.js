@@ -2,6 +2,7 @@ import React from 'react';
 import {View, Text, TouchableOpacity, Dimensions} from 'react-native';
 import {Icon} from 'native-base';
 import {settings} from '../../../config';
+import {Colors} from 'green-native';
 
 export const RenderItem = ({item, data, handle, handleDelete}) => {
   const getMarginTop = () => {
@@ -74,7 +75,7 @@ export const RenderItem = ({item, data, handle, handleDelete}) => {
             style={{fontSize: 14, color: '#9e2a2b', width: 20}}
           />
           <Text numberOfLines={1} style={{width: '100%', fontSize: 14}}>
-            Gới tính: {parseInt(item?.GioiTinh) === 1 ? 'Nam' : 'Nữ'}
+            Gới tính: {parseInt(item?.GIoiTinh) === 0 ? 'Nam' : 'Nữ'}
           </Text>
         </View>
         <View
@@ -125,6 +126,34 @@ export const RenderItem = ({item, data, handle, handleDelete}) => {
             Địa chỉ: {item?.DiaChi}
           </Text>
         </View>
+
+        <View
+          style={{
+            width: '100%',
+            flexDirection: 'row',
+            alignItems: 'center',
+            marginTop: 5,
+          }}>
+          <Icon
+            type="Ionicons"
+            name="ios-ribbon-sharp"
+            style={{fontSize: 14, color: '#1E88E5', width: 20}}
+          />
+
+          <Text numberOfLines={1} style={{width: '100%', fontSize: 14}}>
+            Loại tài khoản:
+            <Text
+              numberOfLines={1}
+              style={{
+                fontWeight: parseInt(item?.isAdmin) === 1 ? 'bold' : 'normal',
+                color: parseInt(item?.isAdmin) === 1 ? '#4CAF50' : '#000',
+              }}>
+              {' '}
+              {parseInt(item?.isAdmin) === 0 ? 'Thường' : 'Admin'}
+            </Text>
+          </Text>
+        </View>
+
         <View
           style={{
             width: '100%',
@@ -136,17 +165,24 @@ export const RenderItem = ({item, data, handle, handleDelete}) => {
             <Icon
               type="Fontisto"
               name="radio-btn-active"
-              style={{fontSize: 14, color: 'green', width: 20}}
+              style={{fontSize: 14, color: '#4CAF50', width: 20}}
             />
           ) : (
             <Icon
               type="FontAwesome5"
               name="lock"
-              style={{fontSize: 14, color: '#ee6123', width: 20}}
+              style={{fontSize: 14, color: Colors.red, width: 20}}
             />
           )}
 
-          <Text numberOfLines={1} style={{width: '100%', fontSize: 14}}>
+          <Text
+            numberOfLines={1}
+            style={{
+              width: '100%',
+              fontSize: 14,
+              color: parseInt(item?.TrangThai) === 0 ? '#4CAF50' : Colors.red,
+              fontWeight: parseInt(item?.TrangThai) === 0 ? 'bold' : 'normal',
+            }}>
             {parseInt(item?.TrangThai) === 0 ? 'Hoạt động' : 'Không hoạt động'}
           </Text>
         </View>

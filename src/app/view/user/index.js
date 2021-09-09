@@ -7,7 +7,7 @@ import {
   Text,
   DefaultTabBar,
 } from 'native-base';
-import {useNavigation, useRoute} from '@react-navigation/native';
+import {useRoute} from '@react-navigation/native';
 import {settings} from '../../config';
 import {Header} from '../../components/header';
 

@@ -2,15 +2,19 @@ import {settings} from '../../../app/config';
 
 let api = settings.hostURL;
 
-const getLop = async () => {
+const deleteLop = async MaLop => {
   let res = '';
 
+  var data = new FormData();
+  data.append('MaLop', MaLop);
+
   var requestOptions = {
-    method: 'GET',
+    method: 'POST',
+    body: data,
     redirect: 'follow',
   };
 
-  await fetch(api + 'Lop/getLop.php', requestOptions)
+  await fetch(api + 'Lop/deleteLop.php', requestOptions)
     .then(response => response.json())
     .then(data => {
       res = data;
@@ -20,4 +24,4 @@ const getLop = async () => {
   return res;
 };
 
-export {getLop};
+export {deleteLop};

@@ -64,6 +64,7 @@ export const HomeScreen = () => {
   // ------ nhấn item trên header
   const HeaderHandle = value => {
     console.log('HeaderHandle: ', value);
+
     if (value === 'Môn học') {
       nav.navigate(AppRouter.COURSE);
     }
@@ -83,7 +84,7 @@ export const HomeScreen = () => {
       nav.navigate(AppRouter.LISTLHP);
     }
 
-    if (value === 'Đổi mật khẩu') {
+    if (value === 'CHANGEPASS') {
       nav.navigate(AppRouter.CHANGEPASS);
     }
   };
@@ -500,7 +501,7 @@ export const HomeScreen = () => {
             {user[0]?.TenGV} {user[0]?.TenSV}
           </Text>
         </View>
-        <TouchableOpacity
+        {/* <TouchableOpacity
           activeOpacity={0.5}
           style={{
             height: 60,
@@ -518,7 +519,7 @@ export const HomeScreen = () => {
               marginRight: -3,
             }}
           />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </Animated.View>
     </SafeAreaView>
   );

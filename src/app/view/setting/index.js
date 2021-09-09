@@ -114,7 +114,7 @@ export const UserScreen = ({navigation, route}) => {
       <View style={styles.fakeView} />
       <View style={styles.fakeViewA} />
       <View style={styles.fakeViewC} />
-      <View style={styles.viewImageContainer}>
+      {/* <View style={styles.viewImageContainer}>
         <View style={styles.viewImage}>
           {getImage() ? (
             <Image source={{uri: url}} style={styles.imgAvatar} />
@@ -125,7 +125,7 @@ export const UserScreen = ({navigation, route}) => {
             />
           )}
         </View>
-      </View>
+      </View> */}
       <View style={body.containerX}>
         <View style={body.fakeView} />
         <View style={styles.infoContainer}>
@@ -149,7 +149,7 @@ export const UserScreen = ({navigation, route}) => {
             </View>
           </View>
           <View style={{flex: 1}} />
-          <TouchableOpacity
+          {/* <TouchableOpacity
             onPress={() => {
               handleChangeAvatar();
             }}
@@ -165,7 +165,7 @@ export const UserScreen = ({navigation, route}) => {
               }}
             />
             <Text style={styles.txtAvatar}>Avatar</Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
       </View>
       <View style={styles.fakeViewB} />
@@ -455,7 +455,7 @@ const body = StyleSheet.create({
   },
   containerX: {
     width: '100%',
-    marginTop: 10,
+    marginTop: 30,
     paddingBottom: 15,
     backgroundColor: '#fff',
 

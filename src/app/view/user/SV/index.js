@@ -72,7 +72,13 @@ export const ListSV = () => {
 
   // Nhấn vô item để nhảy qua trang thông tin
   const handlePressItem = item => {
-    //
+    parseInt(par.user[0]?.isAdmin) === 1
+      ? nav.navigate('NEWSV', {
+          type: 1,
+          user: par.user,
+          data: item,
+        })
+      : console.log('x');
   };
 
   // Nhấn nút delete
@@ -118,37 +124,42 @@ export const ListSV = () => {
                 keyExtractor={item => item.MaSV}
                 style={{flex: 1, paddingTop: 10, backgroundColor: '#fff'}}
               />
-              <View
-                style={{
-                  width: '100%',
-                  height: 50,
-                  marginTop: -65,
-                  alignItems: 'flex-end',
-                  paddingRight: 15,
-                  marginBottom: 15,
-                }}>
-                <TouchableOpacity
-                  onPress={() => {
-                    // ----------------------------------------
-                  }}
-                  activeOpacity={0.5}
+              {par.user[0]?.isAdmin == 1 && (
+                <View
                   style={{
-                    width: 55,
-                    height: 55,
-                    borderRadius: 500,
-                    backgroundColor: settings.colors.colorMain,
-                    borderWidth: 0.5,
-                    borderColor: settings.colors.colorBoderDark,
-                    alignItems: 'center',
-                    justifyContent: 'center',
+                    width: '100%',
+                    height: 50,
+                    marginTop: -65,
+                    alignItems: 'flex-end',
+                    paddingRight: 15,
+                    marginBottom: 15,
                   }}>
-                  <Icon
-                    type="Entypo"
-                    name="plus"
-                    style={{fontSize: 24, color: '#fff', marginBottom: -2}}
-                  />
-                </TouchableOpacity>
-              </View>
+                  <TouchableOpacity
+                    onPress={() => {
+                      nav.navigate('NEWSV', {
+                        type: 0,
+                        user: par.user,
+                      });
+                    }}
+                    activeOpacity={0.5}
+                    style={{
+                      width: 55,
+                      height: 55,
+                      borderRadius: 500,
+                      backgroundColor: settings.colors.colorMain,
+                      borderWidth: 0.5,
+                      borderColor: settings.colors.colorBoderDark,
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}>
+                    <Icon
+                      type="Entypo"
+                      name="plus"
+                      style={{fontSize: 24, color: '#fff', marginBottom: -2}}
+                    />
+                  </TouchableOpacity>
+                </View>
+              )}
             </View>
           ) : (
             <View
