@@ -2,11 +2,13 @@ import { settings } from '../../app/config';
 
 let api = settings.hostURL;
 
-const getCTBaiKiemTra = async (MaSV, MaBaiKT) => {
+export const setTimeTest = async (MaBaiKT, time) => {
     let res = '';
+
     var data = new FormData();
-    data.append('MaSV', MaSV);
     data.append('MaBaiKT', MaBaiKT);
+    data.append('time', time);
+
 
     var requestOptions = {
         method: 'POST',
@@ -14,13 +16,12 @@ const getCTBaiKiemTra = async (MaSV, MaBaiKT) => {
         redirect: 'follow',
     };
 
-    await fetch(api + 'BaiKiemTra/get-chi-tiet-bkt.php', requestOptions)
+    await fetch(api + 'BaiKiemTra/set-time-test.php', requestOptions)
         .then(response => response.json())
         .then(data => {
             res = data;
         })
         .catch(error => console.log('error', error));
+
     return res;
 };
-
-export { getCTBaiKiemTra };

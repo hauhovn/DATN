@@ -5,13 +5,21 @@ import { Icon } from 'native-base';
 // Constants
 import { COLORS, SIZES, STYLES } from '../../../assets/constants'
 
-const DialogPickerModal = ({ data, handle, style, displayValue }) => {
+const DialogPickerModal = ({
+    data, handle, style,
+    filterBarStyle, displayValue,
+    addAllItem = true, textStyles
+}) => {
+
+    let _data = [{ MaLopHP: -1, TenLopHP: 'Tất cả' }, ...data,]
+    if (!addAllItem) _data = data;
 
     const [show, setShow] = React.useState(false);
-    const _data = [{ MaLopHP: -1, TenLopHP: 'Tất cả' }, ...data,]
+    const [selectedItem, setSelectedItem] = React.useState(data[0]);
 
     const pressHandle = (item) => {
         setShow(!show);
+        setSelectedItem(item);
         handle(item);
     }
 
@@ -19,7 +27,7 @@ const DialogPickerModal = ({ data, handle, style, displayValue }) => {
         return (
             <View style={{
                 borderBottomColor: COLORS.black,
-                borderBottomWidth: .3, marginHorizontal: SIZES.width * .1
+                borderBottomWidth: .3, marginHorizontal: SIZES.width * .1,
             }}>
                 <TouchableOpacity
                     onPress={() => pressHandle(item)}
@@ -35,7 +43,10 @@ const DialogPickerModal = ({ data, handle, style, displayValue }) => {
         <View >
 
             {/** Show button */}
-            <View style={{ backgroundColor: COLORS.white }}>
+            <View style={{
+                backgroundColor: COLORS.white,
+                ...filterBarStyle
+            }}>
                 <TouchableOpacity
                     onPress={() => setShow(!show)}
                     style={{
@@ -46,9 +57,9 @@ const DialogPickerModal = ({ data, handle, style, displayValue }) => {
                 >
                     <Text style={{
                         marginHorizontal: SIZES.padding,
-                        fontSize: 16, alignSelf: 'center'
+                        fontSize: 16, alignSelf: 'center', ...textStyles
                     }}>
-                        {displayValue?.TenLopHP}</Text>
+                        {selectedItem?.TenLopHP}</Text>
                     <Icon type='MaterialCommunityIcons' name='filter-menu'
                         style={{ marginHorizontal: SIZES.padding, fontSize: 20 }} />
 

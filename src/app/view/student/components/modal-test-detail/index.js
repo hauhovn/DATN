@@ -41,8 +41,8 @@ export
 
         async function getResponse() {
             const res = await getCTBaiKiemTra(data.MaSV, data.MaBaiKT);
-            await setResData(res.data[0]);
-            console.log('getResponse: ', resData);
+            await setResData(res.data);
+            console.log('Test Detail: ', resData);
         }
 
         return (
