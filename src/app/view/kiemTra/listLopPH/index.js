@@ -298,7 +298,7 @@ export const ListLopHP = () => {
             />
           </View>
 
-          {user[0]?.isAdmin !== undefined && parseInt(user[0]?.isAdmin) === 1 && (
+          {/* {user[0]?.isAdmin !== undefined && parseInt(user[0]?.isAdmin) === 1 && (
             <Fab
               containerStyle={{}}
               style={{backgroundColor: settings.colors.colorMain}}
@@ -308,7 +308,7 @@ export const ListLopHP = () => {
               }}>
               <Icon name="plus" type="AntDesign" />
             </Fab>
-          )}
+          )} */}
         </>
       ) : (
         <View

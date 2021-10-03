@@ -34,6 +34,8 @@ export const QuestToTest = () => {
   const [D, setD] = useState('');
   const [dapAn, setDapAn] = useState('');
 
+  console.log('QuestToTest');
+
   useEffect(() => {
     console.log('pareams: ', params);
     console.log('MaMonHoc: ', MaMonHoc);

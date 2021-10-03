@@ -113,7 +113,10 @@ export const BaiKiemTra = ({params}) => {
         MaLopPH,
         minToTime(thoiGian),
       );
-      onRefresh();
+      console.log('createBaiKT: ', res);
+      // onRefresh();
+
+      getData(MaLopPH);
     } catch (error) {
       //
     }
@@ -121,6 +124,7 @@ export const BaiKiemTra = ({params}) => {
 
   // Nhấn nút thêm
   const createKT = () => {
+    console.log('THEM BAI KIEM TRA NE');
     setModal(false);
     postData();
 

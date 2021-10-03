@@ -42,6 +42,8 @@ export const ThemCauHoi = () => {
   // Vừa focus vào là gọi refesh để lấy data
   useEffect(() => {
     if (focus) {
+      console.log('ThemCauHoi');
+      console.log(params);
       getListChuDe();
       getData();
     }
@@ -111,7 +113,8 @@ export const ThemCauHoi = () => {
   // Gọi api thêm danh sách câu hỏi vô bài kiểm tra
   const postData = async MaCH => {
     try {
-      await createCTBKT(params.BaiKiemTra.MaBaiKT, MaCH);
+      const res = await createCTBKT(params.BaiKiemTra.MaBaiKT, MaCH);
+      console.log('createCTBKT: ', res);
     } catch (error) {
       //
     }

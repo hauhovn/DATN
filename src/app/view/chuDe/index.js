@@ -11,6 +11,7 @@ import {MonHoc} from './listMonHoc';
 const Stack = createStackNavigator();
 
 function ChuDeNav() {
+  console.log('ChuDeNav');
   return (
     <Stack.Navigator>
       <Stack.Screen

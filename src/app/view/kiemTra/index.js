@@ -13,6 +13,7 @@ import {ThemSinhvVien} from './sinhVien/addSinhVien';
 const Stack = createStackNavigator();
 
 function KiemTraNav() {
+  console.log('KiemTraNav');
   return (
     <Stack.Navigator>
       <Stack.Screen

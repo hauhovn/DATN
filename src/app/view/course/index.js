@@ -16,6 +16,7 @@ import {EditAnswer} from './listExercise/infoQuest/editQuest/editAnswer';
 const Stack = createStackNavigator();
 
 function CourseNav() {
+  console.log('CourseNav');
   return (
     <Stack.Navigator>
       <Stack.Screen

@@ -22,6 +22,7 @@ import {deleteCD} from '../../../../server/ChuDe/deleteCD';
 import {getMH} from '../../../../server/MonHoc/getMH';
 
 export const ListChuDe = () => {
+  console.log('ListChuDe');
   const nav = useNavigation();
   const route = useRoute();
   const MonHoc = route.params.item;
