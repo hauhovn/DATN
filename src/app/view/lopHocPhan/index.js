@@ -13,6 +13,7 @@ import {ThemSinhvVien} from './sinhVien/addSinhVien';
 const Stack = createStackNavigator();
 
 function LopHocPhanNav() {
+  console.log('LopHocPhanNav');
   return (
     <Stack.Navigator>
       <Stack.Screen

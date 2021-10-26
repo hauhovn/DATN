@@ -36,6 +36,8 @@ export const ThemCauHoi = () => {
   const [showDetails, setShowDetails] = useState(false);
   const [details, setDetails] = useState('');
 
+  console.log('ThemCauHoi ======= ');
+
   // Vừa focus vào là gọi refesh để lấy data
   useEffect(() => {
     if (focus) {
@@ -61,10 +63,13 @@ export const ThemCauHoi = () => {
     try {
       const res = await getCauHoiByMaMH(MaMH, filter, user[0]?.MaGV);
       setQuestions(res.data);
+      console.log('getCauHoiByMaMH: ', res);
+
       const xx = [];
       await res.data.map(i => {
         xx.push({label: i.CauHoi + '~' + i.TenCD, value: i.MaCH});
       });
+
       setData(xx);
     } catch (error) {
       //
@@ -280,6 +285,8 @@ export const ThemCauHoi = () => {
               }}>
               <TouchableOpacity
                 onPress={() => {
+                  // console.log('ThemCauHoi ======= ');
+
                   setSelectedFruits([]);
                   Toast.show('Thành công', Toast.SHORT);
                   subMit();

@@ -58,6 +58,7 @@ export const BaiKiemTra = ({params}) => {
   useEffect(() => {
     if (focus) {
       onRefresh(MaLopPH);
+      console.log('route.params: ', route.params);
     }
   }, [focus]);
 
@@ -91,6 +92,7 @@ export const BaiKiemTra = ({params}) => {
 
   // Nhấn vô
   const handlePressItem = data => {
+    console.log(item);
     nav.navigate(AppRouter.INFO, {
       item: data,
       TenMH: item.TenMonHoc,
