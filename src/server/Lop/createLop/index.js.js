@@ -1,28 +1,28 @@
-import {settings} from '../../../app/config';
+import { settings } from '../../../app/config';
 
 let api = settings.hostURL;
 
 const createLop = async (TenLop, SoLuongSV) => {
-  let res = '';
+    let res = '';
 
-  var data = new FormData();
-  data.append('TenLop', TenLop);
-  data.append('SoLuongSV', SoLuongSV);
+    var data = new FormData();
+    data.append('TenLop', TenLop);
+    data.append('SoLuongSV', SoLuongSV);
 
-  var requestOptions = {
-    method: 'POST',
-    body: data,
-    redirect: 'follow',
-  };
+    var requestOptions = {
+        method: 'POST',
+        body: data,
+        redirect: 'follow',
+    };
 
-  await fetch(api + 'Lop/createLop.php', requestOptions)
-    .then(response => response.json())
-    .then(data => {
-      res = data;
-    })
-    .catch(error => console.log('error', error));
+    await fetch(api + 'Lop/createLop.php', requestOptions)
+        .then(response => response.json())
+        .then(data => {
+            res = data;
+        })
+        .catch(error => console.log('error', error));
 
-  return res;
+    return res;
 };
 
-export {createLop};
+export { createLop };
