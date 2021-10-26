@@ -2,12 +2,16 @@ import { settings } from '../../app/config';
 
 let api = settings.hostURL;
 
-const getBaiKiemTra = async (MaSV, SoLuong, Page) => {
+const getBaiKiemTra = async (MaSV, SoLuong, Page, Status = -1) => {
 
 
     let res = '';
     var data = new FormData();
     data.append('MaSV', MaSV);
+
+    console.log(`sv: ${MaSV} sl: ${SoLuong} page: ${Page}`);
+    if (Status != -1)
+        console.log(`tim bai dang làm`);
 
     if (Page != undefined) {
         data.append('page', Page);
@@ -26,7 +30,7 @@ const getBaiKiemTra = async (MaSV, SoLuong, Page) => {
         .then(data => {
             res = data;
         })
-        .catch(error => console.log('error', error));
+        .catch(error => console.log('error when getBaiKiemTra', error));
     return res;
 };
 

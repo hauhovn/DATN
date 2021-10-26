@@ -5,6 +5,7 @@ import { getCTBKT } from "./BaiKiemTra/getCTBKT";
 import { getCTBaiKiemTra } from "./BaiKiemTra/getTestDetail";
 import { setTimeTest } from "./BaiKiemTra/setTimeTest";
 import { getTimeTest } from "./BaiKiemTra/getTimeTest";
+import { getTestTimeCountdown } from "./BaiKiemTra/get-time-countdown";
 
 
 export {
@@ -14,5 +15,6 @@ export {
     getCTBKT,
     getCTBaiKiemTra,
     setTimeTest,
-    getTimeTest
+    getTimeTest,
+    getTestTimeCountdown
 }

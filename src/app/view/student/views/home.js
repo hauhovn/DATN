@@ -103,18 +103,20 @@ const StudentScreen = () => {
 
     const getTests = async () => {
         let data = await getBaiKiemTra(user[0]?.MaSV, 3);
+        console.log(`tests get: `, data);
         setListTest(data.data);
     };
 
     const HeaderHandle = value => {
-        console.log(value);
+        console.log('Handle value => ', value);
         if (value === ROUTE_NAME.SAP_DIEN_RA)
             nav.navigate(AppRouter.STUDENT_LIST_TEST, { MaSV: user[0]?.MaSV, TenSV: user[0]?.TenSV });
-        if (value === ROUTE_NAME.BAI_KIEM_TRA) nav.navigate(AppRouter.DEMO_VIEW);
+        if (value === ROUTE_NAME.BAI_KIEM_TRA)
+            nav.navigate(AppRouter.STUDENT_TESTING_LIST, { MaSV: user[0]?.MaSV, TenSV: user[0]?.TenSV });
         if (value === ROUTE_NAME.LOP_HOC_PHAN)
             nav.navigate(AppRouter.LOP_HOC_PHAN, { SinhVien: user[0] });
-        if (value === ROUTE_NAME.DA_KET_THUC) {
-        }
+        if (value === ROUTE_NAME.DA_KET_THUC)
+            nav.navigate(AppRouter.STUDENT_COMPLETED_TEST_LIST, { MaSV: user[0]?.MaSV, TenSV: user[0]?.TenSV });
     };
     // Nhấn vô item
     const handlePressItem = item => {

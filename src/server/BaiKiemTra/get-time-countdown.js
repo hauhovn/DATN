@@ -2,20 +2,11 @@ import { settings } from '../../app/config';
 
 let api = settings.hostURL;
 
-export const updateTestStatus = async (MaGV, MaBaiKT, toStatus, toNewTime = -1) => {
+export const getTestTimeCountdown = async (MaBaiKT) => {
     let res = '';
 
     var data = new FormData();
     data.append('MaBaiKT', MaBaiKT);
-    data.append('MaGV', MaGV);
-    data.append('toStatus', toStatus);
-
-    if (toNewTime != -1) {
-        // Set test time
-        data.append('toNewTime', toNewTime);
-    }
-
-    console.log(`thong tin: ${MaBaiKT} - ${MaGV} - ${toStatus}`);
 
     var requestOptions = {
         method: 'POST',
@@ -23,7 +14,7 @@ export const updateTestStatus = async (MaGV, MaBaiKT, toStatus, toNewTime = -1) 
         redirect: 'follow',
     };
 
-    await fetch(api + 'BaiKiemTra/update-status.php', requestOptions)
+    await fetch(api + 'BaiKiemTra/get-test-time-second.php', requestOptions)
         .then(response => response.json())
         .then(data => {
             res = data;

@@ -11,7 +11,8 @@ import { Icon } from 'native-base';
 import {
     UpdateQuestion,
     JointTest,
-    getTestStatus
+    getTestStatus,
+    getTestTimeCountdown
 } from '../../../../server/student-apis'
 
 // Socket IO
@@ -62,6 +63,9 @@ const TestScreen = ({ route, navigation }) => {
 
     const appState = useRef(AppState.currentState);
     const [appStateVisible, setAppStateVisible] = useState(appState.current);
+
+    const [timeTestCountdown, setTimeTest] = React.useState(60);
+
 
 
     React.useEffect(() => {
@@ -257,13 +261,33 @@ const TestScreen = ({ route, navigation }) => {
 
     }
 
+    /** Get time contdown */
+    async function getTimeCountdown() {
+        let rs = await getTestTimeCountdown(thisTest.id);
+        if (rs?.data != undefined) {
+            console.log(rs.data.SoGiayLam + '-' + rs.data.ThoiGianDaDienRa + '= ', rs.data.SoGiayLam - rs.data.ThoiGianDaDienRa);
+
+            const cb = parseFloat(rs.data.SoGiayLam) - parseFloat(rs.data.ThoiGianDaDienRa);
+            console.log('cb = ', cb);
+            console.log(`1_ `, timeTestCountdown);
+            await setTimeTest(cb);
+            console.log(`2_ `, timeTestCountdown);
+            return cb;
+        } else return 9999;
+
+    }
+
     /**  Render*/
     function renderNavigateBar() {
+
+        // Request load test time and convert to SEC
+        getTimeCountdown();
+        console.log(`time ne: `, getTimeCountdown());
 
         return (<View>
             <MyAppBar
                 title={'Waiting . .  .'}
-                child={state !== stateInfo.waiting && (<MyCountDown time={60 * 100} />)}
+                child={state !== stateInfo.waiting && (<MyCountDown time={timeTestCountdown} />)}
                 iconRightStyle={{ fontSize: state === stateInfo.testing ? 26 : 0 }}
                 iconLeftStyle={{ fontSize: 26 }}
                 rightIconType={'Ionicons'}

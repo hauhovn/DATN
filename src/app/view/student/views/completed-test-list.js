@@ -24,7 +24,7 @@ import { AppRouter } from '../../../../app/navigation/AppRouter';
 import { ItemTest, TestDetailModal, MyAppBar, DialogPickerModal, LoadingIndicator } from '../components';
 import { COLORS, SIZES } from '../../../assets/constants';
 
-const StudentTestList = ({ navigation, route }) => {
+const StudentCompletedTestList = ({ navigation, route }) => {
 
 
     const nav = useNavigation();
@@ -79,7 +79,7 @@ const StudentTestList = ({ navigation, route }) => {
     }
 
     const getTests = async (quantity, page, add) => {
-        let res = await getBaiKiemTra(SinhVien.MaSV, quantity, page);
+        let res = await getBaiKiemTra(SinhVien.MaSV, quantity, page, 1);
         add ? setData(data.concat(res?.data)) : setData(res.data);
     };
 
@@ -158,7 +158,7 @@ const StudentTestList = ({ navigation, route }) => {
                     <ActivityIndicator size='large' color={COLORS.black} />
                 </View> : (data == undefined ? (
                     <Text>
-                        Không còn bài kiểm tra nào khác
+                        Không có bài kiểm tra nào đã hoàn thành
                     </Text>
                 ) : null)
 
@@ -170,7 +170,7 @@ const StudentTestList = ({ navigation, route }) => {
 
             {/** Appbar */}
             <MyAppBar
-                title='Bài kiểm tra sắp tới'
+                title='Bài kiểm tra đã kết thúc'
                 leftHandle={() => navigation.goBack()}
                 iconRightStyle={{ fontSize: 0 }}
                 titleStyle={{ fontSize: 18 }}
@@ -216,5 +216,5 @@ const StudentTestList = ({ navigation, route }) => {
         </SafeAreaView>
     );
 };
-export default StudentTestList;
+export default StudentCompletedTestList;
 

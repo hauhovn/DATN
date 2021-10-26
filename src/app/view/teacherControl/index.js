@@ -195,17 +195,20 @@ export const TeacherControl = ({ route, navigation }) => {
     }
 
     /** Set Time Of Test */
-    const setTimeOfTest = async () => {
-        const rs = await setTimeTest(BaiKiemTra.MaBaiKT);
-        console.log(`_@_`, rs);
-    }
+    // const setTimeOfTest = async () => {
+    //     const rs = await setTimeTest(BaiKiemTra.MaBaiKT);
+    //     console.log(`_@_`, rs);
+    // }
 
     const getTimeOfTest = async () => {
-        const rs = await getTimeTest(BaiKiemTra.MaBaiKT);
-        console.log(rs);
+        // const rs = await getTimeTest(BaiKiemTra.MaBaiKT);
+        // console.log(rs);
 
-        var timeSplit = rs?.data?.ThoiGian.split(':');
-        await setTimeTest(parseInt(timeSplit[0]) * 60 * 60 + parseInt(timeSplit[1]) * 60 + parseInt(timeSplit[2]));
+        // var timeSplit = rs?.data?.ThoiGian.split(':');
+        // await setTimeTest(parseInt(timeSplit[0]) * 60 * 60 + parseInt(timeSplit[1]) * 60 + parseInt(timeSplit[2]));
+        // console.log(`thoi gian duoc cap nhat lai la: `, timeTest);
+
+        // Viết lại hàm cập nhật thời gian
 
     }
 
@@ -259,13 +262,13 @@ export const TeacherControl = ({ route, navigation }) => {
     };
 
     /** Update test status */
-    const testStatusUpdate = async (toStatus) => {
+    const testStatusUpdate = async (toStatus, isUpdateTestTime = -1) => {
 
         setLoadingMain(true);
 
-        let rs = await updateTestStatus(user.id, BaiKiemTra.MaBaiKT, toStatus);
+        let rs = await updateTestStatus(user.id, BaiKiemTra.MaBaiKT, toStatus, isUpdateTestTime);
         rs?.code == toStatus && setLoadingMain(false)
-
+        console.log('-------- rs ne', rs);
     }
     // Control Bar Render
     function renderControlBar() {
@@ -299,15 +302,15 @@ export const TeacherControl = ({ route, navigation }) => {
                                                     },
                                                 ];
                                             });
-                                        testStatusUpdate(2);
+                                        testStatusUpdate(2, 1);
                                         setTestStatus(2);
-                                        setTimeOfTest();
+                                        //setTimeOfTest();
                                         setTimeRunning(true);
                                     } break;
                                     case 2: {
                                         /**Runing => Pause test */
                                         console.log(`run_2_@`);
-                                        requestStartTest(user.id, BaiKiemTra.MaBaiKT, true);
+                                        requestStartTest(user.id, BaiKiemTra.MaBaiKT, false);
                                         usersStatusList != undefined &&
                                             setUsersStatusList(currentList => {
                                                 return [
