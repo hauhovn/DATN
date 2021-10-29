@@ -2,13 +2,14 @@ import { settings } from '../../app/config';
 
 let api = settings.hostURL;
 
-const getBaiKiemTraTheoLopHocPhan = async (MaSV, MaLopHP, SoLuong, Page) => {
+const getBaiKiemTraTheoLopHocPhan = async (MaSV, MaLopHP, SoLuong, Page, Type = 'testing') => {
 
 
     let res = '';
     var data = new FormData();
     data.append('MaSV', MaSV);
     data.append('MaLopHP', MaLopHP);
+    data.append('Type', Type)
 
     if (Page != undefined) {
         data.append('page', Page);

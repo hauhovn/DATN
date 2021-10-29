@@ -2,13 +2,12 @@ import { settings } from '../../app/config';
 
 let api = settings.hostURL;
 
-const JointTest = async (MaSV, MaBaiKT, isGetResult = false) => {
+export const getSoCauDung = async (MaSV, MaBaiKT) => {
     let res = '';
 
     var data = new FormData();
-    data.append('MaSV', MaSV);
     data.append('MaBaiKT', MaBaiKT);
-    data.append('IsGetResult', isGetResult);
+    data.append('MaSV', MaSV);
 
     var requestOptions = {
         method: 'POST',
@@ -16,15 +15,12 @@ const JointTest = async (MaSV, MaBaiKT, isGetResult = false) => {
         redirect: 'follow',
     };
 
-    await fetch(api + 'ChiTietKQ/jont-test.php', requestOptions)
+    await fetch(api + 'BaiKiemTra/get-so-cau-dung.php', requestOptions)
         .then(response => response.json())
         .then(data => {
             res = data;
-            //console.log('API LOGs: jont-test: ', data);
         })
         .catch(error => console.log('error', error));
 
     return res;
 };
-
-export { JointTest };

@@ -10,7 +10,6 @@ import {
 } from 'react-native';
 import { Icon } from 'native-base';
 import Moment from 'moment';
-
 //api
 import { getCTBaiKiemTra } from '../../../../../server/BaiKiemTra/getTestDetail';
 //colors
@@ -24,6 +23,7 @@ import { IMAGES, GIFS } from '../../../../assets/constants'
 
 export
     const TestDetailModal = ({ modalVisible, close, data, pressHandle }) => {
+
         const [resData, setResData] = useState(undefined);
         const [keyInput, setKeyInput] = useState('');
         const [isLoading, setIsLoading] = useState(true);
@@ -100,12 +100,17 @@ export
                                 <View style={styles.time}>
                                     <Text
                                         style={[textStyles.date, { color: settings.colors.colorMain }]}>
-                                        {resData?.TenBaiKT}
+                                        Bài kiểm tra: {resData?.TenBaiKT}
                                     </Text>
                                     <Text style={textStyles.date}>
-                                        Ngày: {Moment(resData?.Ngay)?.format('L')}
+                                        Số lượng câu hỏi: {resData?.SoLuongCauHoi} câu
                                     </Text>
-
+                                    <Text style={textStyles.date}>
+                                        Ngày kiểm tra: {Moment(resData?.Ngay)?.format('L')}
+                                    </Text>
+                                    <Text style={textStyles.date}>
+                                        Thời gian bắt đầu: {Moment(resData?.Ngay)?.format('LTS')}
+                                    </Text>
                                     <Text style={textStyles.time}>
                                         Thời gian làm: {resData?.ThoiGianLam}
                                     </Text>

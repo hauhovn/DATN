@@ -9,9 +9,10 @@ import DialogPickerModal from "./dialog-picker-modal";
 import LoadingIndicator from "./loading";
 import PauseTestModal from "./pause-test-modal";
 import TestingDetailItem from "./testing-detail-item";
+import { ItemTestResult } from "./item-test-result";
 
 export {
     ItemTest, TestDetailModal, MyAppBar, WaitingTest,
     MenuQuestionModal, MyAlert, MyCountDown, DialogPickerModal,
-    LoadingIndicator, PauseTestModal, TestingDetailItem
+    LoadingIndicator, PauseTestModal, TestingDetailItem, ItemTestResult
 }

@@ -2,7 +2,7 @@ import React, { useRef, useState } from 'react';
 import {
     View, Text, TouchableOpacity,
     StyleSheet, Image, ScrollView,
-    Switch, AppState
+    Switch, AppState, Alert
 } from 'react-native';
 
 import { Icon } from 'native-base';
@@ -66,6 +66,8 @@ const TestScreen = ({ route, navigation }) => {
 
     const [timeTestCountdown, setTimeTest] = React.useState(60);
 
+    const [isReviewMode, setReviewMode] = React.useState(true);
+
 
 
     React.useEffect(() => {
@@ -118,6 +120,11 @@ const TestScreen = ({ route, navigation }) => {
 
         teacherEditTest((err, isRemove) => {
             if (err) return;
+            if (isRemove) {
+                navigation.goBack();
+                Alert.alert(`Thông báo`, `Bài kiểm tra đã kết thúc!`)
+            }
+
 
         });
 
@@ -128,11 +135,11 @@ const TestScreen = ({ route, navigation }) => {
 
         setLoading(true);
 
-        /** Get Quests List */
-        await getQuestList();
-
         /** Get test status */
         await getTest_Status();
+
+        /** Get Quests List */
+        await getQuestList();
 
         setLoading(false);
     }
@@ -186,17 +193,18 @@ const TestScreen = ({ route, navigation }) => {
         let response = await getTestStatus(thisStudent.id, thisTest.id);
         console.log(`res: `, response);
         switch (response?.status) {
-            case '1': setState(stateInfo.waiting); break;
-            case '2': setState(stateInfo.testing); break;
-            case '3': setState(stateInfo.paused); break;
-            default: setState(stateInfo.waiting);
+            case '1': setState(stateInfo.waiting); setReviewMode(false); break;
+            case '2': setState(stateInfo.testing); setReviewMode(false); break;
+            case '3': setState(stateInfo.paused); setReviewMode(false); break;
+            case '4': setState(stateInfo.testing); setReviewMode(true); break;
+            default: setState(stateInfo.waiting); break;
         }
     }
 
     /** Get test data */
     const getQuestList = async () => {
 
-        let response = await JointTest(thisStudent.id, thisTest.id);
+        let response = await JointTest(thisStudent.id, thisTest.id, isReviewMode);
         await setQuestList(response?.data)
 
     }
@@ -254,10 +262,15 @@ const TestScreen = ({ route, navigation }) => {
 
     /** Press options */
     const pressOption = (option) => {
-
-        selectedOption == option ? setSelectedOption('X') : setSelectedOption(option);
-        setSelectedQuestion(currentQuestion);
-        setUpdate(true);
+        if (isReviewMode) {
+            console.log('Current: ', currentQuestion);
+            return;
+        }
+        else {
+            selectedOption == option ? setSelectedOption('X') : setSelectedOption(option);
+            setSelectedQuestion(currentQuestion);
+            setUpdate(true);
+        }
 
     }
 
@@ -265,13 +278,9 @@ const TestScreen = ({ route, navigation }) => {
     async function getTimeCountdown() {
         let rs = await getTestTimeCountdown(thisTest.id);
         if (rs?.data != undefined) {
-            console.log(rs.data.SoGiayLam + '-' + rs.data.ThoiGianDaDienRa + '= ', rs.data.SoGiayLam - rs.data.ThoiGianDaDienRa);
-
             const cb = parseFloat(rs.data.SoGiayLam) - parseFloat(rs.data.ThoiGianDaDienRa);
-            console.log('cb = ', cb);
-            console.log(`1_ `, timeTestCountdown);
             await setTimeTest(cb);
-            console.log(`2_ `, timeTestCountdown);
+            console.log(`Time for this test: `, cb);
             return cb;
         } else return 9999;
 
@@ -282,12 +291,19 @@ const TestScreen = ({ route, navigation }) => {
 
         // Request load test time and convert to SEC
         getTimeCountdown();
-        console.log(`time ne: `, getTimeCountdown());
 
         return (<View>
             <MyAppBar
-                title={'Waiting . .  .'}
-                child={state !== stateInfo.waiting && (<MyCountDown time={timeTestCountdown} />)}
+                title={'Bài kiểm tra'}
+                child={
+                    state !== stateInfo.waiting
+                    && (
+                        !isReviewMode && <MyCountDown
+                            isRuning={state == stateInfo.testing ? true : false}
+                            time={timeTestCountdown}
+                            onFinish={() => Alert.alert(`time up`)}
+                        />
+                    )}
                 iconRightStyle={{ fontSize: state === stateInfo.testing ? 26 : 0 }}
                 iconLeftStyle={{ fontSize: 26 }}
                 rightIconType={'Ionicons'}
@@ -389,13 +405,48 @@ const TestScreen = ({ route, navigation }) => {
             paddingVertical: SIZES.base
         }
 
+        let colorA, colorB, colorC, colorD;
+        colorA = colorB = colorC = colorD = COLORS.gray;
+
+        if (currentQuestion?.DapAn != undefined) {
+
+            if (currentQuestion?.DapAn == 'A') {
+                colorA = COLORS.colorRed;
+            }
+            if (currentQuestion?.DapAn == 'B') {
+                colorB = COLORS.colorRed;
+            }
+            if (currentQuestion?.DapAn == 'C') {
+                colorC = COLORS.colorRed;
+            }
+            if (currentQuestion?.DapAn == 'D') {
+                colorD = COLORS.colorRed;
+            }
+
+            if (currentQuestion?.DASV == 'A') {
+                colorA = COLORS.green;
+            }
+            if (currentQuestion?.DASV == 'B') {
+                colorB = COLORS.green;
+            }
+            if (currentQuestion?.DASV == 'C') {
+                colorC = COLORS.green;
+            }
+            if (currentQuestion?.DASV == 'D') {
+                colorD = COLORS.green;
+            }
+        }
+
         return (
             <View style={{ flexDirection: 'column', marginBottom: 2 * SIZES.padding }}>
                 <TouchableOpacity
                     onPress={() => pressOption('A')}
                     style={{
                         ...button
-                        , borderColor: selectedOption == 'A' ? COLORS.colorMain : COLORS.gray
+                        , borderColor:
+                            isReviewMode ?
+                                colorA
+                                : (selectedOption == 'A' ? COLORS.green : COLORS.gray)
                     }}>
                     <Text style={{ ...text }}>{currentQuestion?.A}</Text>
                 </TouchableOpacity>
@@ -403,7 +454,10 @@ const TestScreen = ({ route, navigation }) => {
                     onPress={() => pressOption('B')}
                     style={{
                         ...button
-                        , borderColor: selectedOption == 'B' ? COLORS.colorMain : COLORS.gray
+                        , borderColor:
+                            isReviewMode ?
+                                colorB
+                                : (selectedOption == 'B' ? COLORS.green : COLORS.gray)
                     }}>
                     <Text style={{ ...text }}>{currentQuestion?.B}</Text>
                 </TouchableOpacity>
@@ -411,7 +465,9 @@ const TestScreen = ({ route, navigation }) => {
                     onPress={() => pressOption('C')}
                     style={{
                         ...button
-                        , borderColor: selectedOption == 'C' ? COLORS.colorMain : COLORS.gray
+                        , borderColor: isReviewMode ?
+                            colorC
+                            : (selectedOption == "C" ? COLORS.green : COLORS.gray)
                     }}>
                     <Text style={{ ...text }}>{currentQuestion?.C}</Text>
                 </TouchableOpacity>
@@ -419,7 +475,10 @@ const TestScreen = ({ route, navigation }) => {
                     onPress={() => pressOption('D')}
                     style={{
                         ...button
-                        , borderColor: selectedOption == 'D' ? COLORS.colorMain : COLORS.gray
+                        , borderColor:
+                            isReviewMode ?
+                                colorD
+                                : (selectedOption == 'D' ? COLORS.green : COLORS.gray)
                     }}>
                     <Text style={{ ...text }}>{currentQuestion?.D}</Text>
                 </TouchableOpacity>

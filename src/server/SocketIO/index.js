@@ -10,7 +10,7 @@ export const inittiateSocket = (room, user, info = 'Not known', status = 1) => {
         socket.connect();
         console.log(`Connecting socket . . . `);
         if (socket && room) {
-            console.log(`. . . joining room ${room}`);
+            console.log(`${user?.name}. . . joining room ${room}`);
             socket.emit('client-request-join', {
                 user: user,
                 room: room,

@@ -2,13 +2,13 @@ import { settings } from '../../app/config';
 
 let api = settings.hostURL;
 
-const getBaiKiemTra = async (MaSV, SoLuong, Page, Status = -1) => {
+const getBaiKiemTra = async (MaSV, SoLuong, Page, Status = -1, Type = 'testing') => {
 
 
     let res = '';
     var data = new FormData();
     data.append('MaSV', MaSV);
-
+    data.append('Type', Type);
     console.log(`sv: ${MaSV} sl: ${SoLuong} page: ${Page}`);
     if (Status != -1)
         console.log(`tim bai dang làm`);

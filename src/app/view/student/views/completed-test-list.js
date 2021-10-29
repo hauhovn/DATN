@@ -17,11 +17,10 @@ import { getBaiKiemTraTheoLopHocPhan } from '../../../../server/BaiKiemTra/get-b
 import { teacherEditTest } from '../../../../server/SocketIO';
 import { getMiniLopHocPhan } from '../../../../server/LopHP/getListNameLHP';
 //settting
-import { settings } from '../../../config';
 import { AppRouter } from '../../../../app/navigation/AppRouter';
 
 // Components
-import { ItemTest, TestDetailModal, MyAppBar, DialogPickerModal, LoadingIndicator } from '../components';
+import { ItemTestResult, TestDetailModal, MyAppBar, DialogPickerModal, LoadingIndicator } from '../components';
 import { COLORS, SIZES } from '../../../assets/constants';
 
 const StudentCompletedTestList = ({ navigation, route }) => {
@@ -35,6 +34,7 @@ const StudentCompletedTestList = ({ navigation, route }) => {
     const [data, setData] = useState('');
     const [listTenLHP, setListTenLHP] = useState('');
     const [pickerLHP, setPickerLHP] = useState({ MaLopHP: -1, TenLopHP: 'Tất cả' });
+    const TESTED = 'tested';// is key in api
 
     const [sentData, setSentData] = useState({
         MaBaiKT: '',
@@ -74,12 +74,12 @@ const StudentCompletedTestList = ({ navigation, route }) => {
 
     // Get test = LHP
     const getTestWith = async (MaSV, MaLHP, SL, Page, add) => {
-        let res = await getBaiKiemTraTheoLopHocPhan(MaSV, MaLHP, SL, Page);
+        let res = await getBaiKiemTraTheoLopHocPhan(MaSV, MaLHP, SL, Page, TESTED);
         add ? setData(data.concat(res?.data)) : setData(res.data);
     }
 
     const getTests = async (quantity, page, add) => {
-        let res = await getBaiKiemTra(SinhVien.MaSV, quantity, page, 1);
+        let res = await getBaiKiemTra(SinhVien.MaSV, quantity, page, 1, TESTED);
         add ? setData(data.concat(res?.data)) : setData(res.data);
     };
 
@@ -111,7 +111,7 @@ const StudentCompletedTestList = ({ navigation, route }) => {
         sentData.TenSV = SinhVien.TenSV;
         console.log('SINH VIEN: ', SinhVien);
         setSentData(sentData);
-        setIsShowDialog(true);
+        pressHandleKey();
     };
     const pressHandleKey = () => {
         setIsShowDialog(false);
@@ -165,6 +165,7 @@ const StudentCompletedTestList = ({ navigation, route }) => {
         );
     }
 
+
     return (
         <SafeAreaView style={{ flex: 1 }}>
 
@@ -194,7 +195,12 @@ const StudentCompletedTestList = ({ navigation, route }) => {
                     data={data}
                     showsVerticalScrollIndicator={false}
                     renderItem={({ item }) => (
-                        <ItemTest item={item} data={data} handle={handlePressItem} />
+                        <ItemTestResult
+                            item={item}
+                            data={data}
+                            handle={handlePressItem}
+                            MaSV={SinhVien?.MaSV}
+                        />
                     )}
                     keyExtractor={(item, index) => `${index}_${Math.random()}`}
                     style={{ flex: 1, marginTop: 12, backgroundColor: '#fff' }}

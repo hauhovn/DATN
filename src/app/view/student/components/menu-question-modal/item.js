@@ -10,7 +10,7 @@ export const ItemQuestion = ({ item, handle }) => {
     };
     let itemColor = COLORS.colorMain;
     if (item?.DASV == 'X' || item?.DASV == 'X') {
-        itemColor = COLORS.colorGreen;
+        itemColor = COLORS.black;
     } else if (item?.DapAn != undefined) {
         if (item?.DapAn != item?.DASV) {
             // incorrect

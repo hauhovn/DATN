@@ -57,7 +57,13 @@ export const TeacherControl = ({ route, navigation }) => {
     const nav = navigation;
     const _user = route.params?.user;
     const BaiKiemTra = route.params?.BaiKiemTra;
-    const user = { id: _user[0]?.MaGV, name: _user[0]?.TenGV };
+    const user = {
+        id: _user[0]?.MaGV,
+        room: BaiKiemTra.MaBaiKT,
+        name: _user[0]?.TenGV,
+        is_teacher: true,
+        socket_id: ''
+    };
 
     // Refs
     let flatList = React.useRef();
@@ -111,9 +117,12 @@ export const TeacherControl = ({ route, navigation }) => {
 
     /** Check status */
     useEffect(() => {
-
-        if (parseInt(testStatus) == 2) setTimeRunning(true)
-        console.log(`dang chay dung k: ${testStatus}`);
+        try {
+            if (parseInt(testStatus) == 2) setTimeRunning(true)
+            console.log(`dang chay dung k: ${testStatus}`);
+        } catch (error) {
+            console.log(`Error in useEffect`);
+        }
     }, [testStatus])
 
     /** Load option */
@@ -127,7 +136,7 @@ export const TeacherControl = ({ route, navigation }) => {
         /** Get test info */
         await getTestInfo(BaiKiemTra.MaBaiKT);
 
-        console.log(`2`);
+        console.log(testInfo);
 
         /** Get student quantity */
         await getStudentQuantity(BaiKiemTra.MaBaiKT);
@@ -146,15 +155,16 @@ export const TeacherControl = ({ route, navigation }) => {
     /** Socket IO */
     const socketIOListener = async () => {
 
-        disconnectSocket();
-        inittiateSocket(BaiKiemTra.MaBKT, user, 'ko', 1);
+        await disconnectSocket();
+        await inittiateSocket(BaiKiemTra.MaBaiKT, user, 'ko', 1);
 
         listenStudentInOut((err, data) => {
             if (err) return;
-            console.log(data);
-            setUsersStatusList(currentList => {
-                return [...currentList, data];
-            });
+            console.log(`# Co SV moi tham gia: `, data);
+            addTestStatusInfo(
+                res = data
+            )
+
         });
     }
 
@@ -291,59 +301,43 @@ export const TeacherControl = ({ route, navigation }) => {
                                     case 1: {
                                         /** Waiting =>  Start test */
                                         requestStartTest(user.id, BaiKiemTra.MaBaiKT, true);
-                                        usersStatusList != undefined &&
-                                            setUsersStatusList(currentList => {
-                                                return [
-                                                    ...currentList,
-                                                    {
-                                                        isConnect: true,
-                                                        status: 5,
-                                                        name: 'CÁC THÍ SINH ĐÃ \n BẮT ĐẦU LÀM BÀI',
-                                                    },
-                                                ];
-                                            });
-                                        testStatusUpdate(2, 1);
-                                        setTestStatus(2);
-                                        //setTimeOfTest();
-                                        setTimeRunning(true);
+
+                                        addTestStatusInfo(true, 5, 'CÁC THÍ SINH ĐÃ \n BẮT ĐẦU LÀM BÀI');
+                                        try {
+                                            testStatusUpdate(2, 1);
+                                            setTestStatus(2);
+                                            //setTimeOfTest();
+                                            setTimeRunning(true);
+                                        } catch (error) {
+                                            console.log(`#327_3line`);
+                                        }
                                     } break;
                                     case 2: {
                                         /**Runing => Pause test */
                                         console.log(`run_2_@`);
                                         requestStartTest(user.id, BaiKiemTra.MaBaiKT, false);
-                                        usersStatusList != undefined &&
-                                            setUsersStatusList(currentList => {
-                                                return [
-                                                    ...currentList,
-                                                    {
-                                                        isConnect: true,
-                                                        status: 3,
-                                                        name: 'BÀI KIỂM TRA \nĐÃ DỪNG LẠI',
-                                                    },
-                                                ];
-                                            });
-                                        testStatusUpdate(3);
-                                        setTestStatus(3);
-                                        setTimeRunning(false);
+
+                                        addTestStatusInfo(true, 3, 'BÀI KIỂM TRA \nĐÃ DỪNG LẠI');
+                                        try {
+                                            testStatusUpdate(3);
+                                            setTestStatus(3);
+                                            setTimeRunning(false);
+                                        } catch (error) {
+                                            console.log(`#345_3line`);
+                                        }
                                     } break;
                                     case 3: {
                                         /**Pause => Continue test (Runing)*/
                                         console.log(`run_3_@`);
                                         requestStartTest(user.id, BaiKiemTra.MaBaiKT, true);
-                                        usersStatusList != undefined &&
-                                            setUsersStatusList(currentList => {
-                                                return [
-                                                    ...currentList,
-                                                    {
-                                                        isConnect: true,
-                                                        status: 2,
-                                                        name: 'BÀI KIỂM TRA \nĐÃ TIẾP TỤC',
-                                                    },
-                                                ];
-                                            });
-                                        testStatusUpdate(2);
-                                        setTestStatus(2);
-                                        setTimeRunning(true);
+                                        addTestStatusInfo(true, 2, 'BÀI KIỂM TRA \nĐÃ TIẾP TỤC');
+                                        try {
+                                            testStatusUpdate(2);
+                                            setTestStatus(2);
+                                            setTimeRunning(true);
+                                        } catch (error) {
+                                            console.log(`#381_3line`);
+                                        }
                                     } break;
                                     case 4: console.log(4); break;
                                     default: break;
@@ -351,7 +345,7 @@ export const TeacherControl = ({ route, navigation }) => {
 
                             } else {
                                 // Cancel or fini test  
-                                testStatusUpdate(0);
+                                testStatusUpdate(4);
                                 setTimeout(() => {
                                     requestUpdateTestList(true, BaiKiemTra.MaBaiKT);
                                 }, 2000);
@@ -444,6 +438,36 @@ export const TeacherControl = ({ route, navigation }) => {
             </View>
         );
     };
+
+    function addTestStatusInfo(
+        isConnect = true, status = 2,
+        info = 'BÀI KIỂM TRA \nĐÃ TIẾP TỤC',
+        name = ' ', socket_id = Math.random().toString(),
+        res = undefined
+    ) {
+        try {
+
+            let newInfo = {
+                isConnect: isConnect,
+                status: status,
+                name: name,
+                info: info,
+                socket_id: socket_id
+            };
+
+            if (res != undefined) newInfo = res;
+
+            if (usersStatusList.length > 0) {
+                setUsersStatusList([...usersStatusList, newInfo])
+                console.log(`usersStatusList.length > 0`);
+            } else {
+                setUsersStatusList([newInfo])
+                console.log(`usersStatusList.length = 0`);
+            }
+        } catch (error) {
+            console.log(`Khong the them thong bao`);
+        }
+    }
 
     /** List history & test detail */
     function renderListAction() {

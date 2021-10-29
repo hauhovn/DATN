@@ -96,6 +96,22 @@ export const MenuQuestionModal = ({ isVisible, onRequestClose, data, onPressItem
                         />
                         <Text style={myStyles.textTur}>{isCheck.label}</Text>
                     </View>
+                    {data[0]?.DapAn != undefined && (
+                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                            <TouchableOpacity
+                                style={{
+                                    ...STYLES.shadow,
+                                    height: SIZES.width / 10 - 12,
+                                    width: SIZES.width / 10 - 12,
+                                    borderRadius: 10,
+                                    backgroundColor: COLORS.black,
+                                    borderWidth: 1,
+                                    borderColor: '#CFD8DC',
+                                }}
+                            />
+                            <Text style={myStyles.textTur}>Chưa làm</Text>
+                        </View>
+                    )}
                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                         <TouchableOpacity
                             style={{
