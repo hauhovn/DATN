@@ -2,11 +2,12 @@ import {settings} from '../../../app/config';
 
 let api = settings.hostURL;
 
-const deleteLHP = async MaLHP => {
+const updateCD = async (MaCD, TenCD) => {
   let res = '';
 
   var data = new FormData();
-  data.append('MaLopHP', MaLHP);
+  data.append('MaCD', MaCD);
+  data.append('TenCD', TenCD);
 
   var requestOptions = {
     method: 'POST',
@@ -14,7 +15,7 @@ const deleteLHP = async MaLHP => {
     redirect: 'follow',
   };
 
-  await fetch(api + 'LopHocPhan/deleteLPH.php', requestOptions)
+  await fetch(api + 'ChuDe/updateCD.php', requestOptions)
     .then(response => response.json())
     .then(data => {
       res = data;
@@ -24,4 +25,4 @@ const deleteLHP = async MaLHP => {
   return res;
 };
 
-export {deleteLHP};
+export {updateCD};

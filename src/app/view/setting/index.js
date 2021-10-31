@@ -213,7 +213,8 @@ export const UserScreen = ({navigation, route}) => {
                 Change password
               </Text>
             </TouchableOpacity>
-            <TouchableOpacity
+
+            {/* <TouchableOpacity
               activeOpacity={0.5}
               style={body.button}
               onPress={() => {
@@ -234,8 +235,9 @@ export const UserScreen = ({navigation, route}) => {
               <Text style={{fontSize: 14, marginLeft: 10, flex: 10}}>
                 Giao diện
               </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
+            </TouchableOpacity> */}
+
+            {/* <TouchableOpacity
               activeOpacity={0.5}
               style={body.button}
               onPress={() => {
@@ -258,8 +260,9 @@ export const UserScreen = ({navigation, route}) => {
               <Text style={{fontSize: 14, marginLeft: 10, flex: 10}}>
                 Ngôn ngữ
               </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
+            </TouchableOpacity> */}
+
+            {/* <TouchableOpacity
               activeOpacity={0.5}
               style={body.button}
               onPress={() => {
@@ -279,7 +282,8 @@ export const UserScreen = ({navigation, route}) => {
               <Text style={{fontSize: 14, marginLeft: 10, flex: 10}}>
                 Thông tin ứng dụng
               </Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
+
             <TouchableOpacity
               activeOpacity={0.5}
               style={[body.button, {borderBottomWidth: 0, paddingBottom: 0}]}

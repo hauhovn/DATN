@@ -12,7 +12,11 @@ const updateBaiKT = async (MaBaiKT, TenBaiKT, Ngay, MaGV, ThoiGianLam) => {
   data.append('MaGV', MaGV);
   data.append('ThoiGianLam', ThoiGianLam);
 
+  console.log('MaBaiKT: ', MaBaiKT);
+  console.log('TenBaiKT: ', TenBaiKT);
   console.log('Ngay: ', Ngay);
+  console.log('MaGV: ', MaGV);
+  console.log('ThoiGianLam: ', ThoiGianLam);
 
   var requestOptions = {
     method: 'POST',

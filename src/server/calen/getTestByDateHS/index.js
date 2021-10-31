@@ -1,13 +1,12 @@
-import {settings} from '../../app/config';
+import {settings} from '../../../app/config';
 
 let api = settings.hostURL;
 
-const getBaiKiemTra = async (MaSV, SoLuong, Page) => {
-  // $Ngay = $_POST['Ngay'];
-
+const getTestByDateHS = async (MaSV, Ngay, SoLuong, Page) => {
   let res = '';
   var data = new FormData();
   data.append('MaSV', MaSV);
+  data.append('Ngay', Ngay + '');
 
   if (Page != undefined) {
     data.append('page', Page);
@@ -20,7 +19,7 @@ const getBaiKiemTra = async (MaSV, SoLuong, Page) => {
     redirect: 'follow',
   };
 
-  await fetch(api + 'BaiKiemTra/get-bai-kiem-tra.php', requestOptions)
+  await fetch(api + 'Calen/getTestByDateHS.php', requestOptions)
     .then(response => response.json())
     .then(data => {
       res = data;
@@ -29,4 +28,4 @@ const getBaiKiemTra = async (MaSV, SoLuong, Page) => {
   return res;
 };
 
-export {getBaiKiemTra};
+export {getTestByDateHS};

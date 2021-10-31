@@ -21,6 +21,9 @@ import {getTestByDate} from '../../../server/calen/getTestByDate';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {AppRouter} from '../../navigation/AppRouter';
 import {getAllTest} from '../../../server/calen/getAllTest';
+import Moment from 'moment';
+import {getBaiKiemTra} from '../../../server/BaiKiemTra';
+import {getTestByDateHS} from '../../../server/calen/getTestByDateHS';
 
 const {width: dW, height: dH} = Dimensions.get('window'); // Lấy width và height của màn hình điện thoại
 
@@ -89,6 +92,8 @@ export const CalendarScreen = ({navigation}) => {
 
   useEffect(() => {
     if (user != '') {
+      console.log('=================================================');
+      console.log('user[0]?.MaGV: ', user[0]?.MaGV);
       getData(user[0]?.MaGV, getStrDay(dateSelected));
       getAllData(user[0]?.MaGV);
     }
@@ -122,7 +127,7 @@ export const CalendarScreen = ({navigation}) => {
     getData(user[0]?.MaGV, getStrDay(dateSelected));
 
     if (dataAll !== '') {
-      let temp = dataAll.map(x => x.Ngay);
+      let temp = dataAll.map(x => x.Ngay.slice(0, 10));
 
       let flag = 0;
 
@@ -180,7 +185,17 @@ export const CalendarScreen = ({navigation}) => {
   // lấy api chổ này
   const getData = async (MaGV, Ngay) => {
     try {
-      const res = await getTestByDate(MaGV, Ngay);
+      // const res = await getTestByDate(MaGV, Ngay + ' 00:00:00');
+
+      console.log('getData', Ngay);
+
+      const res =
+        user[0]?.MaGV !== undefined
+          ? await getTestByDate(MaGV, Ngay + ' 00:00:00')
+          : await getTestByDateHS(user[0]?.MaSV, Ngay.toString(), 3);
+
+      console.log('getData: ', res);
+
       setData(res?.data);
     } catch (error) {
       //
@@ -189,15 +204,26 @@ export const CalendarScreen = ({navigation}) => {
 
   // lấy api chổ này
   const getAllData = async MaGV => {
+    console.log('getAllData');
     try {
-      const res = await getAllTest(MaGV);
+      const res =
+        user[0]?.MaGV !== undefined
+          ? await getAllTest(MaGV)
+          : await getBaiKiemTra(user[0]?.MaSV, 3);
+
+      console.log('getAllData: ', res);
+
       setDataAll(res?.data);
 
-      let temp = res?.data.map(x => x.Ngay);
+      // 2018-02-02
+
+      let temp = res?.data.map(x => x.Ngay.slice(0, 10));
 
       let json = {...temp};
 
       json = Object.assign({}, temp);
+
+      // "Ngay": "2021-06-29 00:00:00"
 
       json = temp.reduce((json, value, key) => {
         key = value;
@@ -252,12 +278,16 @@ export const CalendarScreen = ({navigation}) => {
 
   // Xử lí khi nhấn vào item
   const handlePressItem = item => {
-    nav.navigate(AppRouter.INFO, {
-      item: item,
-      TenMH: item.TenMonHoc,
-      MaMH: item.MaMH,
-      user: user,
-    });
+    if (user[0]?.MaGV !== undefined) {
+      nav.navigate(AppRouter.INFO, {
+        item: item,
+        TenMH: item.TenMonHoc,
+        MaMH: item.MaMH,
+        user: user,
+      });
+    } else {
+      console.log('as');
+    }
   };
 
   return (
@@ -337,6 +367,18 @@ export const CalendarScreen = ({navigation}) => {
                 )}
                 keyExtractor={item => item.id}
                 style={{flex: 1, paddingTop: 10}}
+                ListEmptyComponent={
+                  <View
+                    style={{
+                      flex: 1,
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}>
+                    <Text style={{fontSize: 14, color: 'red'}}>
+                      Không có bài kiểm tra nào
+                    </Text>
+                  </View>
+                }
               />
             ) : (
               <View

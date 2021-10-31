@@ -9,6 +9,7 @@ import {
   StatusBar,
   Modal,
   TextInput,
+  Alert,
 } from 'react-native';
 import {settings} from '../../../config';
 import {Icon} from 'native-base';
@@ -103,7 +104,19 @@ export const BaiKiemTra = ({params}) => {
 
   // Nhấn nút delete
   const deleteQuest = item => {
-    del(item.MaBaiKT);
+    Alert.alert('Xác nhận', 'Bạn muốn xóa bài kiểm tra này?', [
+      {
+        text: 'Hủy',
+        onPress: () => console.log('Cancel Pressed'),
+        style: 'cancel',
+      },
+      {
+        text: 'OK',
+        onPress: () => {
+          del(item.MaBaiKT);
+        },
+      },
+    ]);
   };
 
   // Gọi api tạo mới
@@ -127,8 +140,8 @@ export const BaiKiemTra = ({params}) => {
     setModal(false);
     postData();
 
-    setNgay('Chọn ngày');
-    setThoiGian('Chọn thời gian');
+    setNgay(new Date());
+    setThoiGian(0);
     setTenBaiKT('');
   };
 
@@ -316,7 +329,7 @@ export const BaiKiemTra = ({params}) => {
               style={{
                 width: '90%',
                 backgroundColor: '#fff',
-                height: 365,
+                height: 350,
                 borderRadius: 12,
               }}>
               <View
@@ -470,7 +483,7 @@ export const BaiKiemTra = ({params}) => {
                   height: 50,
                   backgroundColor: settings.colors.colorGreen,
                   marginHorizontal: 10,
-                  marginVertical: 10,
+                  marginVertical: 5,
                   borderRadius: 12,
                   alignItems: 'center',
                   justifyContent: 'center',

@@ -1,8 +1,18 @@
+import {Icon} from 'native-base';
 import React from 'react';
 import {View, Text, TouchableOpacity} from 'react-native';
 import {settings} from '../../../config';
 
-export const RenderItem = ({item, data, handle, del, handlePressButton}) => {
+export const RenderItem = ({
+  item,
+  data,
+  handle,
+  del,
+  handlePressButton,
+  user,
+  onEdit,
+  onDelete,
+}) => {
   const getMarginTop = () => {
     if (item.MaCD === data[0].MaCD) {
       return 10;
@@ -29,6 +39,8 @@ export const RenderItem = ({item, data, handle, del, handlePressButton}) => {
   const pressDelete = () => {
     del(item);
   };
+
+  // console.log(user);
 
   return (
     <TouchableOpacity
@@ -115,6 +127,54 @@ export const RenderItem = ({item, data, handle, del, handlePressButton}) => {
             </Text>
           </TouchableOpacity>
         </View>
+
+        {user[0]?.isAdmin !== undefined && parseInt(user[0]?.isAdmin) === 1 && (
+          <View style={{flexDirection: 'row', alignItems: 'center'}}>
+            <TouchableOpacity
+              onPress={() => {
+                onEdit(item);
+              }}
+              activeOpacity={0.5}
+              style={{
+                flex: 1,
+                height: 30,
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: '#42A5F5',
+                borderRadius: 5,
+                marginTop: 10,
+                marginRight: 5,
+              }}>
+              <Icon
+                type="FontAwesome"
+                name="edit"
+                style={{color: '#fff', fontSize: 16}}
+              />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() => {
+                onDelete(item);
+              }}
+              activeOpacity={0.5}
+              style={{
+                flex: 1,
+                height: 30,
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: '#EF5350',
+                borderRadius: 5,
+                marginTop: 10,
+                marginLeft: 5,
+              }}>
+              <Icon
+                type="AntDesign"
+                name="delete"
+                style={{color: '#fff', fontSize: 16}}
+              />
+            </TouchableOpacity>
+          </View>
+        )}
       </View>
     </TouchableOpacity>
   );

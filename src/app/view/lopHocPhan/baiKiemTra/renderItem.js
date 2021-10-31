@@ -2,6 +2,7 @@ import React from 'react';
 import {View, Text, TouchableOpacity, Dimensions} from 'react-native';
 import {Icon} from 'native-base';
 import {settings} from '../../../config';
+import Moment from 'moment';
 
 export const RenderItem = ({item, data, handle, handleDelete}) => {
   const getMarginTop = () => {
@@ -34,8 +35,8 @@ export const RenderItem = ({item, data, handle, handleDelete}) => {
   };
 
   // Lấy ra dạng ngày-tháng-năm
-  const getDate = date => {
-    const newDate = new Date(date);
+  const getStrDate = date => {
+    const newDate = new Date(Moment(date));
     return (
       getNum(newDate.getDate()) +
       '-' +
@@ -87,7 +88,7 @@ export const RenderItem = ({item, data, handle, handleDelete}) => {
           {item?.TenBaiKT}
         </Text>
         <Text numberOfLines={1} style={{width: '100%', fontSize: 12}}>
-          Ngày: {getDate(item?.Ngay)} -{' '}
+          Ngày: {getStrDate(item?.Ngay)} -{' '}
           {parseInt(item?.TrangThai) === 0
             ? 'Chưa sẵn sàng'
             : parseInt(item?.TrangThai) === 1
