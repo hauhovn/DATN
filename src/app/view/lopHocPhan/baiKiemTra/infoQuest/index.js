@@ -9,6 +9,7 @@ import {
   TextInput,
   Clipboard,
   Alert,
+  StyleSheet,
 } from 'react-native';
 import {useNavigation, useRoute, useIsFocused} from '@react-navigation/native';
 import {settings} from '../../../../config';
@@ -30,6 +31,7 @@ import {
   requestUpdateTestList,
 } from '../../../../../server/SocketIO';
 import {createTestDetailt} from '../../../../../server';
+import Moment from 'moment';
 
 export const InfomationQuestion = () => {
   const nav = useNavigation();
@@ -40,7 +42,7 @@ export const InfomationQuestion = () => {
 
   const [showModal, setModal] = useState(false);
   const [tenBaiKT, setTenBaiKT] = useState(item.TenBaiKT);
-  const [ngay, setNgay] = useState(new Date(item.Ngay));
+  const [ngay, setNgay] = useState(new Date(Moment(item.Ngay)));
   const [lableButton, setLableButton] = useState('Hoàn thành');
   const [thoiGian, setThoiGian] = useState('Hoàn thành');
   const [datePicker, setDatePicker] = useState(false);
@@ -65,13 +67,14 @@ export const InfomationQuestion = () => {
   // Update bài kiểm tra (gọi api)
   const editBaiKT = async () => {
     try {
-      await updateBaiKT(
+      const res = await updateBaiKT(
         item.MaBaiKT,
         tenBaiKT,
         getDate(ngay),
         user[0]?.MaGV,
         minToTime(thoiGian),
       );
+      console.log(res);
       setModal(false);
     } catch (error) {
       //
@@ -224,6 +227,8 @@ export const InfomationQuestion = () => {
       ]);
   };
 
+  // console.log('new Date(Moment(item.Ngay)): ', new Date(Moment(item.Ngay)));
+
   // Render screen
   return (
     <View style={{flex: 1, backgroundColor: '#fff'}}>
@@ -231,66 +236,24 @@ export const InfomationQuestion = () => {
 
       {item !== undefined ? (
         <View style={{backgroundColor: '#fff', flex: 1}}>
-          <View
-            style={{
-              width: '100%',
-              flexDirection: 'row',
-              alignItems: 'center',
-              marginTop: 5,
-              height: 35,
-            }}>
+          <View style={styles.header}>
             <Icon
               type="MaterialCommunityIcons"
               name="book-open-variant"
-              style={{
-                fontSize: 24,
-                color: settings.colors.colorGreen,
-                marginLeft: 10,
-              }}
+              style={styles.iconBook}
             />
-            <Text
-              style={{
-                color: settings.colors.colorGreen,
-                fontSize: 16,
-                fontWeight: 'bold',
-                marginHorizontal: 10,
-                flex: 1,
-              }}>
-              CHI TIẾT BÀI KIỂM TRA
-            </Text>
+            <Text style={styles.headerTitle}>CHI TIẾT BÀI KIỂM TRA</Text>
             <TouchableOpacity
               onPress={() => {
                 handleStart();
               }}
               activeOpacity={0.7}
-              style={{
-                paddingVertical: 5,
-                paddingHorizontal: 9,
-                backgroundColor: settings.colors.colorGreen,
-                marginRight: 5,
-                alignItems: 'center',
-                justifyContent: 'center',
-                borderRadius: 500,
-              }}>
-              <Text
-                style={{
-                  color: '#fff',
-                  fontWeight: 'bold',
-                  fontSize: 14,
-                  textTransform: 'uppercase',
-                }}>
-                {lableButton}
-              </Text>
+              style={styles.headerButton}>
+              <Text style={styles.headerBtnText}>{lableButton}</Text>
             </TouchableOpacity>
           </View>
-          <View
-            style={{
-              width: '100%',
-              marginTop: 10,
-              paddingHorizontal: 10,
-              borderBottomWidth: 0.5,
-              borderColor: '#CFD8DC',
-            }}>
+
+          <View style={styles.main}>
             <View style={{flexDirection: 'row', alignItems: 'flex-start'}}>
               <Text style={{fontWeight: 'bold', marginRight: 5, fontSize: 16}}>
                 Tên bài:
@@ -299,78 +262,42 @@ export const InfomationQuestion = () => {
                 {tenBaiKT}
               </Text>
             </View>
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'flex-start',
-                marginTop: 5,
-              }}>
-              <Text style={{fontWeight: 'bold', marginRight: 5, fontSize: 16}}>
-                Key:
-              </Text>
+
+            <View style={styles.mainItem}>
+              <Text style={styles.mainItemText}>Key:</Text>
               <Text style={{fontSize: 16}}>{item.KeyBaiKT}</Text>
               <TouchableOpacity
                 onPress={() => {
                   Clipboard.setString(item?.KeyBaiKT);
                 }}
-                style={{
-                  paddingHorizontal: 6,
-                  backgroundColor: '#CFD8DC',
-                  paddingVertical: 3,
-                  marginLeft: 15,
-                  borderRadius: 10,
-                }}>
+                style={styles.btnCopy}>
                 <Text style={{fontSize: 10}}>Copy</Text>
               </TouchableOpacity>
             </View>
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'flex-start',
-                marginTop: 5,
-              }}>
-              <Text style={{fontWeight: 'bold', marginRight: 5, fontSize: 16}}>
-                Lớp học phần:
-              </Text>
+
+            <View style={styles.mainItem}>
+              <Text style={styles.mainItemText}>Lớp học phần:</Text>
               <Text style={{flex: 1, fontSize: 16}}>{item.TenLopHP}</Text>
             </View>
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'flex-start',
-                marginTop: 5,
-              }}>
-              <Text style={{fontWeight: 'bold', marginRight: 5, fontSize: 16}}>
-                Môn học:
-              </Text>
+
+            <View style={styles.mainItem}>
+              <Text style={styles.mainItemText}>Môn học:</Text>
               <Text style={{flex: 1, fontSize: 16}}>{route.params.TenMH}</Text>
             </View>
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'flex-start',
-                marginTop: 5,
-              }}>
-              <Text style={{fontWeight: 'bold', marginRight: 5, fontSize: 16}}>
-                Ngày:
-              </Text>
+
+            <View style={styles.mainItem}>
+              <Text style={styles.mainItemText}>Ngày:</Text>
               <Text style={{flex: 1, fontSize: 16}}>{getStrDate(ngay)}</Text>
             </View>
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'flex-start',
-                marginTop: 5,
-                marginBottom: 10,
-              }}>
-              <Text style={{fontWeight: 'bold', marginRight: 5, fontSize: 16}}>
-                Thời gian
-              </Text>
+
+            <View style={[styles.mainItem, {marginBottom: 10}]}>
+              <Text style={styles.mainItemText}>Thời gian</Text>
               <Text style={{flex: 1, fontSize: 16}}>
                 {minToTime(thoiGian)} ({thoiGian} phút)
               </Text>
             </View>
           </View>
+
           <View
             style={{flexDirection: 'row', marginLeft: 10, marginVertical: 5}}>
             <Text
@@ -382,6 +309,7 @@ export const InfomationQuestion = () => {
               Số câu hỏi: {questions?.SoLuong}
             </Text>
           </View>
+
           <View
             style={{
               flex: 1,
@@ -401,6 +329,7 @@ export const InfomationQuestion = () => {
               style={{flex: 1, backgroundColor: '#fff'}}
             />
           </View>
+
           <View
             style={{
               flexDirection: 'row',
@@ -410,7 +339,6 @@ export const InfomationQuestion = () => {
             }}>
             <TouchableOpacity
               onPress={() => {
-                // console.log('params: ', route.params);
                 nav.navigate(AppRouter.ADDQUEST, {
                   MaMH: route.params.MaMH,
                   BaiKiemTra: item,
@@ -432,6 +360,7 @@ export const InfomationQuestion = () => {
                 THÊM CÂU HỎI
               </Text>
             </TouchableOpacity>
+
             <TouchableOpacity
               onPress={() => {
                 edit();
@@ -465,6 +394,7 @@ export const InfomationQuestion = () => {
         </View>
       )}
 
+      {/* MODAL */}
       <Modal
         animationType="fade"
         transparent={true}
@@ -515,7 +445,7 @@ export const InfomationQuestion = () => {
                     fontWeight: 'bold',
                     flex: 1,
                   }}>
-                  THÊM BÀI KIỂM TRA
+                  SỬA BÀI KIỂM TRA
                 </Text>
                 <TouchableOpacity
                   onPress={() => {
@@ -1100,3 +1030,64 @@ export const InfomationQuestion = () => {
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  header: {
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 5,
+    height: 35,
+  },
+  iconBook: {
+    fontSize: 24,
+    color: settings.colors.colorGreen,
+    marginLeft: 10,
+  },
+  headerTitle: {
+    color: settings.colors.colorGreen,
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginHorizontal: 10,
+    flex: 1,
+  },
+  headerButton: {
+    paddingVertical: 5,
+    paddingHorizontal: 9,
+    backgroundColor: settings.colors.colorGreen,
+    marginRight: 5,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 500,
+  },
+  headerBtnText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 14,
+    textTransform: 'uppercase',
+  },
+  main: {
+    width: '100%',
+    marginTop: 10,
+    paddingHorizontal: 10,
+    borderBottomWidth: 0.5,
+    borderColor: '#CFD8DC',
+  },
+  mainItem: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginTop: 5,
+  },
+  mainItemText: {
+    fontWeight: 'bold',
+    marginRight: 5,
+    fontSize: 16,
+  },
+  btnCopy: {
+    paddingHorizontal: 6,
+    backgroundColor: '#CFD8DC',
+    paddingVertical: 3,
+    marginLeft: 15,
+    borderRadius: 10,
+  },
+});

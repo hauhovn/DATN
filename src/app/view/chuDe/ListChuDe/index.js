@@ -35,10 +35,12 @@ export const ListChuDe = () => {
   const [monHoc, setMonHoc] = useState(MonHoc.MaMH);
   const [listMonHoc, setListMonHoc] = useState('');
 
+  const [laoding, setLoading] = useState(false);
+
   // Lấy thông tin tài khoản đang đăng nhập vs danh sách môn học
   // Bất đồng bộ ---
   useEffect(() => {
-    console.log('user: ', user);
+    // console.log('user: ', user);
     getMonHoc();
     getData();
   }, []);
@@ -52,10 +54,12 @@ export const ListChuDe = () => {
 
   // Lấy danh sách chủ đề
   const getData = async () => {
+    setLoading(true);
     try {
       const res = await getCD(user[0]?.MaGV, MonHoc.MaMH);
-      console.log('data : ', res);
+      // console.log('data : ', res);
       setData(res.data);
+      setLoading(false);
     } catch (error) {
       console.log(error);
     }
@@ -74,9 +78,11 @@ export const ListChuDe = () => {
 
   // Tạo môn chủ đề
   const postData = async () => {
+    setLoading(true);
     try {
       const res = await createCD(tenCD, monHoc, user[0]?.MaGV);
       setResPOST(res);
+      getData();
     } catch (error) {
       console.log(error);
     }
@@ -84,9 +90,10 @@ export const ListChuDe = () => {
 
   // Xóa chủ đề
   const postDel = async data => {
+    setLoading(true);
     try {
-      const res = await deleteCD(data);
-      console.log('res: ', res);
+      await deleteCD(data);
+      getData();
     } catch (error) {
       console.log(error);
     }
@@ -149,7 +156,7 @@ export const ListChuDe = () => {
         </Text>
       </View>
 
-      {data !== '' ? (
+      {!laoding && data !== '' ? (
         <>
           {data.length !== 0 ? (
             <View style={{backgroundColor: '#fff', flex: 1}}>

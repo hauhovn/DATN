@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import {settings} from '../../../../config';
 import {Icon, Picker} from 'native-base';
-import {useRoute} from '@react-navigation/native';
+import {useNavigation, useRoute} from '@react-navigation/native';
 import {useIsFocused} from '@react-navigation/native';
 import {getCauHoiByMaMH} from '../../../../../server/BaiKiemTra/getCauHoiByMaMH';
 import {getCD} from '../../../../../server/ChuDe/getCD';
@@ -23,6 +23,7 @@ import SelectMultiple from 'react-native-select-multiple';
 
 export const ThemCauHoi = () => {
   const focus = useIsFocused();
+  const navigation = useNavigation();
   const route = useRoute();
   const params = route.params;
   const MaMH = params.MaMH;
@@ -86,35 +87,11 @@ export const ThemCauHoi = () => {
     }
   };
 
-  // // Xóa bài kiểm tra
-  // const subMit = async data => {
-  //   // const res = await deleteBaiKT(data);
-  //   console.log(
-  //     'selectedFruits[0].value: ',
-  //     selectedFruits[0].value,
-  //     'params: ',
-  //     params.BaiKiemTra.MaBaiKT,
-  //   );
-  //   for (let i = 0; i < selectedFruits.length; i++) {
-  //     try {
-  //       const res = await addQuestionDetail(
-  //         selectedFruits[i].value,
-  //         params.BaiKiemTra.MaBaiKT,
-  //       );
-  //       console.log('#res: ', res.data);
-  //     } catch (error) {
-  //       console.log('addQuestion ERROR: ', error);
-  //     }
-  //   }
-  // };
-
-  const addQuestToTest = (MaCH, MaBaiKT) => {};
-  //
   // Gọi api thêm danh sách câu hỏi vô bài kiểm tra
   const postData = async MaCH => {
     try {
       const res = await createCTBKT(params.BaiKiemTra.MaBaiKT, MaCH);
-      console.log('createCTBKT: ', res);
+      navigation.goBack();
     } catch (error) {
       //
     }

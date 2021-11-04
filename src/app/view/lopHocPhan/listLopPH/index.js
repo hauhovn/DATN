@@ -28,6 +28,8 @@ import {getMH} from '../../../../server/MonHoc/getMH';
 import {getLop} from '../../../../server/Lop/getLop/index.js';
 import {getGiangVien} from '../../../../server/User/getGiangVien';
 import Toast from 'react-native-simple-toast';
+import {deleteLHP} from '../../../../server/LopHP/deleteLHP';
+import {updateLPH} from '../../../../server/LopHP/updateLPH';
 
 const {width: dW, height: dH} = Dimensions.get('window');
 
@@ -151,16 +153,43 @@ export const ListLopHP = () => {
   // Xóa chủ đề
   const postDel = async data => {
     try {
-      const res = await deleteCD(data);
-      console.log('res: ', res);
+      const res = await deleteLHP(data.MaLopHP);
+      initData();
+      getData();
     } catch (error) {
       console.log(error);
     }
   };
 
+  const [editID, setEditID] = useState('');
+  const [isEdit, setIsEdit] = useState(false);
+
+  const postEdit = async () => {
+    try {
+      const res = await updateLPH(editID, tenCD, teach, monHoc, lopHoc);
+      initData();
+      getData();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const onEdit = data => {
+    console.log(data);
+
+    setEditID(data.MaLopHP);
+    setIsEdit(true);
+
+    setTenCD(data.TenLopHP);
+    setMonHoc(data.MaMH);
+    setTeach(data.MaGV);
+    setLopHoc(data.MaLop);
+
+    setModal(true);
+  };
+
   // Nhấn vô item
   const handlePressItem = item => {
-    console.log('handlePressItem: ', item);
     nav.navigate(AppRouter.QUESTION, {
       item: item,
       user: user,
@@ -192,10 +221,16 @@ export const ListLopHP = () => {
     }
   };
 
+  const initData = () => {
+    setTenCD('');
+    setMonHoc('');
+    setTeach('');
+    setLopHoc('');
+  };
+
   // Nhấn nút xóa môn học
   const del = item => {
-    postDel(item?.MaCD);
-    getData();
+    postDel(item);
   };
 
   // Nhấn nút
@@ -289,7 +324,8 @@ export const ListLopHP = () => {
                   item={item}
                   data={data}
                   handle={handlePressItem}
-                  del={del}
+                  onDelete={del}
+                  onEdit={onEdit}
                   user={user}
                   handlePressButton={handlePressButton}
                 />
@@ -305,6 +341,7 @@ export const ListLopHP = () => {
               }
             />
           </View>
+
           {user[0]?.isAdmin !== undefined && parseInt(user[0]?.isAdmin) === 1 && (
             <Fab
               containerStyle={{}}
@@ -339,6 +376,7 @@ export const ListLopHP = () => {
         visible={showModal}
         onRequestClose={() => {
           setModal(false);
+          initData();
         }}>
         <StatusBar
           barStyle={'light-content'}
@@ -350,6 +388,7 @@ export const ListLopHP = () => {
           <Text
             onPress={() => {
               setModal(false);
+              initData();
             }}
             style={{flex: 1}}
           />
@@ -358,6 +397,7 @@ export const ListLopHP = () => {
             <Text
               onPress={() => {
                 setModal(false);
+                initData();
               }}
               style={{flex: 1}}
             />
@@ -388,6 +428,7 @@ export const ListLopHP = () => {
                 <TouchableOpacity
                   onPress={() => {
                     setModal(false);
+                    initData();
                   }}
                   style={{
                     height: '100%',
@@ -556,28 +597,81 @@ export const ListLopHP = () => {
 
               <View style={{height: 10}} />
 
-              <TouchableOpacity
-                onPress={() => {
-                  createChuDe();
-                }}
-                activeOpacity={0.5}
-                style={{
-                  height: 50,
-                  backgroundColor: settings.colors.colorGreen,
-                  marginHorizontal: 10,
-                  marginVertical: 10,
-                  borderRadius: 12,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}>
-                <Text style={{color: '#ffF', fontSize: 14, fontWeight: 'bold'}}>
-                  THÊM LỚP HỌC PHẦN
-                </Text>
-              </TouchableOpacity>
+              {!isEdit ? (
+                <TouchableOpacity
+                  onPress={() => {
+                    createChuDe();
+                  }}
+                  activeOpacity={0.5}
+                  style={{
+                    height: 50,
+                    backgroundColor: settings.colors.colorGreen,
+                    marginHorizontal: 10,
+                    marginVertical: 10,
+                    borderRadius: 12,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}>
+                  <Text
+                    style={{color: '#ffF', fontSize: 14, fontWeight: 'bold'}}>
+                    THÊM LỚP HỌC PHẦN
+                  </Text>
+                </TouchableOpacity>
+              ) : (
+                <TouchableOpacity
+                  onPress={() => {
+                    if (tenCD.trim() === '' || tenCD === '') {
+                      Alert.alert(
+                        'Không thành công',
+                        'Vui lòng nhập tên chủ đề',
+                      );
+                    } else {
+                      if (teach === '' || tenCD === 'Chọn giảng viên') {
+                        Alert.alert(
+                          'Không thành công',
+                          'Vui lòng chọn giảng viên',
+                        );
+                      } else {
+                        if (monHoc === '' || monHoc === 'Chọn môn học') {
+                          Alert.alert(
+                            'Không thành công',
+                            'Vui lòng chọn môn học',
+                          );
+                        } else {
+                          if (lopHoc === '' || lopHoc === 'Chọn lớp') {
+                            Alert.alert(
+                              'Không thành công',
+                              'Vui lòng chọn lớp',
+                            );
+                          } else {
+                            setModal(false);
+                            postEdit();
+                          }
+                        }
+                      }
+                    }
+                  }}
+                  activeOpacity={0.5}
+                  style={{
+                    height: 50,
+                    backgroundColor: settings.colors.colorGreen,
+                    marginHorizontal: 10,
+                    marginVertical: 10,
+                    borderRadius: 12,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}>
+                  <Text
+                    style={{color: '#ffF', fontSize: 14, fontWeight: 'bold'}}>
+                    CẬP NHẬT THÔNG TIN
+                  </Text>
+                </TouchableOpacity>
+              )}
             </View>
             <Text
               onPress={() => {
                 setModal(false);
+                initData();
               }}
               style={{flex: 1}}
             />
@@ -585,6 +679,7 @@ export const ListLopHP = () => {
           <Text
             onPress={() => {
               setModal(false);
+              initData();
             }}
             style={{flex: 1}}
           />

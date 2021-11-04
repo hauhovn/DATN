@@ -2,11 +2,15 @@ import {settings} from '../../../app/config';
 
 let api = settings.hostURL;
 
-const deleteLHP = async MaLHP => {
+const updateLPH = async (MaLHP, TenLopHP, MaGV, MaMH, MaLop) => {
   let res = '';
 
   var data = new FormData();
   data.append('MaLopHP', MaLHP);
+  data.append('TenLopHP', TenLopHP);
+  data.append('MaGV', MaGV);
+  data.append('MaMH', MaMH);
+  data.append('MaLop', MaLop);
 
   var requestOptions = {
     method: 'POST',
@@ -14,7 +18,7 @@ const deleteLHP = async MaLHP => {
     redirect: 'follow',
   };
 
-  await fetch(api + 'LopHocPhan/deleteLPH.php', requestOptions)
+  await fetch(api + 'LopHocPhan/updateLPH.php', requestOptions)
     .then(response => response.json())
     .then(data => {
       res = data;
@@ -24,4 +28,4 @@ const deleteLHP = async MaLHP => {
   return res;
 };
 
-export {deleteLHP};
+export {updateLPH};

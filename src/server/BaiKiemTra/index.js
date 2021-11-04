@@ -4,7 +4,6 @@ let api = settings.hostURL;
 
 const getBaiKiemTra = async (MaSV, SoLuong, Page, Status = -1, Type = 'testing') => {
 
-
     let res = '';
     var data = new FormData();
     data.append('MaSV', MaSV);

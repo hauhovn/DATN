@@ -121,7 +121,16 @@ export const RenderItem = ({item, data, handle}) => {
           />
         </View>
         <Text style={{flex: 10, fontSize: 14}}>
-          Trạng thái: {item?.TrangThai}
+          Trạng thái:{' '}
+          {item?.TrangThai === 0
+            ? 'Mới tạo'
+            : item?.TrangThai === 1
+            ? 'Đã hoàn thành'
+            : item?.TrangThai === 2
+            ? 'Đang kiểm tra'
+            : item?.TrangThai === 3
+            ? 'Đang tạm dừng'
+            : 'Đã kết thúc'}
         </Text>
       </View>
     </TouchableOpacity>
