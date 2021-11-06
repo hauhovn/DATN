@@ -88,12 +88,33 @@ export const RenderItem = ({item, data, handle, handleDelete}) => {
           {item?.TenBaiKT}
         </Text>
         <Text numberOfLines={1} style={{width: '100%', fontSize: 12}}>
-          Ngày: {getStrDate(item?.Ngay)} -{' '}
+          Ngày: {getStrDate(item?.Ngay)}
+        </Text>
+        <Text
+          numberOfLines={1}
+          style={{
+            width: '100%',
+            fontSize: 12,
+            color:
+              parseInt(item?.TrangThai) === 0
+                ? 'green'
+                : parseInt(item?.TrangThai) === 1
+                ? 'blue'
+                : parseInt(item?.TrangThai) === 2
+                ? 'pink'
+                : parseInt(item?.TrangThai) === 3
+                ? 'orange'
+                : 'red',
+          }}>
           {parseInt(item?.TrangThai) === 0
-            ? 'Chưa sẵn sàng'
+            ? 'Mới tạo'
             : parseInt(item?.TrangThai) === 1
-            ? 'Đã sẵn sằng'
-            : 'Đang làm bài'}
+            ? 'Đã hoàn thành'
+            : parseInt(item?.TrangThai) === 2
+            ? 'Đang kiểm tra'
+            : parseInt(item?.TrangThai) === 3
+            ? 'Đang tạm dừng'
+            : 'Đã kết thúc'}
         </Text>
       </View>
       <TouchableOpacity
