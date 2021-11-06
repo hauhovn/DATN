@@ -32,6 +32,8 @@ import {
 } from '../../../../../server/SocketIO';
 import {createTestDetailt} from '../../../../../server';
 import Moment from 'moment';
+import {getKQ} from '../../../../../server/KetQua/getKetQua.d';
+import {RenderItemKQ} from './renderItemKQ';
 
 export const InfomationQuestion = () => {
   const nav = useNavigation();
@@ -52,6 +54,8 @@ export const InfomationQuestion = () => {
   const [showDetails, setShowDetails] = useState(false);
   const [details, setDetails] = useState('');
 
+  const [ketQua, setKQ] = useState([]);
+
   // Focus vô thì chạy
   useEffect(() => {
     if (focused) {
@@ -61,6 +65,10 @@ export const InfomationQuestion = () => {
       _get123MongTinhYeuTanRa();
 
       getQuestion(route.params.item.MaBaiKT);
+
+      if (route.params.item.TrangThai === '4') {
+        getKQKT();
+      }
     }
   }, [focused]);
 
@@ -101,6 +109,16 @@ export const InfomationQuestion = () => {
       const res = await getCTBKT(data);
       console.log('getCTBKT: ', res);
       setQuestions(res);
+    } catch (error) {
+      //
+    }
+  };
+
+  const getKQKT = async data => {
+    try {
+      const res = await getKQ(data);
+      console.log('getKQ: ', res);
+      setKQ(res.data);
     } catch (error) {
       //
     }
@@ -229,6 +247,8 @@ export const InfomationQuestion = () => {
 
   // console.log('new Date(Moment(item.Ngay)): ', new Date(Moment(item.Ngay)));
 
+  console.log(route.params);
+
   // Render screen
   return (
     <View style={{flex: 1, backgroundColor: '#fff'}}>
@@ -298,89 +318,131 @@ export const InfomationQuestion = () => {
             </View>
           </View>
 
-          <View
-            style={{flexDirection: 'row', marginLeft: 10, marginVertical: 5}}>
-            <Text
-              style={{
-                fontSize: 14,
-                color: settings.colors.colorThumblr,
-                fontWeight: 'bold',
-              }}>
-              Số câu hỏi: {questions?.SoLuong}
-            </Text>
-          </View>
+          {route.params.item.TrangThai !== '4' ? (
+            <>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  marginLeft: 10,
+                  marginVertical: 5,
+                }}>
+                <Text
+                  style={{
+                    fontSize: 14,
+                    color: settings.colors.colorThumblr,
+                    fontWeight: 'bold',
+                  }}>
+                  Số câu hỏi: {questions?.SoLuong}
+                </Text>
+              </View>
 
-          <View
-            style={{
-              flex: 1,
-            }}>
-            <FlatList
-              data={questions.data}
-              showsVerticalScrollIndicator={false}
-              renderItem={({item}) => (
-                <RenderItem
-                  item={item}
+              <View
+                style={{
+                  flex: 1,
+                }}>
+                <FlatList
                   data={questions.data}
-                  handle={handlePressItem}
-                  handleDelete={deleteQuest}
+                  showsVerticalScrollIndicator={false}
+                  renderItem={({item}) => (
+                    <RenderItem
+                      item={item}
+                      data={questions.data}
+                      handle={handlePressItem}
+                      handleDelete={deleteQuest}
+                    />
+                  )}
+                  keyExtractor={item => item.CauHoi}
+                  style={{flex: 1, backgroundColor: '#fff'}}
                 />
-              )}
-              keyExtractor={item => item.CauHoi}
-              style={{flex: 1, backgroundColor: '#fff'}}
-            />
-          </View>
+              </View>
 
-          <View
-            style={{
-              flexDirection: 'row',
-              height: 50,
-              paddingBottom: 5,
-              marginTop: -55,
-            }}>
-            <TouchableOpacity
-              onPress={() => {
-                nav.navigate(AppRouter.ADDQUEST, {
-                  MaMH: route.params.MaMH,
-                  BaiKiemTra: item,
-                  user: user,
-                });
-              }}
-              activeOpacity={0.5}
-              style={{
-                height: 45,
-                marginHorizontal: 10,
-                justifyContent: 'center',
-                alignItems: 'center',
-                backgroundColor: settings.colors.colorGreen,
-                marginBottom: 10,
-                borderRadius: 10,
-                flex: 1,
-              }}>
-              <Text style={{color: '#fff', fontSize: 14, fontWeight: 'bold'}}>
-                THÊM CÂU HỎI
-              </Text>
-            </TouchableOpacity>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  height: 50,
+                  paddingBottom: 5,
+                  marginTop: -55,
+                }}>
+                <TouchableOpacity
+                  onPress={() => {
+                    nav.navigate(AppRouter.ADDQUEST, {
+                      MaMH: route.params.MaMH,
+                      BaiKiemTra: item,
+                      user: user,
+                    });
+                  }}
+                  activeOpacity={0.5}
+                  style={{
+                    height: 45,
+                    marginHorizontal: 10,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    backgroundColor: settings.colors.colorGreen,
+                    marginBottom: 10,
+                    borderRadius: 10,
+                    flex: 1,
+                  }}>
+                  <Text
+                    style={{color: '#fff', fontSize: 14, fontWeight: 'bold'}}>
+                    THÊM CÂU HỎI
+                  </Text>
+                </TouchableOpacity>
 
-            <TouchableOpacity
-              onPress={() => {
-                edit();
-              }}
-              activeOpacity={0.5}
-              style={{
-                width: 80,
-                height: 45,
-                marginRight: 10,
-                justifyContent: 'center',
-                alignItems: 'center',
-                backgroundColor: settings.colors.colorGreen,
-                marginBottom: 10,
-                borderRadius: 10,
-              }}>
-              <Text style={{color: '#fff', fontSize: 14, fontWeight: 'bold'}}>
-                SỬA
-              </Text>
-            </TouchableOpacity>
-          </View>
+                <TouchableOpacity
+                  onPress={() => {
+                    edit();
+                  }}
+                  activeOpacity={0.5}
+                  style={{
+                    width: 80,
+                    height: 45,
+                    marginRight: 10,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    backgroundColor: settings.colors.colorGreen,
+                    marginBottom: 10,
+                    borderRadius: 10,
+                  }}>
+                  <Text
+                    style={{color: '#fff', fontSize: 14, fontWeight: 'bold'}}>
+                    SỬA
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </>
+          ) : (
+            <>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  marginLeft: 10,
+                  marginVertical: 5,
+                }}>
+                <Text
+                  style={{
+                    fontSize: 14,
+                    color: settings.colors.colorThumblr,
+                    fontWeight: 'bold',
+                  }}>
+                  Số sinh viên: {ketQua.length}
+                </Text>
+              </View>
+              <FlatList
+                data={ketQua}
+                showsVerticalScrollIndicator={false}
+                renderItem={({item}) => (
+                  <RenderItemKQ
+                    item={item}
+                    data={ketQua}
+                    handle={handlePressItem}
+                    handleDelete={deleteQuest}
+                  />
+                )}
+                keyExtractor={item => item.CauHoi}
+                style={{flex: 1, backgroundColor: '#fff'}}
+              />
+            </>
+          )}
         </View>
       ) : (
         <View

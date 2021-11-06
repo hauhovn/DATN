@@ -97,16 +97,7 @@ export const RenderItem = ({
           Lớp: {item.TenLop}
         </Text>
 
-        {/* <Text
-          numberOfLines={1}
-          style={{
-            color: settings.colors.colorThumblr,
-            fontSize: 12,
-            width: '100%',
-            marginBottom: 10,
-          }}>
-          Số lượng học sinh: {item?.SoLuongSV}
-        </Text> */}
+        <View style={{flex: 1}} />
 
         <View style={{flexDirection: 'row', alignItems: 'center'}}>
           <TouchableOpacity
