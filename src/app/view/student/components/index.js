@@ -10,9 +10,11 @@ import LoadingIndicator from "./loading";
 import PauseTestModal from "./pause-test-modal";
 import TestingDetailItem from "./testing-detail-item";
 import { ItemTestResult } from "./item-test-result";
+import { StudentJonedListModal } from "./student-joned-list-modal/index";
 
 export {
     ItemTest, TestDetailModal, MyAppBar, WaitingTest,
     MenuQuestionModal, MyAlert, MyCountDown, DialogPickerModal,
-    LoadingIndicator, PauseTestModal, TestingDetailItem, ItemTestResult
+    LoadingIndicator, PauseTestModal, TestingDetailItem, ItemTestResult,
+    StudentJonedListModal
 }

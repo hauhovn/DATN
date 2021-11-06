@@ -80,7 +80,9 @@ export
                                 }}>
                                 <View style={styles.title}>
                                     <Text style={textStyles.title}>{resData?.TenMonHoc} </Text>
-                                    <View style={{ flexDirection: 'row', alignItems: 'flex-end' }}>
+                                    <View style={{
+                                        flexDirection: 'row'
+                                    }}>
                                         <Text
                                             style={[
                                                 textStyles.title,
@@ -91,8 +93,14 @@ export
                                         <Text
                                             style={[
                                                 textStyles.title,
-                                                { fontSize: 15, color: mainColor, fontWeight: 'bold' },
+                                                {
+                                                    fontSize: 13,
+                                                    color: mainColor,
+                                                    fontWeight: 'bold',
+                                                    maxWidth: 120
+                                                },
                                             ]}>
+
                                             {resData?.TenLopHP}
                                         </Text>
                                     </View>

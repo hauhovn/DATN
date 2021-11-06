@@ -6,6 +6,8 @@ import { View, Text, StyleSheet } from 'react-native';
 export const ItemJoinLeaveRoom = ({ item }) => {
     let brColor = '#118011';
 
+    console.log(`from ItemJoinLeaveRoom`, item);
+
     // console.log(`#9_jlri item tao nhan duoc ne: `, item);
 
     if (item.status == 0) {

@@ -6,6 +6,8 @@ import { getCTBaiKiemTra } from "./BaiKiemTra/getTestDetail";
 import { setTimeTest } from "./BaiKiemTra/setTimeTest";
 import { getTimeTest } from "./BaiKiemTra/getTimeTest";
 import { getTestTimeCountdown } from "./BaiKiemTra/get-time-countdown";
+import { getJonedList } from './LopHP/get-joned-list'
+import { tinhKetQua } from './KetQua/tinh-ket-qua';
 
 
 export {
@@ -16,5 +18,7 @@ export {
     getCTBaiKiemTra,
     setTimeTest,
     getTimeTest,
-    getTestTimeCountdown
+    getTestTimeCountdown,
+    getJonedList,
+    tinhKetQua
 }

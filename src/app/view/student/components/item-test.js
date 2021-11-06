@@ -10,7 +10,7 @@ export
             <TouchableOpacity style={styles.container} onPress={() => handle(item)}>
                 <View style={styles.title}>
                     <Text style={styles.titleText}>{item.TenLopHP}</Text>
-                    <Text>{Moment(item?.Ngay)?.format('LTS')} - {Moment(item?.Ngay)?.format('L')}</Text>
+                    <Text style={{ alignSelf: 'flex-end' }}>{Moment(item?.Ngay)?.format('LTS')} - {Moment(item?.Ngay)?.format('L')}</Text>
                 </View>
                 <View style={styles.content}>
                     <View style={styles.content}>
@@ -27,7 +27,7 @@ const styles = StyleSheet.create({
         backgroundColor: COLORS.white,
         marginHorizontal: '5%',
         marginBottom: 8,
-        height: 90,
+        height: 120,
         width: '90%',
         borderWidth: 0.6,
         borderColor: COLORS.colorMain,
@@ -43,7 +43,7 @@ const styles = StyleSheet.create({
         elevation: 5,
     },
     title: {
-        flexDirection: 'row',
+        flexDirection: 'column',
         justifyContent: 'space-between',
         padding: 8,
     },

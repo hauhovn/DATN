@@ -36,7 +36,9 @@ import {
     getTestingDetailt,
     getCTBaiKiemTra,
     setTimeTest,
-    getTimeTest
+    getTimeTest,
+    getJonedList,
+    tinhKetQua
 } from '../../../server';
 
 /** Components */
@@ -44,7 +46,8 @@ import {
     LoadingIndicator,
     DialogPickerModal,
     TestingDetailItem,
-    MyCountDown
+    MyCountDown,
+    StudentJonedListModal
 } from '../student/components'
 import { COLORS, STYLES, SIZES, GIFS } from '../../assets/constants';
 import { Icon } from 'native-base';
@@ -71,12 +74,14 @@ export const TeacherControl = ({ route, navigation }) => {
     const appState = React.useRef(AppState.currentState);
 
     const [appStateVisible, setAppStateVisible] = useState(appState.current);
-    const [usersStatusList, setUsersStatusList] = useState([]);
+    const [studentInOutList, setStudentInOutList] = useState([]);
     const [usersTestDetailList, setUsersTestDetailList] = useState([]);
+    const [jonedList, setJonedList] = useState([]);
     const [reRender, setReRender] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [isLoadingMain, setLoadingMain] = useState(false);
     const [isLoad2, setLoad2] = useState(false);
+    const [isShowStudentJonedList, setShowStudentJonedList] = useState(false);
     const [testStatus, setTestStatus] = useState(1);
     const [studentsQuantity, setStudentsQuantity] = useState(0);
     const [studentTestQuantity, setStudentTestQuantity] = useState(0);
@@ -136,6 +141,9 @@ export const TeacherControl = ({ route, navigation }) => {
         /** Get test info */
         await getTestInfo(BaiKiemTra.MaBaiKT);
 
+        /** Get joned list */
+        await _getJonedList(user.id, BaiKiemTra.MaBaiKT);
+
         console.log(testInfo);
 
         /** Get student quantity */
@@ -162,7 +170,11 @@ export const TeacherControl = ({ route, navigation }) => {
             if (err) return;
             console.log(`# Co SV moi tham gia: `, data);
             addTestStatusInfo(
-                res = data
+                data.isConnect,
+                data.status,
+                data.info,
+                data.name,
+                data.socket_id
             )
 
         });
@@ -174,6 +186,12 @@ export const TeacherControl = ({ route, navigation }) => {
         let response = await getTestStatus(null, testID);
         console.log(`res=`, response);
         setTestStatus(response.status);
+    }
+
+    const _getJonedList = async (MaGV, MaBaiKT) => {
+        const rs = await getJonedList(MaGV, MaBaiKT);
+        console.log(`Joned list MaGV: ${MaGV} - BKT: ${MaBaiKT}`, rs);
+        setStudentTestQuantity(rs.joned)
     }
 
     /** Get test info */
@@ -223,16 +241,16 @@ export const TeacherControl = ({ route, navigation }) => {
     }
 
     async function getOldInfo(MaBKT) {
-        setUsersStatusList([]);
-        const res = await getTestInfo(MaBKT, 1);
-        console.log(MaBKT + 'RES: ', JSON.stringify(res));
-        setUsersStatusList(res?.data);
+        // setStudentInOutList([]);
+        // const res = await getTestInfo(MaBKT, 1);
+        // console.log(MaBKT + 'RES: ', JSON.stringify(res));
+        // setStudentInOutList(res?.data);
     }
     async function getOldInfoBefore(MaBKT) {
-        setUsersStatusList([]);
+        setStudentInOutList([]);
         let res = await getInfoBeforeTest(MaBKT);
         console.log(MaBKT + 'RES: ', JSON.stringify(res));
-        setUsersStatusList(res.data);
+        setStudentInOutList(res.data);
     }
 
     // Press students list
@@ -280,6 +298,14 @@ export const TeacherControl = ({ route, navigation }) => {
         rs?.code == toStatus && setLoadingMain(false)
         console.log('-------- rs ne', rs);
     }
+
+    /** Tinh toan va update diem */
+    const tinhKetQuaBKT = async () => {
+        let rs = await tinhKetQua(user.id, BaiKiemTra.MaBaiKT);
+        console.log(rs);
+    }
+
+
     // Control Bar Render
     function renderControlBar() {
 
@@ -302,7 +328,7 @@ export const TeacherControl = ({ route, navigation }) => {
                                         /** Waiting =>  Start test */
                                         requestStartTest(user.id, BaiKiemTra.MaBaiKT, true);
 
-                                        addTestStatusInfo(true, 5, 'CÁC THÍ SINH ĐÃ \n BẮT ĐẦU LÀM BÀI');
+                                        addTestStatusInfo(true, 5, '', 'CÁC THÍ SINH ĐÃ \n BẮT ĐẦU LÀM BÀI');
                                         try {
                                             testStatusUpdate(2, 1);
                                             setTestStatus(2);
@@ -317,7 +343,7 @@ export const TeacherControl = ({ route, navigation }) => {
                                         console.log(`run_2_@`);
                                         requestStartTest(user.id, BaiKiemTra.MaBaiKT, false);
 
-                                        addTestStatusInfo(true, 3, 'BÀI KIỂM TRA \nĐÃ DỪNG LẠI');
+                                        addTestStatusInfo(true, 3, '', 'BÀI KIỂM TRA \nĐÃ DỪNG LẠI');
                                         try {
                                             testStatusUpdate(3);
                                             setTestStatus(3);
@@ -330,7 +356,7 @@ export const TeacherControl = ({ route, navigation }) => {
                                         /**Pause => Continue test (Runing)*/
                                         console.log(`run_3_@`);
                                         requestStartTest(user.id, BaiKiemTra.MaBaiKT, true);
-                                        addTestStatusInfo(true, 2, 'BÀI KIỂM TRA \nĐÃ TIẾP TỤC');
+                                        addTestStatusInfo(true, 2, '', 'BÀI KIỂM TRA \nĐÃ TIẾP TỤC');
                                         try {
                                             testStatusUpdate(2);
                                             setTestStatus(2);
@@ -349,6 +375,7 @@ export const TeacherControl = ({ route, navigation }) => {
                                 setTimeout(() => {
                                     requestUpdateTestList(true, BaiKiemTra.MaBaiKT);
                                 }, 2000);
+                                tinhKetQuaBKT();
                                 Alert.alert(
                                     `Thông báo`,
                                     `Đã ${statusInfoAction[testStatus].toLowerCase()} bài kiểm tra ${BaiKiemTra.TenBaiKT} `,
@@ -393,7 +420,7 @@ export const TeacherControl = ({ route, navigation }) => {
                     {/** Class quantity */}
                     <View style={{ ...actionBar.row, alignItems: "center", justifyContent: 'flex-start' }}>
                         <TouchableOpacity
-                            onPress={() => Alert.alert('Mo danh sach may dua da vao, chua vao')}
+                            onPress={() => setShowStudentJonedList(!isShowStudentJonedList)}
                         >
                             <Icon
                                 type="Entypo"
@@ -441,13 +468,22 @@ export const TeacherControl = ({ route, navigation }) => {
 
     function addTestStatusInfo(
         isConnect = true, status = 2,
-        info = 'BÀI KIỂM TRA \nĐÃ TIẾP TỤC',
-        name = ' ', socket_id = Math.random().toString(),
+        info = '',
+        name = 'BÀI KIỂM TRA \nĐÃ TIẾP TỤC',
+        socket_id = Math.random().toString(),
         res = undefined
     ) {
-        try {
 
-            let newInfo = {
+        console.log(`
+        From function addTestStatusInfo
+        isConnect: ${isConnect}
+        status: ${status}
+        info: ${info}
+        name: ${name}
+        socket_id: ${socket_id}
+        `);
+        try {
+            let newElement = {
                 isConnect: isConnect,
                 status: status,
                 name: name,
@@ -455,15 +491,10 @@ export const TeacherControl = ({ route, navigation }) => {
                 socket_id: socket_id
             };
 
-            if (res != undefined) newInfo = res;
+            // Add item to list info
 
-            if (usersStatusList.length > 0) {
-                setUsersStatusList([...usersStatusList, newInfo])
-                console.log(`usersStatusList.length > 0`);
-            } else {
-                setUsersStatusList([newInfo])
-                console.log(`usersStatusList.length = 0`);
-            }
+            console.log(`item new: `, newElement);
+            setStudentInOutList(oldArray => [...oldArray, newElement]);
         } catch (error) {
             console.log(`Khong the them thong bao`);
         }
@@ -526,13 +557,13 @@ export const TeacherControl = ({ route, navigation }) => {
 
                 {/** List history */}
                 <Animated.View style={{ width: SIZES.width, right: listMarginRight }}>
-                    {usersStatusList?.length > 0 ? (
+                    {studentInOutList?.length > 0 ? (
                         <FlatList
                             style={{ backgroundColor: COLORS.white }}
                             ref={flatList}
                             style={{ ...styles.flatList }}
                             onContentSizeChange={() => flatList.current.scrollToEnd()}
-                            data={usersStatusList}
+                            data={studentInOutList}
                             extraData={reRender}
                             keyExtractor={item =>
                                 item.socketid + (Math.random() * 1000).toString()
@@ -601,6 +632,7 @@ export const TeacherControl = ({ route, navigation }) => {
             flex: 1,
             backgroundColor: COLORS.white
         }}>
+            <StudentJonedListModal isVisible={isShowStudentJonedList} />
             <LoadingIndicator isLoading={isLoadingMain} />
             <Header
                 isTeacher={true}

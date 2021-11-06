@@ -71,7 +71,6 @@ const StudentScreen = () => {
     const [isNullTest, setIsNullTest] = useState(false);
 
     useEffect(() => {
-        inittiateSocket();
         getAccount();
         teacherEditTest((err, isRemove) => {
             if (err) return;
