@@ -15,7 +15,7 @@ import { ItemQuestion } from './item';
 // Constants
 import { COLORS, SIZES, STYLES } from '../../../../assets/constants'
 
-export const MenuQuestionModal = ({ isVisible, onRequestClose, data, onPressItem }) => {
+export const MenuQuestionModal = ({ isVisible, onRequestClose, data, onPressItem, isTest = true }) => {
 
     let isCheck = {
         //is check or correct
@@ -44,7 +44,6 @@ export const MenuQuestionModal = ({ isVisible, onRequestClose, data, onPressItem
 
     return (
         <Modal visible={isVisible}
-            onRequestClose={() => close(true)}
             animationType='slide'>
             <View style={{ flex: 1 }}>
 
@@ -112,20 +111,22 @@ export const MenuQuestionModal = ({ isVisible, onRequestClose, data, onPressItem
                             <Text style={myStyles.textTur}>Chưa làm</Text>
                         </View>
                     )}
-                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                        <TouchableOpacity
-                            style={{
-                                ...STYLES.shadow,
-                                height: SIZES.width / 10 - 12,
-                                width: SIZES.width / 10 - 12,
-                                borderRadius: 10,
-                                backgroundColor: unCheck.color,
-                                borderWidth: 1,
-                                borderColor: '#CFD8DC',
-                            }}
-                        />
-                        <Text style={myStyles.textTur}>{unCheck.label}</Text>
-                    </View>
+                    {
+                        !isTest && <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                            <TouchableOpacity
+                                style={{
+                                    ...STYLES.shadow,
+                                    height: SIZES.width / 10 - 12,
+                                    width: SIZES.width / 10 - 12,
+                                    borderRadius: 10,
+                                    backgroundColor: unCheck.color,
+                                    borderWidth: 1,
+                                    borderColor: '#CFD8DC',
+                                }}
+                            />
+                            <Text style={myStyles.textTur}>{unCheck.label}</Text>
+                        </View>
+                    }
                 </View>
                 <View
                     style={{

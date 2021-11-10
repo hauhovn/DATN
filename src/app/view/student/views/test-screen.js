@@ -565,6 +565,7 @@ const TestScreen = ({ route, navigation }) => {
 
             {/** Menu questions */}
             <MenuQuestionModal
+                isTest={isReviewMode ? false : true}
                 data={questList}
                 isVisible={isShowMenuQuestion}
                 onRequestClose={() => setShowMenuQuestion(!isShowMenuQuestion)}

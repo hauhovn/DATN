@@ -113,7 +113,7 @@ const StudentScreen = () => {
         if (value === ROUTE_NAME.BAI_KIEM_TRA)
             nav.navigate(AppRouter.STUDENT_TESTING_LIST, { MaSV: user[0]?.MaSV, TenSV: user[0]?.TenSV });
         if (value === ROUTE_NAME.LOP_HOC_PHAN)
-            nav.navigate(AppRouter.LOP_HOC_PHAN, { SinhVien: user[0] });
+            nav.navigate(AppRouter.LOP_HOC_PHAN, { MaSV: user[0]?.MaSV, TenSV: user[0]?.TenSV });
         if (value === ROUTE_NAME.DA_KET_THUC)
             nav.navigate(AppRouter.STUDENT_COMPLETED_TEST_LIST, { MaSV: user[0]?.MaSV, TenSV: user[0]?.TenSV });
     };

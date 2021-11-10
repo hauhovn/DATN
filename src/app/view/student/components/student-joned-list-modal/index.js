@@ -2,35 +2,76 @@ import React from "react";
 import {
     View,
     Modal,
-    Text
+    Text,
+    FlatList
 } from 'react-native';
-import { SIZES } from "../../../../assets/constants";
-
+import { COLORS, SIZES } from "../../../../assets/constants";
+import { getJonedList } from '../../../../../server'
 
 export
-    const StudentJonedListModal = ({ isVisible = false }) => {
+    const StudentJonedListModal = ({ isVisible = false, closePopup, props }) => {
+
+        const getData = async () => {
+            if (data.length > 0) return;
+            console.log(`props ne: `, props);
+            const rs = await getJonedList(props.MaGV, props.MaBaiKT);
+            console.log(rs);
+            await setData(rs.data);
+
+        }
+
+        const [data, setData] = React.useState([]);
+
+        getData();
+
+        function renderItem(item) {
+            console.log(item);
+            return (
+                <View style={{
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                    backgroundColor: COLORS.colorBoderLight,
+                    paddingHorizontal: SIZES.padding,
+                    paddingVertical: SIZES.padding / 2,
+                    borderRadius: SIZES.radius,
+                    marginTop: SIZES.radius
+                }}>
+                    <Text style={{ fontSize: 16 }}>{item.TenSV} </Text>
+                    <Text style={{ fontSize: 16, color: item.Joned == 'true' ? COLORS.green : COLORS.colorRed }}> {item.Joned == 'true' ? 'Đã tham gia' : 'Chưa tham gia'}</Text>
+                </View>
+            )
+        }
 
         return (
             <Modal
                 transparent={true}
                 visible={isVisible}
+                onRequestClose={closePopup}
                 style={{
-                    height: SIZES.height,
-                    width: SIZES.width,
                     alignItems: 'center',
                     justifyContent: 'center',
                     backgroundColor: 'yellow'
                 }}
             >
                 <View style={{
-                    height: 120,
-                    width: 120,
-                    backgroundColor: 'red',
+                    height: SIZES.height,
+                    width: SIZES.width,
+                    backgroundColor: COLORS.backgroundFade,
                     alignItems: 'center',
-                    justifyContent: 'center'
+                    justifyContent: 'center',
+                    alignSelf: 'center'
                 }}>
-                    <Text>Joned</Text>
-
+                    <FlatList
+                        style={{
+                            flex: 1,
+                            alignSelf: 'center',
+                            marginTop: SIZES.height * .27,
+                            width: SIZES.width * .9
+                        }}
+                        data={data}
+                        keyExtractor={item => item.MaSV}
+                        renderItem={(item) => renderItem(item.item)}
+                    />
                 </View>
             </Modal>
         )

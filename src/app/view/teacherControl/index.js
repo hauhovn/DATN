@@ -632,7 +632,11 @@ export const TeacherControl = ({ route, navigation }) => {
             flex: 1,
             backgroundColor: COLORS.white
         }}>
-            <StudentJonedListModal isVisible={isShowStudentJonedList} />
+            <StudentJonedListModal
+                isVisible={isShowStudentJonedList}
+                closePopup={() => setShowStudentJonedList(false)}
+                props={{ MaGV: user.id, MaBaiKT: BaiKiemTra.MaBaiKT }}
+            />
             <LoadingIndicator isLoading={isLoadingMain} />
             <Header
                 isTeacher={true}
