@@ -74,28 +74,16 @@ export const AboutMe = () => {
           />
         </TouchableOpacity>
       </View>
-      <View
-        style={{
-          flex: 1,
-          alignItems: 'center',
-          justifyContent: 'center',
-          width: '100%',
-          paddingHorizontal: 20,
-        }}>
-        <Text style={{fontWeight: 'bold'}}></Text>
-        <Text style={{fontSize: 16, fontWeight: 'bold'}}>
-          Giới thiệu về ứng dụng
-        </Text>
-        <Text style={{fontSize: 18, textAlign: 'center'}}>
-          Đây là một ứng dụng cho phép giảng viên, giáo viên có thể triển khai
-          cho học sinh, sinh viên{' '}
-          <Text style={{fontWeight: 'bold'}}>
-            thực hiện các bài kiểm tra và quản lý chúng
-          </Text>
-          . Tất cả chỉ trên một ứng dụng
-        </Text>
+
+      <View style={{width: '100%', alignItems: 'center', marginTop: 20}}>
+        <Image
+          resizeMode="contain"
+          source={require('../../assets/images/oopxx.png')}
+          style={{width: dW - 50, height: undefined, aspectRatio: 1}}
+        />
       </View>
-      {/* <View
+
+      <View
         style={{
           flex: 1,
           alignItems: 'center',
@@ -103,26 +91,16 @@ export const AboutMe = () => {
           width: '100%',
           paddingHorizontal: 20,
         }}>
-        <Text style={{fontWeight: 'bold'}}></Text>
-        <Text style={{fontSize: 16, fontWeight: 'bold'}}>
-          GV hướng dẫn: Thầy Lê Viết Hoàng Nguyên
+        <Text style={{fontSize: 22, fontWeight: 'bold', marginBottom: 20}}>
+          LÀM BÀI KIỂM TRA ONLINE
         </Text>
-        <Text style={{fontSize: 16, fontWeight: 'bold'}}>
-          Nhóm SV thực hiện
+        <Text style={{fontSize: 16, marginBottom: 20}}>
+          Hướng dẫn: (thầy) Lê Viết Hoàng Nguyên
         </Text>
-        <Text style={{fontSize: 18, textAlign: 'center'}}>Hồ Văn Hậu</Text>
-        <Text style={{fontSize: 18, textAlign: 'center'}}>
-          Nguyễn Phúc Bảo Châu
+        <Text style={{fontSize: 16, marginBottom: 20}}>
+          Thực hiện: Bảo Châu, Văn Hậu
         </Text>
-      </View> */}
-      <View
-        style={{
-          width: '100%',
-          height: 315,
-          paddingHorizontal: 15,
-          paddingBottom: 15,
-        }}>
-        <Slide width={dW - 30} height={300} data={slideData} />
+        <Text style={{fontSize: 16, marginBottom: 20}}>Phiên bản: 1.0.0</Text>
       </View>
     </View>
   );

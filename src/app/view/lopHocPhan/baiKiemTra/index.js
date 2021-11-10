@@ -190,7 +190,11 @@ export const BaiKiemTra = ({params}) => {
       <StatusBar barStyle="dark-content" hidden={true} />
       <Header user={user} />
 
-      <View>
+      <View
+        style={{
+          borderBottomWidth: 1,
+          borderColor: settings.colors.colorBoderDark,
+        }}>
         <Text
           numberOfLines={1}
           style={{
@@ -210,10 +214,10 @@ export const BaiKiemTra = ({params}) => {
             marginLeft: '3%',
             color: settings.colors.colorThumblr,
             fontWeight: 'bold',
-            marginBottom: -5,
             fontSize: 16,
             zIndex: 999,
             marginTop: 10,
+            marginBottom: 10,
           }}>
           DANH SÁCH BÀI KIỂM TRA
         </Text>
@@ -222,7 +226,7 @@ export const BaiKiemTra = ({params}) => {
       {!loading ? (
         <>
           {data !== '' && data !== undefined && data.length !== 0 ? (
-            <View style={{backgroundColor: '#fff', flex: 1}}>
+            <View style={{backgroundColor: '#fff', flex: 1, marginTop: 0}}>
               <FlatList
                 data={data}
                 refreshControl={

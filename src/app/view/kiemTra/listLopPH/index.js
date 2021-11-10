@@ -47,7 +47,6 @@ export const ListLopHP = () => {
   const [showFilter, setShowFilter] = useState(false);
   const [filter, setFilter] = useState(0);
 
-  // Lấy thông tin tài khoản đang đăng nhập vs danh sách môn học
   // Bất đồng bộ ---
   useEffect(() => {
     getAccount();
@@ -96,7 +95,6 @@ export const ListLopHP = () => {
   const getData = async () => {
     try {
       const res = await getLPH(user[0]?.MaGV, filter);
-      console.log('res: ', res);
       setData(res.data);
     } catch (error) {
       console.log(error);
@@ -118,7 +116,6 @@ export const ListLopHP = () => {
     try {
       const res = await getMH();
       setListMonHoc(res.data);
-      console.log('Mon hoc: ', listMonHoc);
     } catch (error) {
       console.log(error);
     }
@@ -129,7 +126,6 @@ export const ListLopHP = () => {
     try {
       const res = await getLop();
       setListLopHoc(res.data);
-      console.log('Lop hoc: ', listLopHoc);
     } catch (error) {
       console.log(error);
     }
@@ -149,7 +145,6 @@ export const ListLopHP = () => {
   const postDel = async data => {
     try {
       const res = await deleteCD(data);
-      console.log('res: ', res);
     } catch (error) {
       console.log(error);
     }
@@ -157,7 +152,6 @@ export const ListLopHP = () => {
 
   // Nhấn vô item
   const handlePressItem = item => {
-    console.log('handlePressItem: ', item);
     nav.navigate(AppRouter.QUESTION, {
       item: item,
       user: user,
@@ -197,7 +191,6 @@ export const ListLopHP = () => {
 
   // Nhấn nút
   const handlePressButton = item => {
-    console.log(item);
     nav.navigate(AppRouter.SINHVIEN, {
       LopHP: item,
       user: user,

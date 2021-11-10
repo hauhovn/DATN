@@ -262,11 +262,11 @@ export const UserScreen = ({navigation, route}) => {
               </Text>
             </TouchableOpacity> */}
 
-            {/* <TouchableOpacity
+            <TouchableOpacity
               activeOpacity={0.5}
               style={body.button}
               onPress={() => {
-                handleChangePassword();
+                navigation.navigate(AppRouter.INFO);
               }}>
               <View
                 style={[body.viewIcon, {backgroundColor: colors.colorTwitter}]}>
@@ -282,7 +282,7 @@ export const UserScreen = ({navigation, route}) => {
               <Text style={{fontSize: 14, marginLeft: 10, flex: 10}}>
                 Thông tin ứng dụng
               </Text>
-            </TouchableOpacity> */}
+            </TouchableOpacity>
 
             <TouchableOpacity
               activeOpacity={0.5}

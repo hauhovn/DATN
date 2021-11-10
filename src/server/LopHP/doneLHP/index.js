@@ -2,7 +2,7 @@ import {settings} from '../../../app/config';
 
 let api = settings.hostURL;
 
-const deleteLPH = async MaLHP => {
+const doneLPH = async MaLHP => {
   let res = '';
 
   var data = new FormData();
@@ -14,7 +14,7 @@ const deleteLPH = async MaLHP => {
     redirect: 'follow',
   };
 
-  await fetch(api + 'LopHocPhan/deleteLPH.php', requestOptions)
+  await fetch(api + 'LopHocPhan/doneLPH.php', requestOptions)
     .then(response => response.json())
     .then(data => {
       res = data;
@@ -24,4 +24,4 @@ const deleteLPH = async MaLHP => {
   return res;
 };
 
-export {deleteLPH};
+export {doneLPH};

@@ -28,8 +28,9 @@ import {getMH} from '../../../../server/MonHoc/getMH';
 import {getLop} from '../../../../server/Lop/getLop/index.js';
 import {getGiangVien} from '../../../../server/User/getGiangVien';
 import Toast from 'react-native-simple-toast';
-import {deleteLHP} from '../../../../server/LopHP/deleteLHP';
 import {updateLPH} from '../../../../server/LopHP/updateLPH';
+import {deleteLPH} from '../../../../server/LopHP/deleteLHP';
+import {doneLPH} from '../../../../server/LopHP/doneLHP';
 
 const {width: dW, height: dH} = Dimensions.get('window');
 
@@ -59,7 +60,6 @@ export const ListLopHP = () => {
 
   useEffect(() => {
     if (user !== '') {
-      console.log('user: ', user);
       getMonHoc();
       getData();
       getLopHoc();
@@ -100,10 +100,9 @@ export const ListLopHP = () => {
   const getData = async () => {
     try {
       const res = await getLPH(user[0]?.MaGV, filter);
-      console.log('getLPH: ', res);
       setData(res.data);
     } catch (error) {
-      console.log(error);
+      //
     }
   };
 
@@ -113,7 +112,7 @@ export const ListLopHP = () => {
       const res = await getGiangVien();
       await setTeachers(res.data);
     } catch (error) {
-      console.log(error);
+      //
     }
   };
 
@@ -122,9 +121,8 @@ export const ListLopHP = () => {
     try {
       const res = await getMH();
       setListMonHoc(res.data);
-      console.log('Mon hoc: ', listMonHoc);
     } catch (error) {
-      console.log(error);
+      //
     }
   };
 
@@ -133,9 +131,8 @@ export const ListLopHP = () => {
     try {
       const res = await getLop();
       setListLopHoc(res.data);
-      console.log('Lop hoc: ', listLopHoc);
     } catch (error) {
-      console.log(error);
+      //
     }
   };
 
@@ -146,18 +143,29 @@ export const ListLopHP = () => {
       setResPOST(res);
       getData();
     } catch (error) {
-      console.log(error);
+      //
     }
   };
 
   // Xóa chủ đề
   const postDel = async data => {
     try {
-      const res = await deleteLHP(data.MaLopHP);
+      const res = await deleteLPH(data.MaLopHP);
       initData();
       getData();
     } catch (error) {
-      console.log(error);
+      //
+    }
+  };
+
+  // xong chủ đề
+  const postDone = async data => {
+    try {
+      const res = await doneLPH(data.MaLopHP);
+      initData();
+      getData();
+    } catch (error) {
+      //
     }
   };
 
@@ -170,21 +178,17 @@ export const ListLopHP = () => {
       initData();
       getData();
     } catch (error) {
-      console.log(error);
+      //
     }
   };
 
   const onEdit = data => {
-    console.log(data);
-
     setEditID(data.MaLopHP);
     setIsEdit(true);
-
     setTenCD(data.TenLopHP);
     setMonHoc(data.MaMH);
     setTeach(data.MaGV);
     setLopHoc(data.MaLop);
-
     setModal(true);
   };
 
@@ -233,9 +237,12 @@ export const ListLopHP = () => {
     postDel(item);
   };
 
+  const dol = item => {
+    postDone(item);
+  };
+
   // Nhấn nút
   const handlePressButton = item => {
-    console.log(item);
     nav.navigate(AppRouter.SINHVIEN, {
       LopHP: item,
       user: user,
@@ -297,7 +304,6 @@ export const ListLopHP = () => {
                     textStyle={{opacity: 0}}
                     style={{height: 45, width: 50, opacity: 0}}
                     onValueChange={(itemValue, itemIndex) => {
-                      console.log(itemValue);
                       setFilter(itemValue);
                     }}>
                     <Picker.Item label="Tất cả" value={'0'} />
@@ -325,6 +331,7 @@ export const ListLopHP = () => {
                   data={data}
                   handle={handlePressItem}
                   onDelete={del}
+                  onDone={dol}
                   onEdit={onEdit}
                   user={user}
                   handlePressButton={handlePressButton}
@@ -505,7 +512,6 @@ export const ListLopHP = () => {
                     mode="dialog"
                     style={{height: 45, width: dW - 65, marginLeft: -15}}
                     onValueChange={(itemValue, itemIndex) => {
-                      console.log('cac');
                       setMonHoc(itemValue);
                     }}>
                     <Picker.Item label="Chọn môn học" value="Chọn môn học" />
@@ -543,7 +549,6 @@ export const ListLopHP = () => {
                     mode="dialog"
                     style={{height: 45, width: dW - 65, marginLeft: -15}}
                     onValueChange={(itemValue, itemIndex) => {
-                      console.log('cac');
                       setLopHoc(itemValue);
                     }}>
                     <Picker.Item label="Chọn lớp" value="Chọn lớp" />
@@ -581,7 +586,6 @@ export const ListLopHP = () => {
                     mode="dialog"
                     style={{height: 45, width: dW - 65, marginLeft: -15}}
                     onValueChange={(itemValue, itemIndex) => {
-                      console.log('cac');
                       setTeach(itemValue);
                     }}>
                     <Picker.Item

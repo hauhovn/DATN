@@ -9,17 +9,21 @@ import {
 } from 'react-native';
 import {settings} from '../../../../config';
 import {Icon, Picker} from 'native-base';
-import {useRoute} from '@react-navigation/native';
+import {useNavigation, useRoute} from '@react-navigation/native';
 import {useIsFocused} from '@react-navigation/native';
 import {getCauHoiByMaMH} from '../../../../../server/BaiKiemTra/getCauHoiByMaMH';
 import {getCD} from '../../../../../server/ChuDe/getCD';
+import {addQuestionDetail} from '../../../../../server/CT_BaiKiemTra';
 import {Header} from '../../../../components/header';
 import {createCTBKT} from '../../../../../server/BaiKiemTra/addQuest';
 import Toast from 'react-native-simple-toast';
 import SelectMultiple from 'react-native-select-multiple';
 
+// NO NE de lam gi v
+
 export const ThemCauHoi = () => {
   const focus = useIsFocused();
+  const navigation = useNavigation();
   const route = useRoute();
   const params = route.params;
   const MaMH = params.MaMH;
@@ -36,11 +40,11 @@ export const ThemCauHoi = () => {
   const [showDetails, setShowDetails] = useState(false);
   const [details, setDetails] = useState('');
 
-  console.log('ThemCauHoi ======= ');
-
   // Vừa focus vào là gọi refesh để lấy data
   useEffect(() => {
     if (focus) {
+      console.log('ThemCauHoi');
+      console.log(params);
       getListChuDe();
       getData();
     }
@@ -63,13 +67,10 @@ export const ThemCauHoi = () => {
     try {
       const res = await getCauHoiByMaMH(MaMH, filter, user[0]?.MaGV);
       setQuestions(res.data);
-      console.log('getCauHoiByMaMH: ', res);
-
       const xx = [];
       await res.data.map(i => {
         xx.push({label: i.CauHoi + '~' + i.TenCD, value: i.MaCH});
       });
-
       setData(xx);
     } catch (error) {
       //
@@ -89,7 +90,8 @@ export const ThemCauHoi = () => {
   // Gọi api thêm danh sách câu hỏi vô bài kiểm tra
   const postData = async MaCH => {
     try {
-      await createCTBKT(params.BaiKiemTra.MaBaiKT, MaCH);
+      const res = await createCTBKT(params.BaiKiemTra.MaBaiKT, MaCH);
+      navigation.goBack();
     } catch (error) {
       //
     }
@@ -285,8 +287,6 @@ export const ThemCauHoi = () => {
               }}>
               <TouchableOpacity
                 onPress={() => {
-                  // console.log('ThemCauHoi ======= ');
-
                   setSelectedFruits([]);
                   Toast.show('Thành công', Toast.SHORT);
                   subMit();
