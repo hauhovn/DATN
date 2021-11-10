@@ -5,7 +5,7 @@ import { getTestStatus } from './BaiKiemTra/get-status'
 import { getSoCauDung } from './BaiKiemTra/get-so-cau-dung'
 import { getTestTimeCountdown } from './BaiKiemTra/get-time-countdown'
 import { getCTBaiKiemTra } from './BaiKiemTra/getTestDetail'
-
+import { getLopHocPhan } from './SinhVien/get-lop-hoc-phan'
 
 export {
     getBaiKiemTra,
@@ -14,5 +14,6 @@ export {
     getTestStatus,
     getTestTimeCountdown,
     getSoCauDung,
-    getCTBaiKiemTra
+    getCTBaiKiemTra,
+    getLopHocPhan
 }
