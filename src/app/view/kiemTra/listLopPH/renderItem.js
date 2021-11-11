@@ -30,6 +30,8 @@ export const RenderItem = ({item, data, handle, del, handlePressButton}) => {
     del(item);
   };
 
+  console.log(item);
+
   return (
     <TouchableOpacity
       activeOpacity={0.5}
@@ -41,7 +43,7 @@ export const RenderItem = ({item, data, handle, del, handlePressButton}) => {
         marginLeft: '3%',
         marginTop: getMarginTop(),
         marginBottom: marginBottom(),
-        borderRadius: 10,
+        borderRadius: 6,
         backgroundColor: '#fff',
         borderColor: settings.colors.colorThumblr,
         flexDirection: 'row',
@@ -84,6 +86,27 @@ export const RenderItem = ({item, data, handle, del, handlePressButton}) => {
             marginBottom: 10,
           }}>
           Lớp: {item.TenLop}
+        </Text>
+        <Text
+          numberOfLines={1}
+          style={{
+            color: settings.colors.colorThumblr,
+            fontSize: 12,
+            width: '100%',
+          }}>
+          Trạng thái:{' '}
+          <Text
+            numberOfLines={1}
+            style={{
+              color:
+                item.TrangThai == 0
+                  ? settings.colors.colorMessenger
+                  : settings.colors.colorGreen,
+              fontSize: 12,
+              width: '100%',
+            }}>
+            {item.TrangThai == 0 ? 'Sẵn sàng' : 'Đã hoàn thành'}
+          </Text>{' '}
         </Text>
       </View>
     </TouchableOpacity>

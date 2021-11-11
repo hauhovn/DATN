@@ -67,7 +67,7 @@ export const InfomationQuestion = () => {
       getQuestion(route.params.item.MaBaiKT);
 
       if (route.params.item.TrangThai === '4') {
-        getKQKT();
+        getKQKT(route.params.item.MaBaiKT);
       }
     }
   }, [focused]);

@@ -7,6 +7,9 @@ import {
   Modal,
   StatusBar,
   TextInput,
+  Clipboard,
+  Alert,
+  StyleSheet,
 } from 'react-native';
 import {useNavigation, useRoute, useIsFocused} from '@react-navigation/native';
 import {settings} from '../../../../config';
@@ -21,18 +24,29 @@ import {RenderItem} from './renderItem';
 import {updateBaiKT} from '../../../../../server/BaiKiemTra/updateBaiKT';
 import {getCTBKT} from '../../../../../server/BaiKiemTra/getCTBKT';
 import {deleteCTBKT} from '../../../../../server/BaiKiemTra/deleteCTBKT';
+import {updateTestStatus} from '../../../../../server/BaiKiemTra/update-status';
+import {getTestStatus} from '../../../../../server/BaiKiemTra/get-status';
+import {
+  inittiateSocket,
+  requestUpdateTestList,
+} from '../../../../../server/SocketIO';
+import {createTestDetailt} from '../../../../../server';
+import Moment from 'moment';
+import {getKQ} from '../../../../../server/KetQua/getKetQua.d';
+import {RenderItemKQ} from './renderItemKQ';
 
 export const InfomationQuestion = () => {
   const nav = useNavigation();
   const route = useRoute();
   const focused = useIsFocused();
-  const item = route.params.item;
   const user = route.params.user;
+  var item = route.params.item;
 
   const [showModal, setModal] = useState(false);
   const [tenBaiKT, setTenBaiKT] = useState(item.TenBaiKT);
-  const [ngay, setNgay] = useState(new Date(item.Ngay));
-  const [thoiGian, setThoiGian] = useState(0);
+  const [ngay, setNgay] = useState(new Date(Moment(item.Ngay)));
+  const [lableButton, setLableButton] = useState('Hoàn thành');
+  const [thoiGian, setThoiGian] = useState('Hoàn thành');
   const [datePicker, setDatePicker] = useState(false);
   const [questions, setQuestions] = useState('');
 
@@ -40,39 +54,90 @@ export const InfomationQuestion = () => {
   const [showDetails, setShowDetails] = useState(false);
   const [details, setDetails] = useState('');
 
+  const [ketQua, setKQ] = useState([]);
+
   // Focus vô thì chạy
   useEffect(() => {
     if (focused) {
+      inittiateSocket(null, null, null, null);
+      setTestState(item.TrangThai);
       timeToNumber(item.ThoiGianLam);
+      _get123MongTinhYeuTanRa();
+
       getQuestion(route.params.item.MaBaiKT);
+
+      if (route.params.item.TrangThai === '4') {
+        getKQKT(route.params.item.MaBaiKT);
+      }
     }
   }, [focused]);
 
   // Update bài kiểm tra (gọi api)
   const editBaiKT = async () => {
     try {
-      await updateBaiKT(
+      const res = await updateBaiKT(
         item.MaBaiKT,
         tenBaiKT,
         getDate(ngay),
         user[0]?.MaGV,
         minToTime(thoiGian),
       );
+      console.log(res);
       setModal(false);
     } catch (error) {
       //
     }
   };
 
+  // Update test status
+  async function _get123MongTinhYeuTanRa() {
+    let rs = await getTestStatus(1, item.MaBaiKT);
+    setTestState(rs?.status);
+  }
+
+  // Set test state
+  const setTestState = status => {
+    console.log(`status = `, status);
+    item.TrangThai = status;
+    if (status > 0) setLableButton('Chi tiết');
+    else setLableButton('Hoàn thành');
+  };
+
   // Gọi api lấy danh sách câu hỏi theo mã môn học
   const getQuestion = async data => {
     try {
       const res = await getCTBKT(data);
+      console.log('getCTBKT: ', res);
       setQuestions(res);
     } catch (error) {
       //
     }
   };
+
+  const getKQKT = async data => {
+    try {
+      const res = await getKQ(data);
+      console.log('getKQ: ', res);
+      setKQ(res.data);
+    } catch (error) {
+      //
+    }
+  };
+
+  // const update test status
+  async function _updateTestStatus(MaGV, MaBaiKT, toStatus) {
+    try {
+      let rs = await updateTestStatus(MaGV, MaBaiKT, toStatus);
+      console.log(rs?.code, ' ?= ', toStatus);
+      if (rs?.code == toStatus) {
+        //Alert.alert('ok');
+        item.TrangThai = toStatus;
+        setTestState(toStatus);
+      }
+    } catch (error) {
+      console.log('_updateTestStatus has error');
+    }
+  }
 
   // Gọi api xóa câu hỏi
   const deleteCauHoi = async data => {
@@ -145,10 +210,44 @@ export const InfomationQuestion = () => {
     setShowDetails(true);
   };
 
+  // _createTestDetail
+  const _createTestDetail = async testID => {
+    let rs = await createTestDetailt(testID);
+    if (rs.code > 0) console.log(rs);
+  };
+
   // Nhấn nút bắt đầu
   const handleStart = () => {
-    console.log('handleStart');
+    let TrangThai = item.TrangThai;
+    if (TrangThai > 0) {
+      // When test status =  1 (ready)
+      nav.navigate(AppRouter.TEACHERCONTROLL, {
+        MaMH: route.params.MaMH,
+        BaiKiemTra: item,
+        user: user,
+      });
+    } else if (TrangThai == 0)
+      Alert.alert('Bạn có chắc', 'Hoàn thành bài kiểm tra này?', [
+        {
+          text: 'Đồng ý',
+          style: 'OK',
+          onPress: () => {
+            // When test status =  0 (waiting)
+            _updateTestStatus(user[0].MaGV, item.MaBaiKT, 1);
+            requestUpdateTestList(false);
+            _createTestDetail(item.MaBaiKT);
+          },
+        },
+        {
+          text: 'Bỏ qua',
+          style: 'cancel',
+        },
+      ]);
   };
+
+  // console.log('new Date(Moment(item.Ngay)): ', new Date(Moment(item.Ngay)));
+
+  console.log(route.params);
 
   // Render screen
   return (
@@ -157,66 +256,24 @@ export const InfomationQuestion = () => {
 
       {item !== undefined ? (
         <View style={{backgroundColor: '#fff', flex: 1}}>
-          <View
-            style={{
-              width: '100%',
-              flexDirection: 'row',
-              alignItems: 'center',
-              marginTop: 5,
-              height: 35,
-            }}>
+          <View style={styles.header}>
             <Icon
               type="MaterialCommunityIcons"
               name="book-open-variant"
-              style={{
-                fontSize: 24,
-                color: settings.colors.colorGreen,
-                marginLeft: 10,
-              }}
+              style={styles.iconBook}
             />
-            <Text
-              style={{
-                color: settings.colors.colorGreen,
-                fontSize: 16,
-                fontWeight: 'bold',
-                marginHorizontal: 10,
-                flex: 1,
-              }}>
-              CHI TIẾT BÀI KIỂM TRA
-            </Text>
+            <Text style={styles.headerTitle}>CHI TIẾT BÀI KIỂM TRA</Text>
             <TouchableOpacity
               onPress={() => {
                 handleStart();
               }}
               activeOpacity={0.7}
-              style={{
-                height: 30,
-                width: 74,
-                backgroundColor: settings.colors.colorGreen,
-                marginRight: 5,
-                alignItems: 'center',
-                justifyContent: 'center',
-                borderRadius: 500,
-              }}>
-              <Text
-                style={{
-                  color: '#fff',
-                  fontWeight: 'bold',
-                  fontSize: 14,
-                  textTransform: 'uppercase',
-                }}>
-                Bắt đầu
-              </Text>
+              style={styles.headerButton}>
+              <Text style={styles.headerBtnText}>{lableButton}</Text>
             </TouchableOpacity>
           </View>
-          <View
-            style={{
-              width: '100%',
-              marginTop: 10,
-              paddingHorizontal: 10,
-              borderBottomWidth: 0.5,
-              borderColor: '#CFD8DC',
-            }}>
+
+          <View style={styles.main}>
             <View style={{flexDirection: 'row', alignItems: 'flex-start'}}>
               <Text style={{fontWeight: 'bold', marginRight: 5, fontSize: 16}}>
                 Tên bài:
@@ -225,145 +282,167 @@ export const InfomationQuestion = () => {
                 {tenBaiKT}
               </Text>
             </View>
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'flex-start',
-                marginTop: 5,
-              }}>
-              <Text style={{fontWeight: 'bold', marginRight: 5, fontSize: 16}}>
-                Key:
-              </Text>
-              <Text style={{flex: 1, fontSize: 16}}>{item.KeyBaiKT}</Text>
+
+            <View style={styles.mainItem}>
+              <Text style={styles.mainItemText}>Key:</Text>
+              <Text style={{fontSize: 16}}>{item.KeyBaiKT}</Text>
+              <TouchableOpacity
+                onPress={() => {
+                  Clipboard.setString(item?.KeyBaiKT);
+                }}
+                style={styles.btnCopy}>
+                <Text style={{fontSize: 10}}>Copy</Text>
+              </TouchableOpacity>
             </View>
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'flex-start',
-                marginTop: 5,
-              }}>
-              <Text style={{fontWeight: 'bold', marginRight: 5, fontSize: 16}}>
-                Lớp học phần:
-              </Text>
+
+            <View style={styles.mainItem}>
+              <Text style={styles.mainItemText}>Lớp học phần:</Text>
               <Text style={{flex: 1, fontSize: 16}}>{item.TenLopHP}</Text>
             </View>
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'flex-start',
-                marginTop: 5,
-              }}>
-              <Text style={{fontWeight: 'bold', marginRight: 5, fontSize: 16}}>
-                Môn học:
-              </Text>
+
+            <View style={styles.mainItem}>
+              <Text style={styles.mainItemText}>Môn học:</Text>
               <Text style={{flex: 1, fontSize: 16}}>{route.params.TenMH}</Text>
             </View>
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'flex-start',
-                marginTop: 5,
-              }}>
-              <Text style={{fontWeight: 'bold', marginRight: 5, fontSize: 16}}>
-                Ngày:
-              </Text>
+
+            <View style={styles.mainItem}>
+              <Text style={styles.mainItemText}>Ngày:</Text>
               <Text style={{flex: 1, fontSize: 16}}>{getStrDate(ngay)}</Text>
             </View>
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'flex-start',
-                marginTop: 5,
-                marginBottom: 10,
-              }}>
-              <Text style={{fontWeight: 'bold', marginRight: 5, fontSize: 16}}>
-                Thời gian
-              </Text>
+
+            <View style={[styles.mainItem, {marginBottom: 10}]}>
+              <Text style={styles.mainItemText}>Thời gian</Text>
               <Text style={{flex: 1, fontSize: 16}}>
                 {minToTime(thoiGian)} ({thoiGian} phút)
               </Text>
             </View>
           </View>
-          <View
-            style={{flexDirection: 'row', marginLeft: 10, marginVertical: 5}}>
-            <Text
-              style={{
-                fontSize: 14,
-                color: settings.colors.colorThumblr,
-                fontWeight: 'bold',
-              }}>
-              Số câu hỏi: {questions?.SoLuong}
-            </Text>
-          </View>
-          <View
-            style={{
-              flex: 1,
-            }}>
-            <FlatList
-              data={questions.data}
-              showsVerticalScrollIndicator={false}
-              renderItem={({item}) => (
-                <RenderItem
-                  item={item}
+
+          {route.params.item.TrangThai !== '4' ? (
+            <>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  marginLeft: 10,
+                  marginVertical: 5,
+                }}>
+                <Text
+                  style={{
+                    fontSize: 14,
+                    color: settings.colors.colorThumblr,
+                    fontWeight: 'bold',
+                  }}>
+                  Số câu hỏi: {questions?.SoLuong}
+                </Text>
+              </View>
+
+              <View
+                style={{
+                  flex: 1,
+                }}>
+                <FlatList
                   data={questions.data}
-                  handle={handlePressItem}
-                  handleDelete={deleteQuest}
+                  showsVerticalScrollIndicator={false}
+                  renderItem={({item}) => (
+                    <RenderItem
+                      item={item}
+                      data={questions.data}
+                      handle={handlePressItem}
+                      handleDelete={deleteQuest}
+                    />
+                  )}
+                  keyExtractor={item => item.CauHoi}
+                  style={{flex: 1, backgroundColor: '#fff'}}
                 />
-              )}
-              keyExtractor={item => item.CauHoi}
-              style={{flex: 1, backgroundColor: '#fff'}}
-            />
-          </View>
-          <View
-            style={{
-              flexDirection: 'row',
-              height: 50,
-              paddingBottom: 5,
-              marginTop: -55,
-            }}>
-            <TouchableOpacity
-              onPress={() => {
-                nav.navigate(AppRouter.ADDQUEST, {
-                  MaMH: route.params.MaMH,
-                  BaiKiemTra: item,
-                  user: user,
-                });
-              }}
-              activeOpacity={0.5}
-              style={{
-                height: 45,
-                marginHorizontal: 10,
-                justifyContent: 'center',
-                alignItems: 'center',
-                backgroundColor: settings.colors.colorGreen,
-                marginBottom: 10,
-                borderRadius: 10,
-                flex: 1,
-              }}>
-              <Text style={{color: '#fff', fontSize: 14, fontWeight: 'bold'}}>
-                THÊM CÂU HỎI
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => {
-                edit();
-              }}
-              activeOpacity={0.5}
-              style={{
-                width: 80,
-                height: 45,
-                marginRight: 10,
-                justifyContent: 'center',
-                alignItems: 'center',
-                backgroundColor: settings.colors.colorGreen,
-                marginBottom: 10,
-                borderRadius: 10,
-              }}>
-              <Text style={{color: '#fff', fontSize: 14, fontWeight: 'bold'}}>
-                SỬA
-              </Text>
-            </TouchableOpacity>
-          </View>
+              </View>
+
+              <View
+                style={{
+                  flexDirection: 'row',
+                  height: 50,
+                  paddingBottom: 5,
+                  marginTop: -55,
+                }}>
+                <TouchableOpacity
+                  onPress={() => {
+                    nav.navigate(AppRouter.ADDQUEST, {
+                      MaMH: route.params.MaMH,
+                      BaiKiemTra: item,
+                      user: user,
+                    });
+                  }}
+                  activeOpacity={0.5}
+                  style={{
+                    height: 45,
+                    marginHorizontal: 10,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    backgroundColor: settings.colors.colorGreen,
+                    marginBottom: 10,
+                    borderRadius: 10,
+                    flex: 1,
+                  }}>
+                  <Text
+                    style={{color: '#fff', fontSize: 14, fontWeight: 'bold'}}>
+                    THÊM CÂU HỎI
+                  </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  onPress={() => {
+                    edit();
+                  }}
+                  activeOpacity={0.5}
+                  style={{
+                    width: 80,
+                    height: 45,
+                    marginRight: 10,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    backgroundColor: settings.colors.colorGreen,
+                    marginBottom: 10,
+                    borderRadius: 10,
+                  }}>
+                  <Text
+                    style={{color: '#fff', fontSize: 14, fontWeight: 'bold'}}>
+                    SỬA
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </>
+          ) : (
+            <>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  marginLeft: 10,
+                  marginVertical: 5,
+                }}>
+                <Text
+                  style={{
+                    fontSize: 14,
+                    color: settings.colors.colorThumblr,
+                    fontWeight: 'bold',
+                  }}>
+                  Số sinh viên: {ketQua.length}
+                </Text>
+              </View>
+              <FlatList
+                data={ketQua}
+                showsVerticalScrollIndicator={false}
+                renderItem={({item}) => (
+                  <RenderItemKQ
+                    item={item}
+                    data={ketQua}
+                    handle={handlePressItem}
+                    handleDelete={deleteQuest}
+                  />
+                )}
+                keyExtractor={item => item.CauHoi}
+                style={{flex: 1, backgroundColor: '#fff'}}
+              />
+            </>
+          )}
         </View>
       ) : (
         <View
@@ -377,6 +456,7 @@ export const InfomationQuestion = () => {
         </View>
       )}
 
+      {/* MODAL */}
       <Modal
         animationType="fade"
         transparent={true}
@@ -427,7 +507,7 @@ export const InfomationQuestion = () => {
                     fontWeight: 'bold',
                     flex: 1,
                   }}>
-                  THÊM BÀI KIỂM TRA
+                  SỬA BÀI KIỂM TRA
                 </Text>
                 <TouchableOpacity
                   onPress={() => {
@@ -1012,3 +1092,64 @@ export const InfomationQuestion = () => {
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  header: {
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 5,
+    height: 35,
+  },
+  iconBook: {
+    fontSize: 24,
+    color: settings.colors.colorGreen,
+    marginLeft: 10,
+  },
+  headerTitle: {
+    color: settings.colors.colorGreen,
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginHorizontal: 10,
+    flex: 1,
+  },
+  headerButton: {
+    paddingVertical: 5,
+    paddingHorizontal: 9,
+    backgroundColor: settings.colors.colorGreen,
+    marginRight: 5,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 500,
+  },
+  headerBtnText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 14,
+    textTransform: 'uppercase',
+  },
+  main: {
+    width: '100%',
+    marginTop: 10,
+    paddingHorizontal: 10,
+    borderBottomWidth: 0.5,
+    borderColor: '#CFD8DC',
+  },
+  mainItem: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginTop: 5,
+  },
+  mainItemText: {
+    fontWeight: 'bold',
+    marginRight: 5,
+    fontSize: 16,
+  },
+  btnCopy: {
+    paddingHorizontal: 6,
+    backgroundColor: '#CFD8DC',
+    paddingVertical: 3,
+    marginLeft: 15,
+    borderRadius: 10,
+  },
+});

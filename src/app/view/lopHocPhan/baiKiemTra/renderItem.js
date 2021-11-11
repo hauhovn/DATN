@@ -15,7 +15,7 @@ export const RenderItem = ({item, data, handle, handleDelete}) => {
 
   const marginBottom = () => {
     if (item?.MaBaiKT === data[data.length - 1]?.MaBaiKT) {
-      return 10;
+      return 20;
     } else {
       return 5;
     }
