@@ -33,6 +33,8 @@ import {createTestDetailt} from '../../../../../server';
 import Moment from 'moment';
 import {getKQ} from '../../../../../server/KetQua/getKetQua.d';
 import {RenderItemKQ} from '../../../lopHocPhan/baiKiemTra/infoQuest/renderItemKQ';
+import {writeFile, readFile} from 'react-native-fs';
+import XLSX from 'xlsx';
 
 // Import HTML to PDF
 import RNHTMLtoPDF from 'react-native-html-to-pdf';
@@ -297,6 +299,41 @@ export const InfomationQuestion = () => {
     }
   };
 
+  const [tempExcel, setTempExcel] = useState([]);
+
+  const getExcel = () => {
+    let temp = [];
+    if (route.params.item.TrangThai === '4') {
+      for (let i = 0; i < ketQua.length; i++) {
+        temp.push({STT: i + 1, TenSV: ketQua[i].TenSV, Diem: ketQua[i].Diem});
+      }
+
+      console.log('temp: ', temp);
+    }
+    setTempExcel(temp);
+  };
+
+  const createExcelFile = async () => {
+    getExcel();
+
+    var ws = XLSX.utils.json_to_sheet(tempExcel);
+
+    var wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Prova');
+
+    const wbout = XLSX.write(wb, {type: 'binary', bookType: 'xlsx'});
+    var RNFS = require('react-native-fs');
+    var file = RNFS.ExternalStorageDirectoryPath + '/KTO/test.xlsx';
+
+    writeFile(file, wbout, 'ascii')
+      .then(r => {
+        /* :) */
+      })
+      .catch(e => {
+        /* :( */
+      });
+  };
+
   // Render screen
   return (
     <View style={{flex: 1, backgroundColor: '#fff'}}>
@@ -458,25 +495,46 @@ export const InfomationQuestion = () => {
                   Số sinh viên: {ketQua.length}
                 </Text>
                 {/* 1283417863612 67167316 36712371361236713 16783 1892 73987123177777766666666666666666666666666666666666666 */}
-                <TouchableOpacity
-                  onPress={createPDF}
-                  activeOpacity={0.7}
-                  style={{
-                    backgroundColor: settings.colors.colorGreen,
-                    paddingHorizontal: 10,
-                    paddingVertical: 5,
-                    marginRight: 10,
-                    borderRadius: 999,
-                  }}>
-                  <Text
+                <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                  <TouchableOpacity
+                    onPress={createPDF}
+                    activeOpacity={0.7}
                     style={{
-                      fontSize: 14,
-                      color: '#fff',
-                      fontWeight: 'bold',
+                      backgroundColor: settings.colors.colorGreen,
+                      paddingHorizontal: 10,
+                      paddingVertical: 5,
+                      marginRight: 10,
+                      borderRadius: 999,
                     }}>
-                    Xuất PDF
-                  </Text>
-                </TouchableOpacity>
+                    <Text
+                      style={{
+                        fontSize: 14,
+                        color: '#fff',
+                        fontWeight: 'bold',
+                      }}>
+                      Xuất PDF
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={createExcelFile}
+                    activeOpacity={0.7}
+                    style={{
+                      backgroundColor: settings.colors.colorGreen,
+                      paddingHorizontal: 10,
+                      paddingVertical: 5,
+                      marginRight: 10,
+                      borderRadius: 999,
+                    }}>
+                    <Text
+                      style={{
+                        fontSize: 14,
+                        color: '#fff',
+                        fontWeight: 'bold',
+                      }}>
+                      Xuất Excel
+                    </Text>
+                  </TouchableOpacity>
+                </View>
               </View>
               <FlatList
                 data={ketQua}
