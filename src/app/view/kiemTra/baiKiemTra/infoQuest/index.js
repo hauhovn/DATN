@@ -441,6 +441,7 @@ export const InfomationQuestion = () => {
                       MaMH: route.params.MaMH,
                       BaiKiemTra: item,
                       user: user,
+                      questions: questions.data,
                     });
                   }}
                   activeOpacity={0.5}
