@@ -12,7 +12,9 @@ import {
     UpdateQuestion,
     JointTest,
     getTestStatus,
-    getTestTimeCountdown
+    getTestTimeCountdown,
+    addTestTime,
+    checkEnd
 } from '../../../../server/student-apis'
 
 // Socket IO
@@ -32,6 +34,7 @@ import {
 
 // Constants
 import { SIZES, STYLES, COLORS } from '../../../assets/constants';
+import { check } from 'react-native-permissions';
 
 const TestScreen = ({ route, navigation }) => {
 
@@ -121,8 +124,7 @@ const TestScreen = ({ route, navigation }) => {
         teacherEditTest((err, isRemove) => {
             if (err) return;
             if (isRemove) {
-                navigation.goBack();
-                Alert.alert(`Thông báo`, `Bài kiểm tra đã kết thúc!`)
+                _endTest();
             }
 
 
@@ -134,6 +136,9 @@ const TestScreen = ({ route, navigation }) => {
     const LoadOption = async () => {
 
         setLoading(true);
+
+        /** Add test time to check */
+        await _addTestTime();
 
         /** Get test status */
         await getTest_Status();
@@ -198,6 +203,18 @@ const TestScreen = ({ route, navigation }) => {
             case '3': setState(stateInfo.paused); setReviewMode(false); break;
             case '4': setState(stateInfo.testing); setReviewMode(true); break;
             default: setState(stateInfo.waiting); break;
+        }
+    }
+
+    /** Add test time */
+    const _addTestTime = async () => {
+        const rs = await addTestTime(thisStudent.id, thisTest.id);
+        //: add test time:  {"code": 1, "data":
+        // { "info": "Add new data with MaSV = 2 and MaBaiKT = 46 SUCCESFULLY", "status": "late", "time_lenght": "23:00:00", "time_sec": 82800, "time_start": "2021-11-11 14:03:47" },
+        await console.log(`_211: add test time: `, rs);
+        await setTimeTest(rs.data.time_sec);
+        if (rs.data.time_sec < 1) {
+            _endTest();
         }
     }
 
@@ -279,11 +296,27 @@ const TestScreen = ({ route, navigation }) => {
         let rs = await getTestTimeCountdown(thisTest.id);
         if (rs?.data != undefined) {
             const cb = parseFloat(rs.data.SoGiayLam) - parseFloat(rs.data.ThoiGianDaDienRa);
-            await setTimeTest(cb);
+            //await setTimeTest(cb);
             console.log(`Time for this test: `, cb);
             return cb;
         } else return 9999;
 
+    }
+
+    /** When end test */
+    const _endTest = async () => {
+        console.log(`b_check`);
+        const rs = await checkEnd(thisTest.id);
+        await console.log(`316: `, rs?.data?.TuDongKetThuc);
+        console.log(`e_check`);
+        if (rs?.data?.TuDongKetThuc > 0) navigation.goBack();
+        Alert.alert(`Thông báo`, `Đã hết thời gian làm bài!`)
+
+    }
+
+    const _checkEnd = async () => {
+        const rs = await checkEnd(thisTest.id);
+        await console.log(`316: `, rs?.data);
     }
 
     /**  Render*/
@@ -301,7 +334,7 @@ const TestScreen = ({ route, navigation }) => {
                         !isReviewMode && <MyCountDown
                             isRuning={state == stateInfo.testing ? true : false}
                             time={timeTestCountdown}
-                            onFinish={() => Alert.alert(`time up`)}
+                            onFinish={() => _endTest()}
                         />
                     )}
                 iconRightStyle={{ fontSize: state === stateInfo.testing ? 26 : 0 }}

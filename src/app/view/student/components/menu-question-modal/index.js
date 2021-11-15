@@ -14,6 +14,7 @@ import { ItemQuestion } from './item';
 
 // Constants
 import { COLORS, SIZES, STYLES } from '../../../../assets/constants'
+import { useFocusEffect } from '@react-navigation/native';
 
 export const MenuQuestionModal = ({ isVisible, onRequestClose, data, onPressItem, isTest = true }) => {
 
@@ -35,6 +36,21 @@ export const MenuQuestionModal = ({ isVisible, onRequestClose, data, onPressItem
         unCheck.color = COLORS.colorRed;
         unCheck.label = 'Sai';
     }
+
+    const [slDaLam, setSL] = React.useState(0);
+
+    const soCauDaLam = () => {
+        let sl = 0;
+        data.forEach(element => {
+            console.log(`element`, element);
+            if (element.DASV != 'X' || element.DASV != 'X') sl++;
+        });
+        setSL(sl);
+    }
+
+    React.useEffect(() => {
+        isVisible && soCauDaLam()
+    }, [isVisible])
 
     //funcs
     const handlePressItem = item => {
@@ -135,20 +151,26 @@ export const MenuQuestionModal = ({ isVisible, onRequestClose, data, onPressItem
                         alignContent: 'center',
                         alignItems: 'center',
                     }}>
+                    {isTest && <Text style={{ fontSize: 12 }}>( Đã làm {slDaLam}/{data?.length} )</Text>}
                     <FlatList
                         data={data}
                         numColumns={Math.round(SIZES.width / (2 * SIZES.padding + SIZES.base))}
                         horizontal={false}
                         showsVerticalScrollIndicator={false}
                         renderItem={({ item }) => (
-                            <ItemQuestion item={item} data={data} handle={handlePressItem} />
+                            <ItemQuestion
+                                item={item}
+                                data={data}
+                                handle={handlePressItem}
+                                showFail={isTest ? false : true}
+                            />
                         )}
                         keyExtractor={item => item.id}
                         style={{ flex: 1, paddingTop: 10 }}
                     />
                 </View>
             </View>
-        </Modal>
+        </Modal >
     );
 };
 

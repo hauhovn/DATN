@@ -4,7 +4,7 @@ import { Text, StyleSheet, TouchableOpacity, View } from 'react-native';
 // Constants
 import { COLORS, SIZES, STYLES } from '../../../../assets/constants'
 
-export const ItemQuestion = ({ item, handle }) => {
+export const ItemQuestion = ({ item, handle, showFail = false }) => {
     const pressItem = () => {
         handle(item.STT);
     };
@@ -14,7 +14,7 @@ export const ItemQuestion = ({ item, handle }) => {
     } else if (item?.DapAn != undefined) {
         if (item?.DapAn != item?.DASV) {
             // incorrect
-            itemColor = COLORS.colorRed;
+            itemColor = !showFail ? COLORS.green : COLORS.colorRed;
         } else {
             itemColor = COLORS.colorGreen;
         }

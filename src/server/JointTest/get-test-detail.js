@@ -8,6 +8,13 @@ const getTestingDetailt = async (MaBaiKT, sort) => {
     var data = new FormData();
     data.append('MaBaiKT', MaBaiKT);
 
+    switch (sort) {
+        case 'DungNhieu': data.append('DungNhieu', MaBaiKT); break;
+        case 'SaiNhieu': data.append('SaiNhieu', MaBaiKT); break;
+        case 'LamNhieu': data.append('LamNhieu', MaBaiKT); break;
+        case 'LamIt': data.append('LamIt', MaBaiKT); break;
+    }
+
     if (sort != undefined && sort != '') data.append('TuXauDenTot', sort);
 
     var requestOptions = {
