@@ -1,23 +1,16 @@
 import React, {useEffect, useState} from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  Image,
-  StatusBar,
-  Modal,
-} from 'react-native';
+import {View, Text, TouchableOpacity, Image, StatusBar, Modal} from 'react-native';
 import {settings} from '../../../../config';
-import {Icon, Picker} from 'native-base';
+import {Fab, Icon, Picker} from 'native-base';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import {useIsFocused} from '@react-navigation/native';
 import {getCauHoiByMaMH} from '../../../../../server/BaiKiemTra/getCauHoiByMaMH';
 import {getCD} from '../../../../../server/ChuDe/getCD';
-import {addQuestionDetail} from '../../../../../server/CT_BaiKiemTra';
 import {Header} from '../../../../components/header';
 import {createCTBKT} from '../../../../../server/BaiKiemTra/addQuest';
 import Toast from 'react-native-simple-toast';
 import SelectMultiple from 'react-native-select-multiple';
+import {Menu, MenuItem, MenuDivider} from 'react-native-material-menu';
 
 // NO NE de lam gi v
 
@@ -29,6 +22,8 @@ export const ThemCauHoi = () => {
   const MaMH = params.MaMH;
   const user = params.user;
 
+  console.log('params: ', params);
+
   const [data, setData] = useState('');
   const [listChuDe, setListChuDe] = useState('');
   const [loading, setLoading] = useState(true);
@@ -39,6 +34,12 @@ export const ThemCauHoi = () => {
 
   const [showDetails, setShowDetails] = useState(false);
   const [details, setDetails] = useState('');
+
+  const [visible, setVisible] = useState(false);
+
+  const hideMenu = () => setVisible(false);
+
+  const showMenu = () => setVisible(true);
 
   // Vừa focus vào là gọi refesh để lấy data
   useEffect(() => {
@@ -91,6 +92,7 @@ export const ThemCauHoi = () => {
   const postData = async MaCH => {
     try {
       const res = await createCTBKT(params.BaiKiemTra.MaBaiKT, MaCH);
+      console.log('POST DATA: ', res);
       navigation.goBack();
     } catch (error) {
       //
@@ -167,6 +169,40 @@ export const ThemCauHoi = () => {
     setSelectedFruits(x);
   };
 
+  console.log('params.questions: ', params.questions);
+
+  const quickAdd = param => {
+    console.log('param: ', param);
+
+    let flag = 0;
+
+    if (questions.length > param) {
+      for (let i = 0; i < questions.length; i++) {
+        console.log('questions[i]: ', questions[i]);
+        if (flag < param) {
+          if (params.questions.length !== 0) {
+            for (let j = 0; j < params.questions.length; j++) {
+              if (questions[i].MaCH !== params.questions[j].MaCH) {
+                postData(questions[i].MaCH);
+                flag++;
+              }
+            }
+          } else {
+            postData(questions[i].MaCH);
+            flag++;
+          }
+        }
+      }
+      Toast.show(`Đã thêm ${flag} câu hỏi`, Toast.SHORT);
+    } else {
+      Toast.show('Số lượng câu hỏi không đủ', Toast.SHORT);
+    }
+
+    console.log('flag: ', flag);
+  };
+
+  console.log('filter: ', filter);
+
   return (
     <View style={{flex: 1, backgroundColor: '#fff'}}>
       <StatusBar barStyle="dark-content" hidden={true} />
@@ -175,6 +211,7 @@ export const ThemCauHoi = () => {
       <View style={{flexDirection: 'row', alignItems: 'center'}}>
         <View style={{flex: 1}}>
           <Text
+            numberOfLines={2}
             style={{
               marginLeft: '3%',
               color: settings.colors.colorThumblr,
@@ -200,6 +237,68 @@ export const ThemCauHoi = () => {
             Số câu đã chọn: {selectedFruits.length}
           </Text>
         </View>
+
+        {/* <TouchableOpacity
+          onPress={() => {}}
+          activeOpacity={0.7}
+          style={{
+            width: 60,
+            height: 30,
+            marginRight: 10,
+            borderRadius: 500,
+            backgroundColor: settings.colors.colorMain,
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}>
+          <Text style={{color: '#fff', fontSize: 12}}>NHANH</Text>
+        </TouchableOpacity> */}
+
+        {filter > -1 && (
+          <Menu
+            visible={visible}
+            anchor={
+              <TouchableOpacity
+                onPress={() => showMenu()}
+                activeOpacity={0.7}
+                style={{
+                  width: 60,
+                  height: 30,
+                  marginRight: 10,
+                  borderRadius: 500,
+                  backgroundColor: settings.colors.colorMain,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}>
+                <Text style={{color: '#fff', fontSize: 12}}>NHANH</Text>
+              </TouchableOpacity>
+            }
+            onRequestClose={hideMenu}>
+            <MenuItem
+              onPress={() => {
+                quickAdd(5);
+                hideMenu();
+              }}>
+              Thêm 5 câu
+            </MenuItem>
+            <MenuDivider />
+            <MenuItem
+              onPress={() => {
+                quickAdd(10);
+                hideMenu();
+              }}>
+              Thêm 10 câu
+            </MenuItem>
+            <MenuDivider />
+            <MenuItem
+              onPress={() => {
+                quickAdd(20);
+                hideMenu();
+              }}>
+              Thêm 20 câu
+            </MenuItem>
+          </Menu>
+        )}
+
         <View
           style={{
             width: 30,
@@ -210,12 +309,9 @@ export const ThemCauHoi = () => {
             alignItems: 'center',
             justifyContent: 'center',
           }}>
-          <Icon
-            type="FontAwesome"
-            name="filter"
-            style={{fontSize: 18, color: '#fff', marginTop: 2}}
-          />
+          <Icon type="FontAwesome" name="filter" style={{fontSize: 18, color: '#fff', marginTop: 2}} />
         </View>
+
         <View
           style={{
             width: 40,
@@ -309,11 +405,7 @@ export const ThemCauHoi = () => {
         </>
       ) : (
         <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-          <Image
-            source={require('../../../../asset/gif/load321.gif')}
-            resizeMode="contain"
-            style={{width: 100, height: 100}}
-          />
+          <Image source={require('../../../../asset/gif/load321.gif')} resizeMode="contain" style={{width: 100, height: 100}} />
         </View>
       )}
 
@@ -324,12 +416,7 @@ export const ThemCauHoi = () => {
         onRequestClose={() => {
           setShowDetails(false);
         }}>
-        <StatusBar
-          barStyle={'light-content'}
-          backgroundColor="rgba(0,0,0,1)"
-          hidden={false}
-          animated={true}
-        />
+        <StatusBar barStyle={'light-content'} backgroundColor="rgba(0,0,0,1)" hidden={false} animated={true} />
         <View style={{flex: 1, backgroundColor: 'rgba(0,0,0,0.5)'}}>
           <Text
             onPress={() => {
@@ -337,8 +424,7 @@ export const ThemCauHoi = () => {
             }}
             style={{flex: 1}}
           />
-          <View
-            style={{width: '100%', flexDirection: 'row', alignItems: 'center'}}>
+          <View style={{width: '100%', flexDirection: 'row', alignItems: 'center'}}>
             <Text
               onPress={() => {
                 setShowDetails(false);

@@ -10,6 +10,8 @@ import {
   Clipboard,
   Alert,
   StyleSheet,
+  Platform,
+  PermissionsAndroid,
 } from 'react-native';
 import {useNavigation, useRoute, useIsFocused} from '@react-navigation/native';
 import {settings} from '../../../../config';
@@ -26,14 +28,16 @@ import {getCTBKT} from '../../../../../server/BaiKiemTra/getCTBKT';
 import {deleteCTBKT} from '../../../../../server/BaiKiemTra/deleteCTBKT';
 import {updateTestStatus} from '../../../../../server/BaiKiemTra/update-status';
 import {getTestStatus} from '../../../../../server/BaiKiemTra/get-status';
-import {
-  inittiateSocket,
-  requestUpdateTestList,
-} from '../../../../../server/SocketIO';
+import {inittiateSocket, requestUpdateTestList} from '../../../../../server/SocketIO';
 import {createTestDetailt} from '../../../../../server';
 import Moment from 'moment';
 import {getKQ} from '../../../../../server/KetQua/getKetQua.d';
-import {RenderItemKQ} from './renderItemKQ';
+import {RenderItemKQ} from '../../../lopHocPhan/baiKiemTra/infoQuest/renderItemKQ';
+import {writeFile, readFile} from 'react-native-fs';
+import XLSX from 'xlsx';
+
+// Import HTML to PDF
+import RNHTMLtoPDF from 'react-native-html-to-pdf';
 
 export const InfomationQuestion = () => {
   const nav = useNavigation();
@@ -75,13 +79,7 @@ export const InfomationQuestion = () => {
   // Update bài kiểm tra (gọi api)
   const editBaiKT = async () => {
     try {
-      const res = await updateBaiKT(
-        item.MaBaiKT,
-        tenBaiKT,
-        getDate(ngay),
-        user[0]?.MaGV,
-        minToTime(thoiGian),
-      );
+      const res = await updateBaiKT(item.MaBaiKT, tenBaiKT, getDate(ngay), user[0]?.MaGV, minToTime(thoiGian));
       console.log(res);
       setModal(false);
     } catch (error) {
@@ -162,25 +160,13 @@ export const InfomationQuestion = () => {
   // Lấy ra dạng ngay-tháng-năm
   const getStrDate = date => {
     const newDate = new Date(date);
-    return (
-      getNum(newDate.getDate()) +
-      '-' +
-      getNum(newDate.getMonth() + 1) +
-      '-' +
-      newDate.getFullYear()
-    );
+    return getNum(newDate.getDate()) + '-' + getNum(newDate.getMonth() + 1) + '-' + newDate.getFullYear();
   };
 
   // Lấy ra dạng năm-tháng-ngày
   const getDate = date => {
     const newDate = new Date(date);
-    return (
-      newDate.getFullYear() +
-      '-' +
-      getNum(newDate.getMonth() + 1) +
-      '-' +
-      getNum(newDate.getDate())
-    );
+    return newDate.getFullYear() + '-' + getNum(newDate.getMonth() + 1) + '-' + getNum(newDate.getDate());
   };
 
   // Convert number to time
@@ -249,6 +235,105 @@ export const InfomationQuestion = () => {
 
   console.log(route.params);
 
+  const [filePath, setFilePath] = useState('');
+
+  const isPermitted = async () => {
+    if (Platform.OS === 'android') {
+      try {
+        const granted = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE, {
+          title: 'External Storage Write Permission',
+          message: 'App needs access to Storage data',
+        });
+        return granted === PermissionsAndroid.RESULTS.GRANTED;
+      } catch (err) {
+        alert('Write permission err', err);
+        return false;
+      }
+    } else {
+      return true;
+    }
+  };
+  const dateNow = new Date();
+
+  const getScript = (stt, name, score) => {
+    return `<tr><td style="border:1px solid #dddddd;text-align:left;padding:8px">${stt}</td><td style="border:1px solid #dddddd;text-align:left;padding:8px">${name}</td><td style="border:1px solid #dddddd;text-align:left;padding:8px">${score}</td></tr>`;
+  };
+
+  let startHtml = `<div><div style="display:flex;align-items:center;flex-direction:column"><h1>BẢNG ĐIỂM KIỂM TRA</h1><h2 style="font-size:16px">Tên bài kiểm tra: ${tenBaiKT} - Môn: ${
+    route.params.TenMH
+  }</h2><h2 style="margin-top:-5px;font-size:16px">Lớp học phần: ${item.TenLopHP} - Ngày kiểm tra: ${getStrDate(
+    ngay,
+  )}</h2><table style="font-family:arial,sans-serif;border-collapse:collapse;width:600px;margin-top:15px;"><tr><th style="border:1px solid #dddddd;text-align:left;padding:8px">Số thứ tự</th><th style="border:1px solid #dddddd;text-align:left;padding:8px">Tên sinh viên</th><th style="border:1px solid #dddddd;text-align:left;padding:8px">Điểm</th></tr>`;
+
+  let middleHtml = '';
+
+  let endHtml = `</table><p style="font-size:14px;width:600px;text-align:end">Kiểm Tra Online (Bảo Châu - Văn Hậu) - Ngày in: ${getStrDate(
+    dateNow,
+  )}</p>`;
+
+  const getMiddle = () => {
+    if (route.params.item.TrangThai === '4') {
+      for (let i = 0; i < ketQua.length; i++) {
+        middleHtml = middleHtml + getScript(i, ketQua[i].TenSV, ketQua[i].Diem);
+      }
+    }
+  };
+
+  let fileName = `${route.params.user[0].MaGV}-${route.params.MaMH}-${item.MaBaiKT}_${getStrDate(dateNow)}`;
+
+  const createPDF = async () => {
+    if (await isPermitted()) {
+      getMiddle();
+
+      let options = {
+        //Content to print
+        html: startHtml + middleHtml + endHtml,
+        //File Name
+        fileName: fileName,
+        //File directory
+        directory: 'KTO',
+      };
+      let file = await RNHTMLtoPDF.convert(options);
+      console.log(file.filePath);
+      setFilePath(file.filePath);
+    }
+  };
+
+  const [tempExcel, setTempExcel] = useState([]);
+
+  const getExcel = () => {
+    let temp = [];
+    if (route.params.item.TrangThai === '4') {
+      for (let i = 0; i < ketQua.length; i++) {
+        temp.push({STT: i + 1, TenSV: ketQua[i].TenSV, Diem: ketQua[i].Diem});
+      }
+
+      console.log('temp: ', temp);
+    }
+    setTempExcel(temp);
+  };
+
+  const createExcelFile = async () => {
+    getExcel();
+
+    var ws = XLSX.utils.json_to_sheet(tempExcel);
+
+    var wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Prova');
+
+    const wbout = XLSX.write(wb, {type: 'binary', bookType: 'xlsx'});
+    var RNFS = require('react-native-fs');
+    var file = RNFS.ExternalStorageDirectoryPath + `/KTO/${fileName}.xlsx`;
+
+    writeFile(file, wbout, 'ascii')
+      .then(r => {
+        /* :) */
+      })
+      .catch(e => {
+        /* :( */
+      });
+  };
+
   // Render screen
   return (
     <View style={{flex: 1, backgroundColor: '#fff'}}>
@@ -257,11 +342,7 @@ export const InfomationQuestion = () => {
       {item !== undefined ? (
         <View style={{backgroundColor: '#fff', flex: 1}}>
           <View style={styles.header}>
-            <Icon
-              type="MaterialCommunityIcons"
-              name="book-open-variant"
-              style={styles.iconBook}
-            />
+            <Icon type="MaterialCommunityIcons" name="book-open-variant" style={styles.iconBook} />
             <Text style={styles.headerTitle}>CHI TIẾT BÀI KIỂM TRA</Text>
             <TouchableOpacity
               onPress={() => {
@@ -275,12 +356,8 @@ export const InfomationQuestion = () => {
 
           <View style={styles.main}>
             <View style={{flexDirection: 'row', alignItems: 'flex-start'}}>
-              <Text style={{fontWeight: 'bold', marginRight: 5, fontSize: 16}}>
-                Tên bài:
-              </Text>
-              <Text style={{fontWeight: 'bold', flex: 1, fontSize: 16}}>
-                {tenBaiKT}
-              </Text>
+              <Text style={{fontWeight: 'bold', marginRight: 5, fontSize: 16}}>Tên bài:</Text>
+              <Text style={{fontWeight: 'bold', flex: 1, fontSize: 16}}>{tenBaiKT}</Text>
             </View>
 
             <View style={styles.mainItem}>
@@ -344,12 +421,7 @@ export const InfomationQuestion = () => {
                   data={questions.data}
                   showsVerticalScrollIndicator={false}
                   renderItem={({item}) => (
-                    <RenderItem
-                      item={item}
-                      data={questions.data}
-                      handle={handlePressItem}
-                      handleDelete={deleteQuest}
-                    />
+                    <RenderItem item={item} data={questions.data} handle={handlePressItem} handleDelete={deleteQuest} />
                   )}
                   keyExtractor={item => item.CauHoi}
                   style={{flex: 1, backgroundColor: '#fff'}}
@@ -369,6 +441,7 @@ export const InfomationQuestion = () => {
                       MaMH: route.params.MaMH,
                       BaiKiemTra: item,
                       user: user,
+                      questions: questions.data,
                     });
                   }}
                   activeOpacity={0.5}
@@ -382,10 +455,7 @@ export const InfomationQuestion = () => {
                     borderRadius: 10,
                     flex: 1,
                   }}>
-                  <Text
-                    style={{color: '#fff', fontSize: 14, fontWeight: 'bold'}}>
-                    THÊM CÂU HỎI
-                  </Text>
+                  <Text style={{color: '#fff', fontSize: 14, fontWeight: 'bold'}}>THÊM CÂU HỎI</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
@@ -403,10 +473,7 @@ export const InfomationQuestion = () => {
                     marginBottom: 10,
                     borderRadius: 10,
                   }}>
-                  <Text
-                    style={{color: '#fff', fontSize: 14, fontWeight: 'bold'}}>
-                    SỬA
-                  </Text>
+                  <Text style={{color: '#fff', fontSize: 14, fontWeight: 'bold'}}>SỬA</Text>
                 </TouchableOpacity>
               </View>
             </>
@@ -415,8 +482,10 @@ export const InfomationQuestion = () => {
               <View
                 style={{
                   flexDirection: 'row',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
                   marginLeft: 10,
-                  marginVertical: 5,
+                  marginVertical: 10,
                 }}>
                 <Text
                   style={{
@@ -426,18 +495,52 @@ export const InfomationQuestion = () => {
                   }}>
                   Số sinh viên: {ketQua.length}
                 </Text>
+                {/* 1283417863612 67167316 36712371361236713 16783 1892 73987123177777766666666666666666666666666666666666666 */}
+                <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                  <TouchableOpacity
+                    onPress={createPDF}
+                    activeOpacity={0.7}
+                    style={{
+                      backgroundColor: settings.colors.colorGreen,
+                      paddingHorizontal: 10,
+                      paddingVertical: 5,
+                      marginRight: 10,
+                      borderRadius: 999,
+                    }}>
+                    <Text
+                      style={{
+                        fontSize: 14,
+                        color: '#fff',
+                        fontWeight: 'bold',
+                      }}>
+                      Xuất PDF
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={createExcelFile}
+                    activeOpacity={0.7}
+                    style={{
+                      backgroundColor: settings.colors.colorGreen,
+                      paddingHorizontal: 10,
+                      paddingVertical: 5,
+                      marginRight: 10,
+                      borderRadius: 999,
+                    }}>
+                    <Text
+                      style={{
+                        fontSize: 14,
+                        color: '#fff',
+                        fontWeight: 'bold',
+                      }}>
+                      Xuất Excel
+                    </Text>
+                  </TouchableOpacity>
+                </View>
               </View>
               <FlatList
                 data={ketQua}
                 showsVerticalScrollIndicator={false}
-                renderItem={({item}) => (
-                  <RenderItemKQ
-                    item={item}
-                    data={ketQua}
-                    handle={handlePressItem}
-                    handleDelete={deleteQuest}
-                  />
-                )}
+                renderItem={({item}) => <RenderItemKQ item={item} data={ketQua} handle={handlePressItem} handleDelete={deleteQuest} />}
                 keyExtractor={item => item.CauHoi}
                 style={{flex: 1, backgroundColor: '#fff'}}
               />
@@ -464,12 +567,7 @@ export const InfomationQuestion = () => {
         onRequestClose={() => {
           setModal(false);
         }}>
-        <StatusBar
-          barStyle={'light-content'}
-          backgroundColor="rgba(0,0,0,1)"
-          hidden={false}
-          animated={true}
-        />
+        <StatusBar barStyle={'light-content'} backgroundColor="rgba(0,0,0,1)" hidden={false} animated={true} />
         <View style={{flex: 1, backgroundColor: 'rgba(0,0,0,0.5)'}}>
           <Text
             onPress={() => {
@@ -477,8 +575,7 @@ export const InfomationQuestion = () => {
             }}
             style={{flex: 1}}
           />
-          <View
-            style={{width: '100%', flexDirection: 'row', alignItems: 'center'}}>
+          <View style={{width: '100%', flexDirection: 'row', alignItems: 'center'}}>
             <Text
               onPress={() => {
                 setModal(false);
@@ -594,8 +691,7 @@ export const InfomationQuestion = () => {
                 </Text>
               </TouchableOpacity>
 
-              <View
-                style={{marginLeft: 10, marginTop: 10, flexDirection: 'row'}}>
+              <View style={{marginLeft: 10, marginTop: 10, flexDirection: 'row'}}>
                 <Text
                   style={{
                     color: settings.colors.colorGreen,
@@ -647,9 +743,7 @@ export const InfomationQuestion = () => {
                   alignItems: 'center',
                   justifyContent: 'center',
                 }}>
-                <Text style={{color: '#ffF', fontSize: 14, fontWeight: 'bold'}}>
-                  LƯU THÔNG TIN
-                </Text>
+                <Text style={{color: '#ffF', fontSize: 14, fontWeight: 'bold'}}>LƯU THÔNG TIN</Text>
               </TouchableOpacity>
             </View>
             <Text
@@ -675,12 +769,7 @@ export const InfomationQuestion = () => {
         onRequestClose={() => {
           setShowDetails(false);
         }}>
-        <StatusBar
-          barStyle={'light-content'}
-          backgroundColor="rgba(0,0,0,1)"
-          hidden={false}
-          animated={true}
-        />
+        <StatusBar barStyle={'light-content'} backgroundColor="rgba(0,0,0,1)" hidden={false} animated={true} />
         <View style={{flex: 1, backgroundColor: 'rgba(0,0,0,0.5)'}}>
           <Text
             onPress={() => {
@@ -688,8 +777,7 @@ export const InfomationQuestion = () => {
             }}
             style={{flex: 1}}
           />
-          <View
-            style={{width: '100%', flexDirection: 'row', alignItems: 'center'}}>
+          <View style={{width: '100%', flexDirection: 'row', alignItems: 'center'}}>
             <Text
               onPress={() => {
                 setShowDetails(false);
