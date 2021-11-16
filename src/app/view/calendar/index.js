@@ -1,15 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  Image,
-  FlatList,
-  ScrollView,
-  Dimensions,
-  RefreshControl,
-  Alert,
-} from 'react-native';
+import {View, Text, TouchableOpacity, Image, FlatList, ScrollView, Dimensions, RefreshControl, Alert} from 'react-native';
 import {Icon} from 'native-base';
 import {useIsFocused, useNavigation} from '@react-navigation/native'; // Cái này trong Document của Navigation
 import {settings} from '../../config';
@@ -59,20 +49,7 @@ export const CalendarScreen = ({navigation}) => {
       'Tháng 11',
       'Tháng 12',
     ],
-    monthNamesShort: [
-      'Th 1',
-      'Th 2',
-      'Th 3',
-      'Th 4',
-      'Th 5',
-      'Th 6',
-      'Th 7',
-      'Th 8',
-      'Th 9',
-      'Th 10',
-      'Th 11',
-      'Th 12',
-    ],
+    monthNamesShort: ['Th 1', 'Th 2', 'Th 3', 'Th 4', 'Th 5', 'Th 6', 'Th 7', 'Th 8', 'Th 9', 'Th 10', 'Th 11', 'Th 12'],
     dayNames: ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'],
     dayNamesShort: ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'],
     today: 'Hôm nay',
@@ -84,7 +61,7 @@ export const CalendarScreen = ({navigation}) => {
     if (isFocus) {
       await setDateSelected(dateNow);
     }
-  }, []);
+  }, [isFocus]);
 
   useEffect(() => {
     getAccount();
@@ -92,8 +69,6 @@ export const CalendarScreen = ({navigation}) => {
 
   useEffect(() => {
     if (user != '') {
-      console.log('=================================================');
-      console.log('user[0]?.MaGV: ', user[0]?.MaGV);
       getData(user[0]?.MaGV, getStrDay(dateSelected));
       getAllData(user[0]?.MaGV);
     }
@@ -173,13 +148,7 @@ export const CalendarScreen = ({navigation}) => {
 
   const getStrDay = date => {
     let dax = new Date(date);
-    return (
-      dax.getFullYear() +
-      '-' +
-      getNum(parseInt(dax.getMonth()) + 1) +
-      '-' +
-      getNum(dax.getDate())
-    );
+    return dax.getFullYear() + '-' + getNum(parseInt(dax.getMonth()) + 1) + '-' + getNum(dax.getDate());
   };
 
   // lấy api chổ này
@@ -206,10 +175,7 @@ export const CalendarScreen = ({navigation}) => {
   const getAllData = async MaGV => {
     console.log('getAllData');
     try {
-      const res =
-        user[0]?.MaGV !== undefined
-          ? await getAllTest(MaGV)
-          : await getBaiKiemTra(user[0]?.MaSV, 3);
+      const res = user[0]?.MaGV !== undefined ? await getAllTest(MaGV) : await getBaiKiemTra(user[0]?.MaSV, 3);
 
       console.log('getAllData: ', res);
 
@@ -257,13 +223,7 @@ export const CalendarScreen = ({navigation}) => {
   // Format ngày tháng năm bằng cơm
   const getStringDate = date => {
     let newDate = new Date(date);
-    return (
-      newDate.getFullYear() +
-      '-' +
-      getNum(newDate.getMonth() + 1) +
-      '-' +
-      getNum(newDate.getDate())
-    );
+    return newDate.getFullYear() + '-' + getNum(newDate.getMonth() + 1) + '-' + getNum(newDate.getDate());
   };
 
   // Nếu số là 4 sẽ thành 04
@@ -306,11 +266,7 @@ export const CalendarScreen = ({navigation}) => {
                 navigation.goBack(); // Quay về màn hình trước
               }}
               style={HeaderStyles.leftButton}>
-              <Icon
-                type="MaterialIcons"
-                name="keyboard-arrow-left"
-                style={HeaderStyles.buttonIcon}
-              />
+              <Icon type="MaterialIcons" name="keyboard-arrow-left" style={HeaderStyles.buttonIcon} />
             </TouchableOpacity>
             <View style={{flex: 1}} />
             <Text style={HeaderStyles.textTitle}>LỊCH KIỂM TRA</Text>
@@ -328,10 +284,7 @@ export const CalendarScreen = ({navigation}) => {
             </TouchableOpacity>
           </View>
           {calendarShow && ( // Nếu calendarShow = true thì mới hiện
-            <ScrollView
-              showsHorizontalScrollIndicator={false}
-              horizontal={true}
-              style={MainStyles.container}>
+            <ScrollView showsHorizontalScrollIndicator={false} horizontal={true} style={MainStyles.container}>
               <Calendar
                 style={{width: dW, marginTop: -5}}
                 markingType={'period'}
@@ -351,20 +304,9 @@ export const CalendarScreen = ({navigation}) => {
             {!dataNull ? ( // Nếu dataNull nghịch dảo với true thì hiện thằng đầu, bằng true thì hiện thằng sau
               <FlatList
                 data={data}
-                refreshControl={
-                  <RefreshControl
-                    refreshing={refreshing}
-                    onRefresh={onRefresh}
-                  />
-                }
+                refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
                 showsVerticalScrollIndicator={false}
-                renderItem={({item}) => (
-                  <RenderItem
-                    item={item}
-                    data={data}
-                    handle={handlePressItem}
-                  />
-                )}
+                renderItem={({item}) => <RenderItem item={item} data={data} handle={handlePressItem} />}
                 keyExtractor={item => item.id}
                 style={{flex: 1, paddingTop: 10}}
                 ListEmptyComponent={
@@ -374,9 +316,7 @@ export const CalendarScreen = ({navigation}) => {
                       alignItems: 'center',
                       justifyContent: 'center',
                     }}>
-                    <Text style={{fontSize: 14, color: 'red'}}>
-                      Không có bài kiểm tra nào
-                    </Text>
+                    <Text style={{fontSize: 14, color: 'red'}}>Không có bài kiểm tra nào</Text>
                   </View>
                 }
               />
@@ -387,20 +327,14 @@ export const CalendarScreen = ({navigation}) => {
                   alignItems: 'center',
                   justifyContent: 'center',
                 }}>
-                <Text
-                  style={{fontSize: 14, color: settings.colors.colorYouTube}}>
-                  Không có bài kiểm tra
-                </Text>
+                <Text style={{fontSize: 14, color: settings.colors.colorYouTube}}>Không có bài kiểm tra</Text>
               </View>
             )}
           </View>
         </>
       ) : (
         <View style={LoadingStyles.container}>
-          <Image
-            source={require('../../asset/gif/loading-super.gif')}
-            style={LoadingStyles.image}
-          />
+          <Image source={require('../../asset/gif/loading-super.gif')} style={LoadingStyles.image} />
         </View>
       )}
     </View>

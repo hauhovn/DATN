@@ -10,14 +10,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useDispatch} from 'react-redux';
 import {activate} from '../../../../store/reducers/userSlice';
 
-import {
-  View,
-  StyleSheet,
-  Image,
-  TouchableOpacity,
-  ScrollView,
-  Text,
-} from 'react-native';
+import {View, StyleSheet, Image, TouchableOpacity, ScrollView, Text} from 'react-native';
 
 import {launchImageLibrary} from 'react-native-image-picker';
 import {requestMultiple, PERMISSIONS} from 'react-native-permissions';
@@ -30,17 +23,14 @@ export const UserScreen = ({navigation, route}) => {
   const dispatch = useDispatch();
   const [link, setLink] = useState('');
   const [url, setURL] = useState('https://bom.to/02HE45bT9BR2M');
+  const [user, setUser] = useState('');
 
   useEffect(() => {
-    requestMultiple([
-      PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE,
-      PERMISSIONS.ANDROID.WRITE_EXTERNAL_STORAGE,
-    ]);
+    getAccount();
   }, []);
 
   useEffect(() => {
     if (link !== '') {
-      console.log('link: ', link);
       setURL(link);
     }
   }, [link]);
@@ -84,6 +74,16 @@ export const UserScreen = ({navigation, route}) => {
     }
   };
 
+  const getAccount = async () => {
+    try {
+      const res = await AsyncStorage.getItem('currentUser');
+      console.log('user: ', res);
+      setUser(JSON.parse(res));
+    } catch (e) {
+      // error reading value
+    }
+  };
+
   const getImage = () => {
     if (url !== '') {
       return true;
@@ -91,6 +91,8 @@ export const UserScreen = ({navigation, route}) => {
       return false;
     }
   };
+
+  console.log('user: ', user[0]);
 
   return (
     <View style={styles.container}>
@@ -130,9 +132,11 @@ export const UserScreen = ({navigation, route}) => {
         <View style={body.fakeView} />
         <View style={styles.infoContainer}>
           <View style={{width: '65%'}}>
-            <Text numberOfLines={1} style={styles.textName}>
-              Nguyễn Phúc Bảo Châu
-            </Text>
+            {user !== undefined && (
+              <Text numberOfLines={1} style={styles.textName}>
+                {user[0]?.TenGV !== undefined ? user[0]?.TenGV : user[0]?.TenSV}
+              </Text>
+            )}
             <View style={{flexDirection: 'row', alignItems: 'center'}}>
               <Icon
                 type="Ionicons"
@@ -143,9 +147,11 @@ export const UserScreen = ({navigation, route}) => {
                   marginRight: 5,
                 }}
               />
-              <Text numberOfLines={1} style={styles.textMail}>
-                baochau@gmail.com
-              </Text>
+              {user !== undefined && (
+                <Text numberOfLines={1} style={styles.textMail}>
+                  {user[0]?.Mail}
+                </Text>
+              )}
             </View>
           </View>
           <View style={{flex: 1}} />
@@ -188,9 +194,7 @@ export const UserScreen = ({navigation, route}) => {
                   }}
                 />
               </View>
-              <Text style={{fontSize: 14, marginLeft: 10, flex: 10}}>
-                Update profile
-              </Text>
+              <Text style={{fontSize: 14, marginLeft: 10, flex: 10}}>Update profile</Text>
             </TouchableOpacity>
             <TouchableOpacity
               activeOpacity={0.5}
@@ -198,8 +202,7 @@ export const UserScreen = ({navigation, route}) => {
               onPress={() => {
                 handleChangePassword();
               }}>
-              <View
-                style={[body.viewIcon, {backgroundColor: colors.colorBlue}]}>
+              <View style={[body.viewIcon, {backgroundColor: colors.colorBlue}]}>
                 <Icon
                   type="FontAwesome"
                   name="lock"
@@ -209,9 +212,7 @@ export const UserScreen = ({navigation, route}) => {
                   }}
                 />
               </View>
-              <Text style={{fontSize: 14, marginLeft: 10, flex: 10}}>
-                Change password
-              </Text>
+              <Text style={{fontSize: 14, marginLeft: 10, flex: 10}}>Change password</Text>
             </TouchableOpacity>
 
             {/* <TouchableOpacity
@@ -268,8 +269,7 @@ export const UserScreen = ({navigation, route}) => {
               onPress={() => {
                 navigation.navigate(AppRouter.INFO);
               }}>
-              <View
-                style={[body.viewIcon, {backgroundColor: colors.colorTwitter}]}>
+              <View style={[body.viewIcon, {backgroundColor: colors.colorTwitter}]}>
                 <Icon
                   type="FontAwesome"
                   name="info"
@@ -279,9 +279,7 @@ export const UserScreen = ({navigation, route}) => {
                   }}
                 />
               </View>
-              <Text style={{fontSize: 14, marginLeft: 10, flex: 10}}>
-                Thông tin ứng dụng
-              </Text>
+              <Text style={{fontSize: 14, marginLeft: 10, flex: 10}}>Thông tin ứng dụng</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -290,8 +288,7 @@ export const UserScreen = ({navigation, route}) => {
               onPress={() => {
                 handleLogOut();
               }}>
-              <View
-                style={[body.viewIcon, {backgroundColor: colors.colorThumblr}]}>
+              <View style={[body.viewIcon, {backgroundColor: colors.colorThumblr}]}>
                 <Icon
                   type="Entypo"
                   name="log-out"
@@ -302,9 +299,7 @@ export const UserScreen = ({navigation, route}) => {
                   }}
                 />
               </View>
-              <Text style={{fontSize: 14, marginLeft: 10, flex: 10}}>
-                Log out
-              </Text>
+              <Text style={{fontSize: 14, marginLeft: 10, flex: 10}}>Log out</Text>
             </TouchableOpacity>
           </View>
         </View>

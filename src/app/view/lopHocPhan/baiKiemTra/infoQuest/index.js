@@ -35,6 +35,7 @@ import {getKQ} from '../../../../../server/KetQua/getKetQua.d';
 import {RenderItemKQ} from '../../../lopHocPhan/baiKiemTra/infoQuest/renderItemKQ';
 import {writeFile, readFile} from 'react-native-fs';
 import XLSX from 'xlsx';
+import Toast from 'react-native-simple-toast';
 
 // Import HTML to PDF
 import RNHTMLtoPDF from 'react-native-html-to-pdf';
@@ -294,8 +295,8 @@ export const InfomationQuestion = () => {
         directory: 'KTO',
       };
       let file = await RNHTMLtoPDF.convert(options);
-      console.log(file.filePath);
       setFilePath(file.filePath);
+      Toast.show('Thành công', Toast.SHORT);
     }
   };
 
@@ -307,8 +308,6 @@ export const InfomationQuestion = () => {
       for (let i = 0; i < ketQua.length; i++) {
         temp.push({STT: i + 1, TenSV: ketQua[i].TenSV, Diem: ketQua[i].Diem});
       }
-
-      console.log('temp: ', temp);
     }
     setTempExcel(temp);
   };
@@ -332,6 +331,7 @@ export const InfomationQuestion = () => {
       .catch(e => {
         /* :( */
       });
+    Toast.show('Thành công', Toast.SHORT);
   };
 
   // Render screen

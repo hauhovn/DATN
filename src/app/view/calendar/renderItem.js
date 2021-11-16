@@ -75,9 +75,7 @@ export const RenderItem = ({item, data, handle}) => {
             }}
           />
         </View>
-        <Text style={{flex: 10, fontSize: 14}}>
-          Thời gian: {timeToNumber(item?.ThoiGianLam)} phút
-        </Text>
+        <Text style={{flex: 10, fontSize: 14}}>Thời gian: {timeToNumber(item?.ThoiGianLam)} phút</Text>
       </View>
       <View
         style={{
@@ -122,13 +120,13 @@ export const RenderItem = ({item, data, handle}) => {
         </View>
         <Text style={{flex: 10, fontSize: 14}}>
           Trạng thái:{' '}
-          {item?.TrangThai === 0
+          {item?.TrangThai == 0
             ? 'Mới tạo'
-            : item?.TrangThai === 1
+            : item?.TrangThai == 1
             ? 'Đã hoàn thành'
-            : item?.TrangThai === 2
+            : item?.TrangThai == 2
             ? 'Đang kiểm tra'
-            : item?.TrangThai === 3
+            : item?.TrangThai == 3
             ? 'Đang tạm dừng'
             : 'Đã kết thúc'}
         </Text>

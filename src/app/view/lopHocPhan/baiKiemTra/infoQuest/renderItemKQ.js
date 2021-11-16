@@ -13,8 +13,7 @@ export const RenderItemKQ = ({item, data, handle, handleDelete}) => {
         borderRadius: 10,
         backgroundColor: '#fff',
         borderWidth: 1,
-        borderColor:
-          item?.Diem < 5 ? '#EF9A9A' : settings.colors.colorBoderDark,
+        borderColor: item?.Diem * 10 < 5 ? '#EF9A9A' : settings.colors.colorBoderDark,
         width: '94%',
         paddingVertical: 10,
         flexDirection: 'row',
@@ -31,11 +30,7 @@ export const RenderItemKQ = ({item, data, handle, handleDelete}) => {
           justifyContent: 'center',
           marginRight: 10,
         }}>
-        <Icon
-          type="AntDesign"
-          name="user"
-          style={{fontSize: 22, color: '#fff'}}
-        />
+        <Icon type="AntDesign" name="user" style={{fontSize: 22, color: '#fff'}} />
       </View>
 
       <View style={{flex: 1}}>
@@ -43,7 +38,7 @@ export const RenderItemKQ = ({item, data, handle, handleDelete}) => {
           Tên sinh viên: {item?.TenSV}
         </Text>
         <Text numberOfLines={1} style={{width: '100%', fontSize: 14}}>
-          Điểm: {item?.Diem}
+          Điểm: {parseFloat(item?.Diem * 10).toFixed(2)}
         </Text>
       </View>
     </TouchableOpacity>
