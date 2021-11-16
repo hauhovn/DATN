@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import Moment from 'moment';
 
-import { COLORS } from '../../../assets/constants'
+import { COLORS, SIZES } from '../../../assets/constants'
 import { getSoCauDung, getCTBaiKiemTra } from '../../../../server/student-apis'
 
 export
@@ -10,6 +10,8 @@ export
 
         const [soCauDung, setSoCauDung] = useState(-1);
         const [soCauHoi, setSoCauHoi] = useState(0);
+        const [gv, setGv] = useState('');
+        const [mail, setMail] = useState('');
 
         const getResult = async () => {
             const rs = await getSoCauDung(MaSV, item?.MaBaiKT);
@@ -20,8 +22,10 @@ export
 
         const getDetailt = async () => {
             const rs = await getCTBaiKiemTra(MaSV, item?.MaBaiKT);
-            console.log(`rs ch vui 2: `, rs);
+            console.log(`ItemTestResult: `, rs);
             setSoCauHoi(rs?.data?.SoLuongCauHoi)
+            setGv(rs?.data?.TenGV)
+            setMail(rs?.data?.Mail)
         }
 
         const caculator = () => {
@@ -36,8 +40,9 @@ export
 
         soCauDung == -1 && getResult();
 
+
         return (
-            <TouchableOpacity style={styles.container} onPress={() => handle(item)}>
+            <View style={styles.container}>
                 <View style={styles.title}>
                     <Text style={styles.titleText}>{item.TenLopHP}</Text>
                     <Text>{Moment(item?.Ngay)?.format('LTS')} - {Moment(item?.Ngay)?.format('L')}</Text>
@@ -46,15 +51,42 @@ export
                     <View style={styles.content}>
                         <Text>Bài kiểm tra: {item.TenBaiKT}</Text>
                         <Text>Thời gian làm: {item.ThoiGianLam}</Text>
+                        <Text>Giảng viên: {gv}</Text>
+                        <Text>Liên hệ: {mail}</Text>
                     </View>
                 </View>
                 <View style={styles.content}>
-                    <View style={styles.content}>
-                        <Text style={{ fontWeight: '900', fontSize: 16 }}>Kết quả: {caculator()} điểm ({soCauDung}/{soCauHoi})</Text>
+                    <View
+                        style={{
+                            ...styles.content,
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            justifyContent: 'space-between'
+                        }}
+                    >
+                        <Text
+                            style={{ fontWeight: '900', fontSize: 16, color: COLORS.colorMain }}>
+                            Kết quả: {caculator()} điểm ({soCauDung}/{soCauHoi})
+                        </Text>
+                        <TouchableOpacity
+                            disabled={item?.ChoXemKetQua > 0 ? false : true}
+                            onPress={() => handle(item)}
+                            style={{
+                                backgroundColor: item?.ChoXemKetQua > 0 ? COLORS.colorMain : COLORS.gray,
+                                paddingHorizontal: SIZES.radius,
+                                paddingVertical: SIZES.radius / 2,
+                                borderRadius: SIZES.radius,
+                                marginTop: -SIZES.radius
+                            }}
+                        >
+                            <Text
+                                style={{ fontSize: 12, color: COLORS.white, textTransform: 'capitalize' }}
+                            >Xem chi tiết</Text>
+                        </TouchableOpacity>
                     </View>
                 </View>
 
-            </TouchableOpacity>
+            </View>
         );
     };
 
@@ -90,6 +122,7 @@ const styles = StyleSheet.create({
     titleText: {
         fontSize: 16,
         fontWeight: 'bold',
+        color: COLORS.green
     },
     contentText: {},
 });

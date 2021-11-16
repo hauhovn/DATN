@@ -38,7 +38,7 @@ import {
     setTimeTest,
     getTimeTest,
     getJonedList,
-    tinhKetQua
+    tinhKetQua, getTeacherTime
 } from '../../../server';
 
 /** Components */
@@ -51,9 +51,6 @@ import {
 } from '../student/components'
 import { COLORS, STYLES, SIZES, GIFS } from '../../assets/constants';
 import { Icon } from 'native-base';
-import moment from 'moment';
-moment.locale('vi')
-import CountDown from 'react-native-countdown-component';
 
 export const TeacherControl = ({ route, navigation }) => {
 
@@ -86,8 +83,7 @@ export const TeacherControl = ({ route, navigation }) => {
     const [studentsQuantity, setStudentsQuantity] = useState(0);
     const [studentTestQuantity, setStudentTestQuantity] = useState(0);
     const [testInfo, setTestInfo] = useState(undefined);
-
-    const [timeTest, setTimeTest] = useState(0);
+    const [countdownTime, setCountdownTime] = useState(60);
     const [isTimeRunning, setTimeRunning] = useState(false);
 
     const statusInfo = ['Chưa hoàn thành', 'Bắt đầu', 'Tạm dừng', 'Tiếp tục', 'Tạm dừng'];
@@ -99,6 +95,7 @@ export const TeacherControl = ({ route, navigation }) => {
 
     const listMarginRight = useRef(new Animated.Value(0)).current;
     const listOpacity = new Animated.Value(1);
+
 
     //Effect
     useEffect(() => {
@@ -133,6 +130,8 @@ export const TeacherControl = ({ route, navigation }) => {
     /** Load option */
     const loadOption = async () => {
 
+        await _getTeacherTime();
+
         /** check test */
         await checkTestStatus(BaiKiemTra.MaBaiKT);
 
@@ -158,6 +157,7 @@ export const TeacherControl = ({ route, navigation }) => {
         /** stop loading */
         setIsLoading(false);
 
+        _getTeacherTime();
     }
 
     /** Socket IO */
@@ -186,6 +186,14 @@ export const TeacherControl = ({ route, navigation }) => {
         let response = await getTestStatus(null, testID);
         console.log(`res=`, response);
         setTestStatus(response.status);
+    }
+
+    /** Get time  */
+    async function _getTeacherTime() {
+        const rs = await getTeacherTime(BaiKiemTra.MaBaiKT);
+        console.log(rs?.data);
+        setCountdownTime(rs?.data)
+        setTimeRunning(true);
     }
 
     const _getJonedList = async (MaGV, MaBaiKT) => {
@@ -302,7 +310,7 @@ export const TeacherControl = ({ route, navigation }) => {
     /** Tinh toan va update diem */
     const tinhKetQuaBKT = async () => {
         let rs = await tinhKetQua(user.id, BaiKiemTra.MaBaiKT);
-        console.log(rs);
+        console.log(`#313 tinh ket qua: `, rs);
     }
 
 
@@ -405,15 +413,12 @@ export const TeacherControl = ({ route, navigation }) => {
                     borderBottomWidth: .3,
                     alignItems: 'center',
                 }}>
-                    {timeTest > 0 &&
-                        <MyCountDown
-                            time={testInfo != undefined && _getTimeTest()}
-                            isRuning={isTimeRunning}
-                            onFinish={() => Alert.alert('Timeup')}
-                        />
 
-                    }
-                    <Text>Time</Text>
+                    <MyCountDown
+                        time={countdownTime}
+                        isRuning={isTimeRunning}
+                        onFinish={() => Alert.alert('Đã hết thời gian!')}
+                    />
                 </View>
                 <View style={actionBar.row}>
 
@@ -507,7 +512,8 @@ export const TeacherControl = ({ route, navigation }) => {
             { TenLopHP: 'Làm đúng nhiều nhất', MaLopHP: 1 },
             { TenLopHP: 'Làm sai nhiều nhất', MaLopHP: 2 },
             { TenLopHP: 'Tổng số câu đã làm nhiều nhất', MaLopHP: 3 },
-            { TenLopHP: 'Tổng số câu đã làm it nhất', MaLopHP: 4 },];
+            { TenLopHP: 'Tổng số câu đã làm it nhất', MaLopHP: 4 },
+        ];
 
         const renderItem = (item) => {
             return (
@@ -542,10 +548,10 @@ export const TeacherControl = ({ route, navigation }) => {
         const pressItem = (item) => {
             selectedItem = item;
             switch (item) {
-                case 1: getTesting_detail(BaiKiemTra.MaBaiKT); break;
-                case 2: getTesting_detail(BaiKiemTra.MaBaiKT, 1); break;
-                case 3: getTesting_detail(BaiKiemTra.MaBaiKT); break;
-                case 4: getTesting_detail(BaiKiemTra.MaBaiKT, 1); break;
+                case 1: getTesting_detail(BaiKiemTra.MaBaiKT, 'DungNhieu'); break;
+                case 2: getTesting_detail(BaiKiemTra.MaBaiKT, 'SaiNhieu'); break;
+                case 3: getTesting_detail(BaiKiemTra.MaBaiKT, 'LamNhieu'); break;
+                case 4: getTesting_detail(BaiKiemTra.MaBaiKT, 'LamIt'); break;
             }
         }
 

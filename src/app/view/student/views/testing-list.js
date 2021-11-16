@@ -181,7 +181,7 @@ const StudentTestingList = ({ navigation, route }) => {
             <DialogPickerModal
                 data={listTenLHP}
                 handle={(item) => classPicker(item)}
-                displayValue={pickerLHP} />
+                displayValue={listTenLHP[0]} />
 
             {/** List */}
 

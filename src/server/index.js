@@ -8,6 +8,10 @@ import { getTimeTest } from "./BaiKiemTra/getTimeTest";
 import { getTestTimeCountdown } from "./BaiKiemTra/get-time-countdown";
 import { getJonedList } from './LopHP/get-joned-list'
 import { tinhKetQua } from './KetQua/tinh-ket-qua';
+import { addTestTime } from "./SinhVien/add-test-time";
+import { getTeacherTime } from "./BaiKiemTra/teacher-time";
+import { getAdvTest } from "./misc/get-adv-test";
+import { setAdvTest } from "./misc/set-adv-test";
 
 
 export {
@@ -20,5 +24,9 @@ export {
     getTimeTest,
     getTestTimeCountdown,
     getJonedList,
-    tinhKetQua
+    tinhKetQua,
+    addTestTime,
+    getTeacherTime,
+    getAdvTest,
+    setAdvTest
 }

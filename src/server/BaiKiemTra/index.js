@@ -8,7 +8,7 @@ const getBaiKiemTra = async (MaSV, SoLuong, Page, Status = -1, Type = 'testing')
     var data = new FormData();
     data.append('MaSV', MaSV);
     data.append('Type', Type);
-    console.log(`sv: ${MaSV} sl: ${SoLuong} page: ${Page}`);
+    console.log(`123 xem no: SV-${MaSV} SL-${SoLuong} Page-${Page} Type-${Type}`);
     if (Status != -1)
         console.log(`tim bai dang làm`);
 

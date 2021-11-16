@@ -11,6 +11,8 @@ const getBaiKiemTraTheoLopHocPhan = async (MaSV, MaLopHP, SoLuong, Page, Type = 
     data.append('MaLopHP', MaLopHP);
     data.append('Type', Type)
 
+    //console.log(`123 xem no: SV-${MaSV} Lop-${MaLopHP} SL-${SoLuong} Page-${Page} Type-${Type}`);
+
     if (Page != undefined) {
         data.append('page', Page);
         data.append('quantity', SoLuong);

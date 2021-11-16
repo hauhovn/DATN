@@ -6,6 +6,8 @@ import { getSoCauDung } from './BaiKiemTra/get-so-cau-dung'
 import { getTestTimeCountdown } from './BaiKiemTra/get-time-countdown'
 import { getCTBaiKiemTra } from './BaiKiemTra/getTestDetail'
 import { getLopHocPhan } from './SinhVien/get-lop-hoc-phan'
+import { addTestTime } from '../server/SinhVien/add-test-time'
+import { checkEnd } from '../server/SinhVien/check-end'
 
 export {
     getBaiKiemTra,
@@ -15,5 +17,7 @@ export {
     getTestTimeCountdown,
     getSoCauDung,
     getCTBaiKiemTra,
-    getLopHocPhan
+    getLopHocPhan,
+    addTestTime,
+    checkEnd
 }
