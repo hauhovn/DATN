@@ -38,7 +38,7 @@ import {
     setTimeTest,
     getTimeTest,
     getJonedList,
-    tinhKetQuam, getTeacherTime
+    tinhKetQua, getTeacherTime
 } from '../../../server';
 
 /** Components */
@@ -310,7 +310,7 @@ export const TeacherControl = ({ route, navigation }) => {
     /** Tinh toan va update diem */
     const tinhKetQuaBKT = async () => {
         let rs = await tinhKetQua(user.id, BaiKiemTra.MaBaiKT);
-        console.log(rs);
+        console.log(`#313 tinh ket qua: `, rs);
     }
 
 
