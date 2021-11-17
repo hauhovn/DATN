@@ -14,6 +14,9 @@ import {Menu, MenuItem, MenuDivider} from 'react-native-material-menu';
 
 // NO NE de lam gi v
 
+let flag = 0;
+let vnFlag = 0;
+
 export const ThemCauHoi = () => {
   const focus = useIsFocused();
   const navigation = useNavigation();
@@ -90,8 +93,10 @@ export const ThemCauHoi = () => {
 
   // Gọi api thêm danh sách câu hỏi vô bài kiểm tra
   const postData = async MaCH => {
+    console.log('======= postData');
     try {
       const res = await createCTBKT(params.BaiKiemTra.MaBaiKT, MaCH);
+      vnFlag = 0;
     } catch (error) {
       //
     }
@@ -168,21 +173,36 @@ export const ThemCauHoi = () => {
     setSelectedFruits(x);
   };
 
-  const quickAdd = param => {
-    let flag = 0;
+  const quickAdd = async param => {
+    setLoading(true);
+    flag = 0;
+    console.log(param, ' ===============================================================================');
+    console.log('flag: ', flag);
+    console.log('vnFlag: ', vnFlag);
+
     if (questions.length > param) {
       for (let i = 0; i < questions.length; i++) {
-        console.log('questions[i]: ', questions[i]);
+        console.log('CHAY LAN THU - ', i);
+        vnFlag = 0;
         if (flag < param) {
-          if (params.questions.length !== 0) {
+          if (params.questions.length > 0) {
             for (let j = 0; j < params.questions.length; j++) {
-              if (questions[i].MaCH !== params.questions[j].MaCH) {
-                postData(questions[i].MaCH);
-                flag++;
+              if (questions[i].MaCH === params.questions[j].MaCH) {
+                console.log('questions[i].MaCH === params.questions[j].MaCH');
+                vnFlag = 1;
               }
             }
+
+            console.log('flag: ', flag);
+            console.log('vnFlag: ', vnFlag);
+
+            if (vnFlag === 0) {
+              console.log('vnFlag === 0');
+              await postData(questions[i].MaCH);
+              flag++;
+            }
           } else {
-            postData(questions[i].MaCH);
+            await postData(questions[i].MaCH);
             flag++;
           }
         }
@@ -194,6 +214,9 @@ export const ThemCauHoi = () => {
     }
 
     console.log('flag: ', flag);
+
+    console.log(param, ' ===============================================================================');
+    setLoading(false);
   };
 
   console.log('filter: ', filter);

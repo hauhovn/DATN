@@ -13,6 +13,8 @@ import SelectMultiple from 'react-native-select-multiple';
 import {Menu, MenuItem, MenuDivider} from 'react-native-material-menu';
 
 // NO NE de lam gi v
+let flag = 0;
+let vnFlag = 0;
 
 export const ThemCauHoi = () => {
   const focus = useIsFocused();
@@ -92,6 +94,7 @@ export const ThemCauHoi = () => {
   const postData = async MaCH => {
     try {
       const res = await createCTBKT(params.BaiKiemTra.MaBaiKT, MaCH);
+      vnFlag = 0;
     } catch (error) {
       //
     }
@@ -170,24 +173,36 @@ export const ThemCauHoi = () => {
 
   console.log('params.questions: ', params.questions);
 
-  const quickAdd = param => {
-    console.log('param: ', param);
-
-    let flag = 0;
+  const quickAdd = async param => {
+    setLoading(true);
+    flag = 0;
+    console.log(param, ' ===============================================================================');
+    console.log('flag: ', flag);
+    console.log('vnFlag: ', vnFlag);
 
     if (questions.length > param) {
       for (let i = 0; i < questions.length; i++) {
-        console.log('questions[i]: ', questions[i]);
+        console.log('CHAY LAN THU - ', i);
+        vnFlag = 0;
         if (flag < param) {
-          if (params.questions.length !== 0) {
+          if (params.questions.length > 0) {
             for (let j = 0; j < params.questions.length; j++) {
-              if (questions[i].MaCH !== params.questions[j].MaCH) {
-                postData(questions[i].MaCH);
-                flag++;
+              if (questions[i].MaCH === params.questions[j].MaCH) {
+                console.log('questions[i].MaCH === params.questions[j].MaCH');
+                vnFlag = 1;
               }
             }
+
+            console.log('flag: ', flag);
+            console.log('vnFlag: ', vnFlag);
+
+            if (vnFlag === 0) {
+              console.log('vnFlag === 0');
+              await postData(questions[i].MaCH);
+              flag++;
+            }
           } else {
-            postData(questions[i].MaCH);
+            await postData(questions[i].MaCH);
             flag++;
           }
         }
@@ -197,6 +212,11 @@ export const ThemCauHoi = () => {
     } else {
       Toast.show('Số lượng câu hỏi không đủ', Toast.SHORT);
     }
+
+    console.log('flag: ', flag);
+
+    console.log(param, ' ===============================================================================');
+    setLoading(false);
   };
 
   console.log('filter: ', filter);
