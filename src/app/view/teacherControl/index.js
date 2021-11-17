@@ -8,7 +8,8 @@ import {
     AppState,
     Image,
     Alert,
-    Animated
+    Animated,
+    Switch
 } from 'react-native';
 
 // Items
@@ -38,7 +39,9 @@ import {
     setTimeTest,
     getTimeTest,
     getJonedList,
-    tinhKetQua, getTeacherTime
+    tinhKetQua, getTeacherTime,
+    getAdvTest,
+    setAdvTest
 } from '../../../server';
 
 /** Components */
@@ -85,6 +88,7 @@ export const TeacherControl = ({ route, navigation }) => {
     const [testInfo, setTestInfo] = useState(undefined);
     const [countdownTime, setCountdownTime] = useState(60);
     const [isTimeRunning, setTimeRunning] = useState(false);
+    const [isSwitchEnable, setSwitch] = useState(false);
 
     const statusInfo = ['Chưa hoàn thành', 'Bắt đầu', 'Tạm dừng', 'Tiếp tục', 'Tạm dừng'];
     const statusColor = [COLORS.green, COLORS.green, COLORS.yellow, COLORS.green, COLORS.yellow];
@@ -154,6 +158,9 @@ export const TeacherControl = ({ route, navigation }) => {
         /** get old data */
         await getOldInfo(BaiKiemTra.MaBaiKT);
 
+        /** */
+        await getAdv();
+
         /** stop loading */
         setIsLoading(false);
 
@@ -179,6 +186,23 @@ export const TeacherControl = ({ route, navigation }) => {
 
         });
     }
+
+    /** get adv */
+    const getAdv = async () => {
+        const rs = await getAdvTest(BaiKiemTra.MaBaiKT);
+        console.log(`Advance: `, rs);
+        if (rs?.data?.ChoPhepVaoTre > 0) setSwitch(true);
+        else setSwitch(false);
+    }
+
+    const onSwitchChange = async () => {
+        let vl = 1;
+        if (isSwitchEnable) vl = 0;
+        setSwitch(isSwitchEnable ? false : true);
+        const rs = await setAdvTest(BaiKiemTra.MaBaiKT, '', '', vl)
+        console.log(rs);
+    }
+
 
     /** Check test status */
     const checkTestStatus = async (testID) => {
@@ -335,7 +359,8 @@ export const TeacherControl = ({ route, navigation }) => {
                                     case 1: {
                                         /** Waiting =>  Start test */
                                         requestStartTest(user.id, BaiKiemTra.MaBaiKT, true);
-
+                                        /** Get time show */
+                                        getTimeOfTest();
                                         addTestStatusInfo(true, 5, '', 'CÁC THÍ SINH ĐÃ \n BẮT ĐẦU LÀM BÀI');
                                         try {
                                             testStatusUpdate(2, 1);
@@ -412,13 +437,25 @@ export const TeacherControl = ({ route, navigation }) => {
                     ...actionBar.row,
                     borderBottomWidth: .3,
                     alignItems: 'center',
+                    justifyContent: 'flex-start'
                 }}>
 
                     <MyCountDown
                         time={countdownTime}
                         isRuning={isTimeRunning}
-                        onFinish={() => Alert.alert('Đã hết thời gian!')}
+                        onFinish={() => { }
+                            //Alert.alert('Đã hết thời gian!')
+                        }
                     />
+                    <TouchableOpacity
+                        onPress={() => { _getTeacherTime() }}
+                    >
+                        <Icon
+                            name='spinner-refresh'
+                            type='Fontisto'
+                            style={{ color: COLORS.colorMain, fontSize: 22, marginRight: SIZES.width / 2 }}
+                        />
+                    </TouchableOpacity>
                 </View>
                 <View style={actionBar.row}>
 
@@ -466,6 +503,16 @@ export const TeacherControl = ({ route, navigation }) => {
                         ]}>
                         <Text style={[actionBar.text]}>{statusInfoAction[testStatus]}</Text>
                     </TouchableOpacity>
+                </View>
+                <View style={{ ...actionBar.row, alignItems: 'center', justifyContent: 'flex-end' }}>
+
+                    {/** Button cancel */}
+                    <Text style={{ fontSize: 12 }}>Cho phép vào sau 1/3 thời gian</Text>
+                    <Switch
+                        thumbColor={true ? "#f5dd4b" : "#f4f3f4"}
+                        value={isSwitchEnable}
+                        onValueChange={() => onSwitchChange()}
+                    />
                 </View>
             </View>
         );

@@ -3,10 +3,12 @@ import {
     View,
     Modal,
     Text,
-    FlatList
+    FlatList,
+    TouchableOpacity
 } from 'react-native';
 import { COLORS, SIZES } from "../../../../assets/constants";
 import { getJonedList } from '../../../../../server'
+import { Icon } from "native-base";
 
 export
     const StudentJonedListModal = ({ isVisible = false, closePopup, props }) => {
@@ -54,18 +56,27 @@ export
                 }}
             >
                 <View style={{
-                    height: SIZES.height,
-                    width: SIZES.width,
-                    backgroundColor: COLORS.backgroundFade,
+                    marginTop: SIZES.height * 0.206,
+                    height: SIZES.height - SIZES.height * 0.25,
+                    width: SIZES.width * 0.95,
+                    backgroundColor: '#f5d682',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    alignSelf: 'center'
+                    alignSelf: 'center',
+                    borderRadius: SIZES.radius
                 }}>
+                    <TouchableOpacity
+                        onPress={closePopup}
+                        style={{ padding: SIZES.base, alignItems: 'center' }}
+                    >
+                        <Icon type='FontAwesome' name='close' style={{ color: COLORS.colorMain, fontSize: 24 }} />
+                    </TouchableOpacity>
                     <FlatList
                         style={{
                             flex: 1,
                             alignSelf: 'center',
-                            marginTop: SIZES.height * .27,
+                            marginTop: SIZES.padding,
+                            marginBottom: SIZES.padding / 2,
                             width: SIZES.width * .9
                         }}
                         data={data}

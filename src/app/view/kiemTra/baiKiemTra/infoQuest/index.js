@@ -118,7 +118,7 @@ export const InfomationQuestion = () => {
         console.log(`status = `, status);
         item.TrangThai = status;
 
-        if (status == 1) setLableButton('Chi tiết');
+        if (status >= 1 && status < 4) setLableButton('Chi tiết');
         if (status == 0) setLableButton('Hoàn thành');
         if (status == 4) setLableButton('VanHau');
     };

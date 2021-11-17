@@ -26,15 +26,22 @@ export const MenuQuestionModal = ({ isVisible, onRequestClose, data, onPressItem
         unCheck = {
             // or incorrect
             label: 'Chưa làm',
-            color: COLORS.colorGreen,
+            color: COLORS.black,
         };
-    if (data[0]?.DapAn != undefined) {
+    if (!isTest) {
         // is test result
         isCheck.color = COLORS.colorGreen;
         isCheck.label = 'Đúng';
 
         unCheck.color = COLORS.colorRed;
         unCheck.label = 'Sai';
+    } else {
+        // is test result
+        isCheck.color = COLORS.green;
+        isCheck.label = 'Đã làm';
+
+        unCheck.color = COLORS.black;
+        unCheck.label = 'Chưa làm';
     }
 
     const [slDaLam, setSL] = React.useState(0);
@@ -154,7 +161,7 @@ export const MenuQuestionModal = ({ isVisible, onRequestClose, data, onPressItem
                     {isTest && <Text style={{ fontSize: 12 }}>( Đã làm {slDaLam}/{data?.length} )</Text>}
                     <FlatList
                         data={data}
-                        numColumns={Math.round(SIZES.width / (2 * SIZES.padding + SIZES.base))}
+                        numColumns={5} //Math.round(SIZES.width / (2 * SIZES.padding + SIZES.base))
                         horizontal={false}
                         showsVerticalScrollIndicator={false}
                         renderItem={({ item }) => (
