@@ -92,7 +92,6 @@ export const ThemCauHoi = () => {
   const postData = async MaCH => {
     try {
       const res = await createCTBKT(params.BaiKiemTra.MaBaiKT, MaCH);
-      console.log('POST DATA: ', res);
       navigation.goBack();
     } catch (error) {
       //
@@ -169,13 +168,8 @@ export const ThemCauHoi = () => {
     setSelectedFruits(x);
   };
 
-  console.log('params.questions: ', params.questions);
-
   const quickAdd = param => {
-    console.log('param: ', param);
-
     let flag = 0;
-
     if (questions.length > param) {
       for (let i = 0; i < questions.length; i++) {
         console.log('questions[i]: ', questions[i]);

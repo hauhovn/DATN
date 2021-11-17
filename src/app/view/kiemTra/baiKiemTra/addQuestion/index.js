@@ -92,7 +92,6 @@ export const ThemCauHoi = () => {
   const postData = async MaCH => {
     try {
       const res = await createCTBKT(params.BaiKiemTra.MaBaiKT, MaCH);
-      console.log('POST DATA: ', res);
       navigation.goBack();
     } catch (error) {
       //
