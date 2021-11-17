@@ -57,6 +57,7 @@ const TestScreen = ({ route, navigation }) => {
     const [isShowMenuQuestion, setShowMenuQuestion] = React.useState(false);
     const [isLoading, setLoading] = React.useState(false);
     const [isUpdate, setUpdate] = React.useState(false);
+    const [isTimeRunning, setTimeRunning] = React.useState(false);
 
     const [selectedOption, setSelectedOption] = React.useState(undefined);
     const [selectedQuestion, setSelectedQuestion] = React.useState(undefined);
@@ -68,12 +69,18 @@ const TestScreen = ({ route, navigation }) => {
     const [appStateVisible, setAppStateVisible] = useState(appState.current);
 
     const [timeTestCountdown, setTimeTest] = React.useState(60);
+    const [timeTestCountdown2, setTimeTest2] = React.useState(-1);
 
     const [isReviewMode, setReviewMode] = React.useState(true);
 
+    var chuaSetTime = true;
 
 
     React.useEffect(() => {
+
+
+
+        timeTestCountdown2 == -1 ? _addTestTime() : setTimeTest(timeTestCountdown2)
 
         /** Load option */
         LoadOption();
@@ -117,7 +124,10 @@ const TestScreen = ({ route, navigation }) => {
         /** Teacher start or pause test */
         serverStartTest((err, isStart) => {
             if (err) return;
-            if (isStart) setState(stateInfo.testing);
+            if (isStart) {
+                _addTestTime();
+                setState(stateInfo.testing);
+            }
             else setState(stateInfo.paused);
         });
 
@@ -137,18 +147,22 @@ const TestScreen = ({ route, navigation }) => {
 
         setLoading(true);
 
+        /** Get test status */
+        getTest_Status();
 
         /** Add test time to check */
-        await _addTestTime();
-
-        /** Get test status */
-        await getTest_Status();
+        _addTestTime();
 
         if (timeTestCountdown < 1) {
-            if (state == stateInfo.testing) {
-                console.log(`#149 out do het thoi gian`, timeTestCountdown);
-                _endTest();
-            }
+
+            if (timeTestCountdown2 == -1) return;
+            if (state == stateInfo.waiting) { }
+            else
+                if (state == stateInfo.testing) {
+                    await console.log(`#149 out do het thoi gian`, timeTestCountdown);
+                    if (timeTestCountdown == 0) return;
+                    await _endTest();
+                }
         }
 
         /** Get Quests List */
@@ -206,9 +220,9 @@ const TestScreen = ({ route, navigation }) => {
         let response = await getTestStatus(thisStudent.id, thisTest.id);
         console.log(`res: `, response);
         switch (response?.status) {
-            case '1': setState(stateInfo.waiting); setReviewMode(false); break;
-            case '2': setState(stateInfo.testing); setReviewMode(false); break;
-            case '3': setState(stateInfo.paused); setReviewMode(false); break;
+            case '1': setState(stateInfo.waiting); setReviewMode(false); setTimeRunning(false); break;
+            case '2': setState(stateInfo.testing); setReviewMode(false); setTimeRunning(true); break;
+            case '3': setState(stateInfo.paused); setReviewMode(false); setTimeRunning(false); break;
             case '4': setState(stateInfo.testing); setReviewMode(true); break;
             default: setState(stateInfo.waiting); break;
         }
@@ -220,7 +234,9 @@ const TestScreen = ({ route, navigation }) => {
         //: add test time:  {"code": 1, "data":
         // { "info": "Add new data with MaSV = 2 and MaBaiKT = 46 SUCCESFULLY", "status": "late", "time_lenght": "23:00:00", "time_sec": 82800, "time_start": "2021-11-11 14:03:47" },
         await console.log(`_211: add test time: `, rs);
-        await setTimeTest(rs.data.time_sec);
+        setTimeTest(rs.data.time_sec);
+        setTimeTest2(rs.data.time_sec);
+
     }
 
     /** Get test data */
@@ -337,16 +353,17 @@ const TestScreen = ({ route, navigation }) => {
                     state !== stateInfo.waiting
                     && (
                         !isReviewMode && <MyCountDown
-                            isRuning={state == stateInfo.testing ? true : false}
+                            isRuning={isTimeRunning}
                             time={timeTestCountdown}
-                            onFinish={() => { _endTest() }}
+                            onFinish={() => { state != undefined && _endTest() }}
                         />
                     )}
                 iconRightStyle={{ fontSize: state === stateInfo.testing ? 26 : 0 }}
                 iconLeftStyle={{ fontSize: 26 }}
-                rightIconType={'Ionicons'}
-                rightIconName={'ios-checkmark-done'}
-                rightHandle={() => updateQuestion(true, true)}
+                leftHandle={() => navigation.goBack()}
+                rightIconType={'Fontisto'}
+                rightIconName={'spinner-refresh'}
+                rightHandle={() => { updateQuestion(true, true); _addTestTime() }}
             />
         </View>)
     }
