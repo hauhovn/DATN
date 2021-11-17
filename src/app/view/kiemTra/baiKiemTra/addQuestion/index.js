@@ -92,7 +92,6 @@ export const ThemCauHoi = () => {
   const postData = async MaCH => {
     try {
       const res = await createCTBKT(params.BaiKiemTra.MaBaiKT, MaCH);
-      navigation.goBack();
     } catch (error) {
       //
     }
@@ -103,6 +102,7 @@ export const ThemCauHoi = () => {
     for (var i = 0; i < selectedFruits.length; i++) {
       postData(selectedFruits[i].value);
     }
+    navigation.goBack();
   };
 
   // getTen
@@ -193,11 +193,10 @@ export const ThemCauHoi = () => {
         }
       }
       Toast.show(`Đã thêm ${flag} câu hỏi`, Toast.SHORT);
+      navigation.goBack();
     } else {
       Toast.show('Số lượng câu hỏi không đủ', Toast.SHORT);
     }
-
-    console.log('flag: ', flag);
   };
 
   console.log('filter: ', filter);
